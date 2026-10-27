@@ -1,6 +1,8 @@
 # 迁移映射：原仓库 → 重构后
 
-原仓库单提交 `c030dfa`（分支 `main`）。重构在分支 `claude/refactor-opt-paper` 上分 11 步提交（见 `CHANGELOG.md`），
+原仓库 `https://github.com/Linshan-Ding/Yuhao_Zhu_code_FSHGRL_DFFSP-HFOI`，单提交 `c030dfa`（分支 `main`）。
+重构后的正式仓库是 `https://github.com/Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI`，其 `main` 以 `c030dfa` 为根，
+逐步提交（见 `CHANGELOG.md`；等价性测试从本仓库自身的历史检出 `c030dfa` 生成黄金基线），
 每步都通过 `python -m tests.equivalence`（对 `model_type` 为 `hgnn` 与 `mlp` 的 3 轮训练：`train_metrics.csv`
 的 57 个浮点列与全部检查点张量逐位相等）。
 

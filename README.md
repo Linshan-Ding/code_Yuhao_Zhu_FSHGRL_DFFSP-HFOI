@@ -1,5 +1,8 @@
 # FSHGRL for DFFSP-HFOI —— 论文代码仓库（重构版）
 
+正式代码仓库：`Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI`（本仓库）。原仓库 `Linshan-Ding/Yuhao_Zhu_code_FSHGRL_DFFSP-HFOI`
+保留重构前的代码，其 `main` 即本仓库历史中的初始提交 c030dfa；本仓库的 `main` 在该提交之上完成了全部重构（见 `CHANGELOG.md`）。
+
 论文：*Fluid-Guided Sparse Heterogeneous Graph Reinforcement Learning for the Dynamic Flexible Flow Shop
 Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库是论文实验的**复现手册与代码**：
 按 `opt-paper-codegen` 技能的五大模块骨架（configs / data / environment / agent / result）重排了原仓库，

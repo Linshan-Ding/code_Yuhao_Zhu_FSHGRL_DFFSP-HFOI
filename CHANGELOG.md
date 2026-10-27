@@ -17,3 +17,5 @@
 - C11 多进程轨迹采集（`environment/collector.py`、`rollout.collect_vectorized_rollouts_parallel`、`env.collector_workers`）：
   仿真器与观测构建分到 worker 进程，策略前向、采样与更新留在训练进程，同 `num_envs` 下采集数据逐位一致
   （`tests/test_collector.py`、`python -m tests.equivalence --collector-workers 3`）；`tools/profile_collector.py` 定档；默认关闭。
+- C12 仓库迁移：完整历史（含原仓库初始提交 `c030dfa`）推送为 `Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI` 的 `main`，
+  以后以该仓库为论文对应的代码仓库；原仓库只保留历史。
