@@ -1,12 +1,13 @@
-"""Train the learned baselines (A2C, DQN, DDQN; new implementations on the training simulator, see
-docs/migration-map.md) with the same num_envs / max_iterations budget as the proposed method, N =
-learned_baselines in configs/runs.yaml, under the configured paradigm (see run_03).
+"""Train the learned comparators (HSDDQN and HGNN-PPO adapted, A2C, DQN, DDQN; new implementations on the
+training simulator, see docs/baselines.md) with the same num_envs / max_iterations budget as the proposed
+method, fluid guidance off, N = learned_baselines in configs/runs.yaml, under the configured paradigm (see run_03).
 Products: result/<method>/run<k>/ (generalization) or result/<method>/<instance_id>/run<k>/ (per-instance)."""
 from _bootstrap import (instance_ids, method_jobs, n_runs, paradigm, require_train_confirmed, resolve_workers,
                         run_jobs, step)
 
 PARALLEL, RESOURCE, MAX_CONCURRENT, GPU_MEM_PER_JOB_GB = True, "cpu", 2, None
-BASELINES = {"a2c": ["configs/baselines/a2c.yaml"], "dqn": ["configs/baselines/dqn.yaml"],
+BASELINES = {"hsddqn": ["configs/baselines/hsddqn.yaml"], "hgnn_ppo": ["configs/baselines/hgnn_ppo.yaml"],
+             "a2c": ["configs/baselines/a2c.yaml"], "dqn": ["configs/baselines/dqn.yaml"],
              "ddqn": ["configs/baselines/ddqn.yaml"]}
 TIERS = ("benchmark",)
 N_RUNS = n_runs("learned_baselines", 1)

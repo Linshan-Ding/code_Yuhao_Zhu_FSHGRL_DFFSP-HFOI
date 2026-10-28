@@ -15,8 +15,9 @@ from _bootstrap import (CONFIGS, ROOT, Job, done, paradigm, pilot_cfg, pilot_ena
                         require_train_confirmed, resolve_workers, run_jobs, runs_cfg, step)
 
 PARALLEL, RESOURCE, MAX_CONCURRENT, GPU_MEM_PER_JOB_GB = True, "cpu", 2, None
-METHOD_CONFIGS = {"ours": [], "a2c": ["configs/baselines/a2c.yaml"], "dqn": ["configs/baselines/dqn.yaml"],
-                  "ddqn": ["configs/baselines/ddqn.yaml"]}
+METHOD_CONFIGS = {"ours": [], "hsddqn": ["configs/baselines/hsddqn.yaml"],
+                  "hgnn_ppo": ["configs/baselines/hgnn_ppo.yaml"], "a2c": ["configs/baselines/a2c.yaml"],
+                  "dqn": ["configs/baselines/dqn.yaml"], "ddqn": ["configs/baselines/ddqn.yaml"]}
 PILOT_DIR = ROOT / "result" / "pilot"
 VERDICT = PILOT_DIR / "verdict.txt"
 

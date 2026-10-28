@@ -55,3 +55,9 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   逐键标注对应论文表 6 的行），脚本默认加载（`_bootstrap.CONFIGS`）；`configs/pools/{arrival_train,case_train}.yaml`
   （`ours_arrival`、`ours_case`）；`configs/algo.yaml` `train_version: 2`、`viz: false`；`configs/pilot.yaml` 启用泛化型门控
   （ours × 1000 轮）；`run_07` 评测档位按各 run 的快照；冒烟脚本改为泛化型流程（42 s）。
+- V7 DRL 对比方法：`hsddqn`（`agent/baselines/hsddqn.py`，层级 Double DQN 的改编：第一层在合法 (机器, 工序类型) 对上取 Q，
+  第二层在该对的候选订单上取 Q，两层均为在线选择、目标评估的 Double-DQN 目标，复用 `offpolicy.py` 的回放循环与验证钩子；
+  `algo.algorithm: hsddqn`，`agent/factory.py` 建网与建 agent）、`hgnn_ppo`（`configs/baselines/hgnn_ppo.yaml`：同编码器与 PPO，
+  无流体引导、无候选自注意力、`order_top_k: 1` 即 (工序类型, 机器) 对动作）；全部对比方法的覆盖层关闭流体引导
+  （`fluid_features: off`、`fluid_mask: false`）；`run_05`、`run_02` 纳入两者；`docs/baselines.md` 记录改编范围；
+  `tests/test_learned_baselines.py` 新增动作可行性、双层 TD 更新、token 编解码、检查点往返与覆盖层测试。

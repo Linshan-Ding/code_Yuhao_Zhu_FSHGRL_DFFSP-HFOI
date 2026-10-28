@@ -1,4 +1,4 @@
-"""Replay-based training loop of the DQN / DDQN baselines (new code).
+"""Replay-based training loop of the DQN / DDQN / HSDDQN baselines (new code).
 
 It mirrors the bookkeeping of the PPO loop in ``train.py``: the same ``train_metrics.csv`` columns, the same
 checkpoint files (``best_checkpoint.pt`` by the mean fulfilment of the collected episodes,
@@ -26,10 +26,9 @@ import numpy as np
 import torch
 
 from agent.baselines.common import legacy_metrics_row, monte_carlo_returns, prepare_policy
-from agent.baselines.dqn import DQNAgent
 from agent.buffer import RolloutBuffer, _mark_last_transition_terminal
 from agent.checkpoint import load_checkpoint, save_checkpoint
-from agent.factory import algorithm_of
+from agent.factory import algorithm_of, build_agent
 from data.dataset import select_instance
 from data.instance_io import parse_instance_file
 from environment.simulator import TrainingSimulator
@@ -180,7 +179,7 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
 
     algorithm = algorithm_of(train_paras)
     model_paras = trainer.build_model_paras(config, update_device, train_paras)
-    agent = DQNAgent(model_paras, train_paras, double=(algorithm == "ddqn"))
+    agent = build_agent(model_paras, train_paras)          # DQNAgent (dqn / ddqn) or HSDDQNAgent (hsddqn)
     exp_name = args.experiment_name or train_paras.get("experiment_name", "default")
     result_dir = trainer.ROOT_DIR / "result" / exp_name
     result_dir.mkdir(parents=True, exist_ok=True)
