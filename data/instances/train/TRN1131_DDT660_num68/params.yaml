@@ -1,0 +1,39 @@
+instance_id: TRN1131_DDT660_num68
+tier: train
+source: generated
+file: TRN1131_DDT660_num68.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 68
+ddt: 660
+orders_per_product:
+- 9
+- 16
+- 17
+- 14
+- 12
+arrival_first: 1.0
+arrival_last: 1419.0
+inter_arrival_mean: 21.16417910447761
+due_slack_min: 408.0
+due_slack_mean: 745.9558823529412
+due_slack_max: 1015.0
+process_time_min: 25.0
+process_time_mean: 224.032
+process_time_max: 445.0
+seed: 1131
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,39 @@
+instance_id: VAL2010_DDT500_num100
+tier: val
+source: generated
+file: VAL2010_DDT500_num100.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 100
+ddt: 500
+orders_per_product:
+- 20
+- 20
+- 19
+- 18
+- 23
+arrival_first: 1.0
+arrival_last: 1987.0
+inter_arrival_mean: 20.060606060606062
+due_slack_min: 324.0
+due_slack_mean: 551.99
+due_slack_max: 768.0
+process_time_min: 28.0
+process_time_mean: 241.296
+process_time_max: 440.0
+seed: 2010
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

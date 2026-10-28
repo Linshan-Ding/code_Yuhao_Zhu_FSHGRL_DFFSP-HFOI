@@ -1,15 +1,37 @@
-# Instance set and generator settings.
+# Instance set, paradigm and generator settings.
 instance:
   problem: dffsp_hfoi                 # dynamic flexible flow shop, high-frequency order insertion
+  paradigm: per_instance              # per_instance (legacy: train = evaluation instance) | generalization
+                                      # (one policy trained on the generated pool, evaluated on unseen tiers;
+                                      # configs/paper.yaml switches to it)
   data_dir: data/instances/benchmark  # one folder per instance (<id>/<id>.txt + params.yaml), scanned recursively
   patterns: ["DDT*.txt", "num*.txt", "train_num*.txt"]   # glob patterns used when train_instances is empty
   train_instances: ["DDT500_num100.txt"]  # fixed instance file(s); `--instances` on the CLI has priority
   instance_selection: fixed           # fixed | round_robin | random (how the instance is picked per iteration)
-  generator:                          # paper Table 5 (data/generator.py); not used by the benchmark set
+  val_data_dir: data/instances/val    # validation tier (generalization: model selection, pilot gate)
+  val_instances: []                   # explicit validation files; empty = every instance of val_data_dir
+  eval_tiers: [benchmark]             # tiers evaluated by scripts/run_07 in the generalization paradigm
+  generator:                          # data/generator.py; v2 defaults matched to the benchmark statistics
     n_products: 5
     n_stages: 5
     machines_per_stage: 5
-    process_time_range: [25, 450]     # seconds, discrete uniform
-    inter_arrival_range: [1, 200]     # seconds, discrete uniform
-    ddt_range: [300, 2500]            # due-date tightness (mean of d_s - a_s)
-    n_orders_range: [20, 200]
+    process_time_range: [25, 450]     # seconds, discrete uniform per (product, machine)
+    inter_arrival_range: [1, 40]      # seconds, discrete uniform (mean 20.5 s; benchmark files 14.5-22 s)
+    ddt_range: [500, 1600]            # due-date tightness drawn per instance
+    slack_rule: ddt_uniform           # order slack uniform in slack_rel_range x DDT (per_order = legacy rule)
+    slack_rel_range: [0.6, 1.55]      # benchmark files: slack in about [0.6, 1.55] x DDT
+    n_orders_range: [50, 150]
+  pools:                              # generated tiers written by scripts/run_01_prepare_data.py
+    train:                            # training pool of the generalization paradigm
+      tier: train
+      prefix: TRN
+      seed: 1000                      # seeds 1000 .. 1199
+      n: 200
+    val:                              # validation set: S x DDT grid x 2 seeds = 30 instances
+      tier: val
+      prefix: VAL
+      seed: 2000
+      grid:
+        n_orders: [50, 100, 150]
+        ddt: [500, 600, 900, 1200, 1600]
+        seeds: 2

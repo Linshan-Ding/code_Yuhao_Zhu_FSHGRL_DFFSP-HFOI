@@ -1,0 +1,39 @@
+instance_id: TRN1005_DDT1222_num72
+tier: train
+source: generated
+file: TRN1005_DDT1222_num72.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 72
+ddt: 1222
+orders_per_product:
+- 7
+- 20
+- 14
+- 14
+- 17
+arrival_first: 1.0
+arrival_last: 1373.0
+inter_arrival_mean: 19.323943661971832
+due_slack_min: 738.0
+due_slack_mean: 1328.986111111111
+due_slack_max: 1888.0
+process_time_min: 29.0
+process_time_mean: 246.888
+process_time_max: 449.0
+seed: 1005
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

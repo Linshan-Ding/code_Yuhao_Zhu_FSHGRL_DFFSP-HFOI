@@ -1,0 +1,39 @@
+instance_id: TRN1057_DDT1063_num92
+tier: train
+source: generated
+file: TRN1057_DDT1063_num92.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 92
+ddt: 1063
+orders_per_product:
+- 20
+- 16
+- 21
+- 15
+- 20
+arrival_first: 1.0
+arrival_last: 1829.0
+inter_arrival_mean: 20.087912087912088
+due_slack_min: 640.0
+due_slack_mean: 1170.7826086956522
+due_slack_max: 1645.0
+process_time_min: 31.0
+process_time_mean: 228.712
+process_time_max: 450.0
+seed: 1057
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

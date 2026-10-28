@@ -1,0 +1,39 @@
+instance_id: TRN1148_DDT767_num150
+tier: train
+source: generated
+file: TRN1148_DDT767_num150.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 150
+ddt: 767
+orders_per_product:
+- 36
+- 36
+- 19
+- 33
+- 26
+arrival_first: 1.0
+arrival_last: 2761.0
+inter_arrival_mean: 18.523489932885905
+due_slack_min: 463.0
+due_slack_mean: 810.6133333333333
+due_slack_max: 1179.0
+process_time_min: 30.0
+process_time_mean: 240.728
+process_time_max: 448.0
+seed: 1148
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

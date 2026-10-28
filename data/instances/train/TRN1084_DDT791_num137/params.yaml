@@ -1,0 +1,39 @@
+instance_id: TRN1084_DDT791_num137
+tier: train
+source: generated
+file: TRN1084_DDT791_num137.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 137
+ddt: 791
+orders_per_product:
+- 28
+- 25
+- 20
+- 27
+- 37
+arrival_first: 1.0
+arrival_last: 2723.0
+inter_arrival_mean: 20.014705882352942
+due_slack_min: 485.0
+due_slack_mean: 914.985401459854
+due_slack_max: 1221.0
+process_time_min: 32.0
+process_time_mean: 234.488
+process_time_max: 438.0
+seed: 1084
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

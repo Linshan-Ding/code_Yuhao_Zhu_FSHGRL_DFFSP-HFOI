@@ -139,37 +139,79 @@ def write_params_yaml(folder: str | Path, params: dict) -> Path:
     return target
 
 
-def prepare_benchmark(benchmark_dir: str | Path = BENCHMARK_DIR, index_path: str | Path = INDEX_PATH,
-                      tier: str = "benchmark", source: str = "external") -> List[dict]:
-    """Write params.yaml into every instance folder and the tier index (data/instances/index.csv).
-
-    Idempotent: re-running rewrites identical files. ``scale`` is the number of orders (the paper's S) and
-    ``ddt`` the due-date tightness from the file name; ``path`` is relative to the repository root.
-    """
-    benchmark_dir = Path(benchmark_dir)
-    files = sorted(
-        path for path in benchmark_dir.glob("*/*.txt")
+def instance_files_in(folder: str | Path) -> List[Path]:
+    """``<folder>/<id>/<id>.txt`` files of one tier directory, sorted."""
+    folder = Path(folder)
+    return sorted(
+        path for path in folder.glob("*/*.txt")
         if path.is_file() and not path.name.startswith("._") and path.stem == path.parent.name
     )
+
+
+def _existing_params(path: Path) -> dict:
+    target = path.parent / "params.yaml"
+    if not target.exists():
+        return {}
+    try:
+        return yaml.safe_load(target.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
+def prepare_tier(tier_dir: str | Path, tier: str, source: str) -> List[dict]:
+    """params.yaml for every instance folder of one tier and its index rows (nothing is re-sampled).
+    Generator-written keys of an existing params.yaml (seed, ddt, slack_rule, ...) are preserved."""
+    tier_dir = Path(tier_dir)
+    files = instance_files_in(tier_dir)
     if not files:
-        raise FileNotFoundError(f"No instance folders found under '{benchmark_dir}'.")
+        raise FileNotFoundError(f"No instance folders found under '{tier_dir}'.")
     rows = []
     for path in files:
         params = describe_instance(path, tier=tier, source=source)
+        previous = _existing_params(path)
+        for key, value in previous.items():
+            if key not in params or (key == "ddt" and params.get("ddt") is None):
+                params[key] = value
         write_params_yaml(path.parent, params)
         rows.append({
             "instance_id": params["instance_id"],
             "tier": tier,
             "scale": params["n_orders"],
-            "ddt": params["ddt"] if params["ddt"] is not None else "",
+            "ddt": params["ddt"] if params.get("ddt") is not None else "",
             "n_orders": params["n_orders"],
             "n_products": params["n_products"],
             "n_stages": params["n_stages"],
             "n_machines": params["n_machines"],
             "source": source,
-            "path": path.relative_to(ROOT).as_posix(),
+            "path": path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix(),
         })
-    rows.sort(key=lambda row: (row["ddt"] if row["ddt"] != "" else -1, row["scale"], row["instance_id"]))
+    return rows
+
+
+def tier_directories(instances_dir: str | Path = INSTANCES_DIR) -> List[Path]:
+    """Tier directories under data/instances/ that hold instance folders (benchmark first, then alphabetical)."""
+    instances_dir = Path(instances_dir)
+    if not instances_dir.exists():
+        return []
+    tiers = [p for p in sorted(instances_dir.iterdir()) if p.is_dir() and instance_files_in(p)]
+    return sorted(tiers, key=lambda p: (0 if p.name == "benchmark" else 1, p.name))
+
+
+def prepare_all(instances_dir: str | Path = INSTANCES_DIR, index_path: str | Path = INDEX_PATH) -> List[dict]:
+    """Write params.yaml for every tier under ``instances_dir`` and one index (data/instances/index.csv).
+
+    Idempotent: re-running rewrites identical files. ``scale`` is the number of orders (the paper's S) and
+    ``ddt`` the due-date tightness (file name or generator record); ``path`` is relative to the repository
+    root. Tier order: benchmark, then the generated tiers alphabetically; within a tier by (ddt, scale, id).
+    """
+    rows = []
+    for tier_dir in tier_directories(instances_dir):
+        tier = tier_dir.name
+        tier_rows = prepare_tier(tier_dir, tier, "external" if tier == "benchmark" else "generated")
+        tier_rows.sort(key=lambda row: (row["ddt"] if row["ddt"] != "" else -1, row["scale"], row["instance_id"]))
+        rows.extend(tier_rows)
+    if not rows:
+        raise FileNotFoundError(f"No instance folders found under '{instances_dir}'.")
     index_path = Path(index_path)
     index_path.parent.mkdir(parents=True, exist_ok=True)
     with index_path.open("w", newline="", encoding="utf-8") as file:
@@ -177,6 +219,13 @@ def prepare_benchmark(benchmark_dir: str | Path = BENCHMARK_DIR, index_path: str
         writer.writeheader()
         writer.writerows(rows)
     return rows
+
+
+def prepare_benchmark(benchmark_dir: str | Path = BENCHMARK_DIR, index_path: str | Path = INDEX_PATH,
+                      tier: str = "benchmark", source: str = "external") -> List[dict]:
+    """Index every tier (see ``prepare_all``) and return the rows of the benchmark tier."""
+    rows = prepare_all(Path(benchmark_dir).parent, index_path)
+    return [row for row in rows if row["tier"] == tier]
 
 
 def load_index(index_path: str | Path = INDEX_PATH) -> dict:
@@ -196,24 +245,42 @@ def load_index(index_path: str | Path = INDEX_PATH) -> dict:
     return index
 
 
-def benchmark_instance_files(instance_ids: Sequence[str] | None = None,
-                             benchmark_dir: str | Path = BENCHMARK_DIR) -> List[Path]:
-    """Instance files of the benchmark tier (all, or the given ids / file names), in index order."""
-    benchmark_dir = Path(benchmark_dir)
-    by_id = {path.stem: path for path in benchmark_dir.glob("*/*.txt")
-             if path.is_file() and not path.name.startswith("._") and path.stem == path.parent.name}
+def tier_instance_files(tier: str, instances_dir: str | Path = INSTANCES_DIR) -> List[Path]:
+    """Instance files of one tier directory, in index order (then sorted for unindexed files)."""
+    tier_dir = Path(instances_dir) / tier
+    by_id = {path.stem: path for path in instance_files_in(tier_dir)}
     if not by_id:
-        raise FileNotFoundError(f"No instance folders found under '{benchmark_dir}'.")
-    if instance_ids:
-        missing = [name for name in instance_ids if Path(name).stem not in by_id]
-        if missing:
-            raise FileNotFoundError(f"Unknown benchmark instances {missing}; available: {sorted(by_id)}")
-        return [by_id[Path(name).stem] for name in instance_ids]
+        raise FileNotFoundError(f"No instance folders found under '{tier_dir}' (tier '{tier}').")
     index = load_index()
-    ordered = [iid for iid in index if iid in by_id] + sorted(iid for iid in by_id if iid not in index)
+    ordered = [iid for iid, row in index.items() if row.get("tier") == tier and iid in by_id]
+    ordered += sorted(iid for iid in by_id if iid not in index)
     return [by_id[iid] for iid in ordered]
 
 
+def instance_files_by_ids(instance_ids: Sequence[str], instances_dir: str | Path = INSTANCES_DIR) -> List[Path]:
+    """Instance files by id or file name, searched across every tier directory."""
+    by_id: dict = {}
+    for tier_dir in tier_directories(instances_dir):
+        for path in instance_files_in(tier_dir):
+            by_id.setdefault(path.stem, path)
+    missing = [name for name in instance_ids if Path(name).stem not in by_id]
+    if missing:
+        raise FileNotFoundError(f"Unknown instances {missing}; available tiers: "
+                                f"{[p.name for p in tier_directories(instances_dir)]}")
+    return [by_id[Path(name).stem] for name in instance_ids]
+
+
+def benchmark_instance_files(instance_ids: Sequence[str] | None = None,
+                             benchmark_dir: str | Path = BENCHMARK_DIR) -> List[Path]:
+    """Instance files of the benchmark tier (all, in index order), or the given ids / file names of any tier."""
+    if instance_ids:
+        return instance_files_by_ids(instance_ids, Path(benchmark_dir).parent)
+    return tier_instance_files(Path(benchmark_dir).name, Path(benchmark_dir).parent)
+
+
 if __name__ == "__main__":   # python -m data.dataset  (scripts/run_01_prepare_data.py)
-    _rows = prepare_benchmark()
-    print(f"[DATA] {len(_rows)} benchmark instances indexed -> {INDEX_PATH}")
+    _rows = prepare_all()
+    _tiers = {}
+    for _row in _rows:
+        _tiers[_row["tier"]] = _tiers.get(_row["tier"], 0) + 1
+    print(f"[DATA] {len(_rows)} instances indexed -> {INDEX_PATH} ({', '.join(f'{k}: {v}' for k, v in _tiers.items())})")

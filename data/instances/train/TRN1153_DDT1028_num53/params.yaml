@@ -1,0 +1,39 @@
+instance_id: TRN1153_DDT1028_num53
+tier: train
+source: generated
+file: TRN1153_DDT1028_num53.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 53
+ddt: 1028
+orders_per_product:
+- 16
+- 15
+- 8
+- 8
+- 6
+arrival_first: 1.0
+arrival_last: 1171.0
+inter_arrival_mean: 22.5
+due_slack_min: 634.0
+due_slack_mean: 1134.5094339622642
+due_slack_max: 1593.0
+process_time_min: 29.0
+process_time_mean: 240.904
+process_time_max: 449.0
+seed: 1153
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

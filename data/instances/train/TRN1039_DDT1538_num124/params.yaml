@@ -1,0 +1,39 @@
+instance_id: TRN1039_DDT1538_num124
+tier: train
+source: generated
+file: TRN1039_DDT1538_num124.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 124
+ddt: 1538
+orders_per_product:
+- 21
+- 33
+- 27
+- 24
+- 19
+arrival_first: 1.0
+arrival_last: 2746.0
+inter_arrival_mean: 22.317073170731707
+due_slack_min: 950.0
+due_slack_mean: 1699.8387096774193
+due_slack_max: 2384.0
+process_time_min: 34.0
+process_time_mean: 238.712
+process_time_max: 438.0
+seed: 1039
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

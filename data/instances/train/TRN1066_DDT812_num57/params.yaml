@@ -1,0 +1,39 @@
+instance_id: TRN1066_DDT812_num57
+tier: train
+source: generated
+file: TRN1066_DDT812_num57.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 57
+ddt: 812
+orders_per_product:
+- 9
+- 8
+- 11
+- 14
+- 15
+arrival_first: 1.0
+arrival_last: 1052.0
+inter_arrival_mean: 18.767857142857142
+due_slack_min: 501.0
+due_slack_mean: 884.7719298245614
+due_slack_max: 1253.0
+process_time_min: 25.0
+process_time_mean: 254.624
+process_time_max: 450.0
+seed: 1066
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

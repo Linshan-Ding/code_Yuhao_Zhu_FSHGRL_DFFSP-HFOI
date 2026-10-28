@@ -1,0 +1,39 @@
+instance_id: VAL2012_DDT600_num100
+tier: val
+source: generated
+file: VAL2012_DDT600_num100.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 100
+ddt: 600
+orders_per_product:
+- 23
+- 18
+- 11
+- 25
+- 23
+arrival_first: 1.0
+arrival_last: 2175.0
+inter_arrival_mean: 21.95959595959596
+due_slack_min: 365.0
+due_slack_mean: 670.26
+due_slack_max: 929.0
+process_time_min: 29.0
+process_time_mean: 220.688
+process_time_max: 446.0
+seed: 2012
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

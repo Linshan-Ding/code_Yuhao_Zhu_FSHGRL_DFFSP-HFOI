@@ -1,0 +1,39 @@
+instance_id: TRN1168_DDT689_num69
+tier: train
+source: generated
+file: TRN1168_DDT689_num69.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 69
+ddt: 689
+orders_per_product:
+- 17
+- 15
+- 14
+- 13
+- 10
+arrival_first: 1.0
+arrival_last: 1538.0
+inter_arrival_mean: 22.602941176470587
+due_slack_min: 414.0
+due_slack_mean: 743.7536231884058
+due_slack_max: 1058.0
+process_time_min: 26.0
+process_time_mean: 241.44
+process_time_max: 448.0
+seed: 1168
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

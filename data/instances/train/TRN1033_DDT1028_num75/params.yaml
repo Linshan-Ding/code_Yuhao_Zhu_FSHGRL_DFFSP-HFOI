@@ -1,0 +1,39 @@
+instance_id: TRN1033_DDT1028_num75
+tier: train
+source: generated
+file: TRN1033_DDT1028_num75.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 75
+ddt: 1028
+orders_per_product:
+- 18
+- 9
+- 18
+- 15
+- 15
+arrival_first: 1.0
+arrival_last: 1296.0
+inter_arrival_mean: 17.5
+due_slack_min: 640.0
+due_slack_mean: 1128.5733333333333
+due_slack_max: 1571.0
+process_time_min: 34.0
+process_time_mean: 243.872
+process_time_max: 450.0
+seed: 1033
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

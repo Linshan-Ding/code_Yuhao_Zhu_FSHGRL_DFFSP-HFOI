@@ -1,0 +1,39 @@
+instance_id: TRN1196_DDT1282_num58
+tier: train
+source: generated
+file: TRN1196_DDT1282_num58.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 58
+ddt: 1282
+orders_per_product:
+- 13
+- 14
+- 8
+- 14
+- 9
+arrival_first: 1.0
+arrival_last: 1045.0
+inter_arrival_mean: 18.31578947368421
+due_slack_min: 773.0
+due_slack_mean: 1338.3103448275863
+due_slack_max: 1971.0
+process_time_min: 28.0
+process_time_mean: 227.704
+process_time_max: 450.0
+seed: 1196
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

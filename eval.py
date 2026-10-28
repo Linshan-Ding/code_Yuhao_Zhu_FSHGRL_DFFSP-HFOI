@@ -47,7 +47,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from agent.checkpoint import load_policy  # noqa: E402
-from data.dataset import benchmark_instance_files, load_index, parse_ddt  # noqa: E402
+from data.dataset import benchmark_instance_files, instance_files_by_ids, load_index, parse_ddt, tier_instance_files  # noqa: E402
 from data.instance_io import parse_instance_file  # noqa: E402
 from environment.profiled import ProfiledSimulator  # noqa: E402
 from result.metrics import gap_pct, load_reference, objective_from_fulfillment  # noqa: E402
@@ -70,33 +70,53 @@ def parse_instance_names(values) -> list:
     return names
 
 
+def read_snapshot(checkpoint_path: Path) -> dict:
+    """config_snapshot.yaml next to a checkpoint (empty when absent or unreadable)."""
+    snapshot_path = Path(checkpoint_path).resolve().parent / "config_snapshot.yaml"
+    if not snapshot_path.exists():
+        return {}
+    try:
+        return yaml.safe_load(snapshot_path.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
 def trained_instances(checkpoint_path: Path) -> list:
     """Instances a run trained on, from the config_snapshot.yaml next to the checkpoint (the checkpoint's own
     train_paras keep the YAML value even when --instances overrode it on the command line)."""
-    snapshot_path = Path(checkpoint_path).resolve().parent / "config_snapshot.yaml"
-    if not snapshot_path.exists():
-        return []
-    try:
-        snapshot = yaml.safe_load(snapshot_path.read_text(encoding="utf-8")) or {}
-    except Exception:
-        return []
-    return [str(name) for name in (snapshot.get("instances") or [])]
+    return [str(name) for name in (read_snapshot(checkpoint_path).get("instances") or [])]
 
 
-def resolve_eval_instances(requested, train_paras: dict, checkpoint_path: Path | None = None) -> list:
-    """``--instances``: ids or file names, or ``all``; default: the instances the checkpoint was trained on."""
+def tier_files(tiers) -> list:
+    files = []
+    for tier in tiers:
+        files.extend(tier_instance_files(str(tier)))
+    return files
+
+
+def resolve_eval_instances(requested, train_paras: dict, checkpoint_path: Path | None = None, tiers=None) -> list:
+    """Evaluation instances: ``--tiers`` (whole tiers), ``--instances`` (ids of any tier, or ``all`` = the
+    benchmark tier); default: the evaluation tiers of a generalisation checkpoint (its snapshot's
+    ``eval_tiers``), else the instances the checkpoint was trained on (per-instance paradigm)."""
+    if tiers:
+        return tier_files(tiers)
     names = parse_instance_names(requested)
     if names == ["all"]:
         return benchmark_instance_files(None)
     if names:
-        return benchmark_instance_files(names)
-    configured = trained_instances(checkpoint_path) if checkpoint_path is not None else []
+        return instance_files_by_ids(names)
+    snapshot = read_snapshot(checkpoint_path) if checkpoint_path is not None else {}
+    paradigm = str(snapshot.get("paradigm") or train_paras.get("paradigm") or "").lower()
+    if paradigm == "generalization":
+        eval_tiers = snapshot.get("eval_tiers") or train_paras.get("eval_tiers") or ["benchmark"]
+        return tier_files(eval_tiers)
+    configured = [str(name) for name in (snapshot.get("instances") or [])]
     if not configured:
         configured = train_paras.get("train_instances") or []
     if isinstance(configured, str):
         configured = [configured]
     if configured:
-        return benchmark_instance_files([Path(name).stem for name in configured])
+        return instance_files_by_ids([Path(name).stem for name in configured])
     return benchmark_instance_files(None)
 
 
@@ -167,7 +187,7 @@ def evaluate_checkpoint(args) -> list:
     if args.threads:
         torch.set_num_threads(int(args.threads))
     seed_everything(args.seed)
-    instance_files = resolve_eval_instances(args.instances, train_paras, Path(args.ckpt))
+    instance_files = resolve_eval_instances(args.instances, train_paras, Path(args.ckpt), args.tiers)
     index = load_index()
     reference = load_reference()
     checkpoint = relative_to_root(Path(args.ckpt))
@@ -289,7 +309,9 @@ def main() -> None:
                         help="YAML overlays or legacy JSON; overrides the configuration stored in the checkpoint")
     parser.add_argument("--collect", default=None, help="glob of fixed_set_final.csv files of per-instance runs")
     parser.add_argument("--instances", nargs="*", default=None,
-                        help="instance ids / file names, or 'all'; default: the checkpoint's training instances")
+                        help="instance ids / file names (any tier), or 'all' (benchmark tier); default: the "
+                             "evaluation tiers of a generalisation checkpoint, else its training instances")
+    parser.add_argument("--tiers", nargs="*", default=None, help="evaluate every instance of these tiers")
     parser.add_argument("--decode", choices=["greedy", "sample", "both"], default="greedy")
     parser.add_argument("--episodes", type=int, default=10, help="sampled episodes per instance")
     parser.add_argument("--batch-episodes", type=int, default=1, help="sampled episodes per lockstep batch")

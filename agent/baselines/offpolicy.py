@@ -203,7 +203,9 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
     logger.write_snapshot(trainer.build_snapshot(args, train_paras, model_paras, instance_files, rollout_device,
                                                  update_device, start_iteration, max_iterations))
     eval_every = int(train_paras.get("eval_every", 1))
+    eval_scope = str(train_paras.get("eval_scope", "all") or "all").lower()
     checkpoint_every = int(train_paras.get("checkpoint_every", 0))
+    validation = trainer.make_validation_tracker(result_dir, train_paras, max_iterations, resume=start_iteration > 0)
     num_envs = int(train_paras.get("num_envs", train_paras.get("num_workers", 4)))
     batch_size = int(train_paras.get("replay_batch_size", 128))
     updates_per_iteration = int(train_paras.get("updates_per_iteration", 50))
@@ -268,7 +270,8 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
             if eval_every > 0 and iteration % eval_every == 0:
                 eval_start_time = time.time()
                 eval_policy = prepare_policy(agent.policy, rollout_device, update_device)
-                greedy_rows = trainer.evaluate_fixed_set(eval_policy, instance_files, train_paras, reference)
+                eval_files = instance_files if eval_scope == "all" else [selected_instance]
+                greedy_rows = trainer.evaluate_fixed_set(eval_policy, eval_files, train_paras, reference)
                 sampled_best_obj = objective_from_fulfillment(fulfillment_metrics["fulfillment_rate_max"])
                 wall_time_s = round(logger.wall_time(), 3)
                 for greedy_row in greedy_rows:
@@ -286,6 +289,13 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
                     best_greedy_iteration = iteration
                     save_checkpoint(best_greedy_checkpoint_path, agent, iteration, best_fulfillment_rate,
                                     train_paras, config)
+            val_metrics = {}
+            if validation.due(iteration):
+                val_policy = prepare_policy(agent.policy, rollout_device, update_device)
+                val_metrics = validation.evaluate(
+                    iteration, lambda files: trainer.evaluate_fixed_set(val_policy, files, train_paras, reference),
+                    round(logger.wall_time(), 3),
+                    lambda path: save_checkpoint(path, agent, iteration, best_fulfillment_rate, train_paras, config))
             logger.log(iteration, {
                 "env_steps": logger.env_steps,
                 "wall_time_s": round(logger.wall_time(), 3),
@@ -305,12 +315,20 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
                 "fixed_fulfillment_mean": fixed_fulfillment_mean,
                 "eval_seconds": eval_seconds,
                 **buffer.mask_summary(),
+                "val_obj_mean": val_metrics.get("val_obj_mean", ""),
+                "val_fulfillment_mean": val_metrics.get("val_fulfillment_mean", ""),
+                "val_seconds": val_metrics.get("val_seconds", ""),
             })
             if checkpoint_every > 0 and iteration % checkpoint_every == 0:
                 save_checkpoint(result_dir / f"checkpoint_epoch{iteration:04d}.pt", agent, iteration,
                                 best_fulfillment_rate, train_paras, config)
             last_iteration = iteration
-        stop_reason = "max_iterations"
+            if validation.should_stop(iteration):
+                stop_reason = "early_stop"
+                print(f"[Validation] early stop at iteration {iteration}")
+                break
+        else:
+            stop_reason = "max_iterations"
     except KeyboardInterrupt:
         stop_reason = "interrupted"
         raise
@@ -320,7 +338,8 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
     finally:
         try:
             trainer.finalize_run(logger, stop_reason, start_iteration, last_iteration, best_fulfillment_rate,
-                                 best_greedy_obj, best_greedy_iteration, train_paras, instance_files)
+                                 best_greedy_obj, best_greedy_iteration, train_paras, instance_files,
+                                 validation.summary() if "validation" in locals() else None)
         except Exception as exc:
             print(f"[RunLogger] could not write the run summary: {exc}")
         logger.close()

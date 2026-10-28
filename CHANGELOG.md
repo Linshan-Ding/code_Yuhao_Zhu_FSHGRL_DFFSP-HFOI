@@ -31,3 +31,11 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   `env.fluid_recompute decision|event`（每个新状态重解 LP，按状态签名缓存；`event` 为旧行为）；`log.csv` 与 `eval_results.csv` 新增
   `candidate_pairs_mean / masked_pairs_mean / mask_fallback_rate`，`config_snapshot.yaml` 记录实际求解后端；
   消融配置 `configs/ablation/{nf,nf_feature,nf_mask}.yaml`；`tests/test_fluid_mask.py`。
+- V2 泛化型范式支撑：`data/generator.py` 按基准统计生成训练池与验证集（`instance.pools`：train 200 个、val 30 个，
+  到达间隔 rand[1,40] s、每算例一个 DDT、松弛 [0.6, 1.55]×DDT，种子入库），`data/dataset.py` 对全部档位建索引
+  （`prepare_all`、`tier_instance_files`、`instance_files_by_ids`）；`instance.paradigm per_instance|generalization`、
+  `val_data_dir/val_instances/eval_tiers`；训练器验证钩子 `result/validation.py`（`algo.train.val_every`、`early_stop_patience`、
+  `val_curve.csv`、`best_val_checkpoint.pt`，PPO 与 DQN/DDQN 循环共用）、`eval_scope all|selected`；`eval.py --tiers`
+  与泛化检查点默认按快照的 `eval_tiers` 评测；`baselines/run_rules.py --tiers`（默认除 train 外全部档位）；脚本按范式分派
+  （`_bootstrap.pool_jobs/method_jobs/paradigm`），`run_02` 泛化型门控（`result/pilot.py`，最佳验证轮对规则参考值）；
+  `configs/runs.yaml` 的 `eval.checkpoint/tiers: auto`；`tests/test_generalization.py`。

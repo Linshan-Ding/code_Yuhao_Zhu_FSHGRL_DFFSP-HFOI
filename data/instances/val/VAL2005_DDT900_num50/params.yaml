@@ -1,0 +1,39 @@
+instance_id: VAL2005_DDT900_num50
+tier: val
+source: generated
+file: VAL2005_DDT900_num50.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 50
+ddt: 900
+orders_per_product:
+- 11
+- 10
+- 9
+- 9
+- 11
+arrival_first: 1.0
+arrival_last: 993.0
+inter_arrival_mean: 20.244897959183675
+due_slack_min: 543.0
+due_slack_mean: 958.06
+due_slack_max: 1382.0
+process_time_min: 26.0
+process_time_mean: 243.856
+process_time_max: 448.0
+seed: 2005
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

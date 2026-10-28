@@ -1,0 +1,39 @@
+instance_id: TRN1099_DDT984_num98
+tier: train
+source: generated
+file: TRN1099_DDT984_num98.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 98
+ddt: 984
+orders_per_product:
+- 14
+- 23
+- 20
+- 21
+- 20
+arrival_first: 1.0
+arrival_last: 2117.0
+inter_arrival_mean: 21.814432989690722
+due_slack_min: 603.0
+due_slack_mean: 1094.8673469387754
+due_slack_max: 1523.0
+process_time_min: 27.0
+process_time_mean: 226.192
+process_time_max: 437.0
+seed: 1099
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

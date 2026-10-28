@@ -1,0 +1,39 @@
+instance_id: TRN1106_DDT1090_num96
+tier: train
+source: generated
+file: TRN1106_DDT1090_num96.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 96
+ddt: 1090
+orders_per_product:
+- 12
+- 19
+- 22
+- 24
+- 19
+arrival_first: 1.0
+arrival_last: 2144.0
+inter_arrival_mean: 22.557894736842105
+due_slack_min: 670.0
+due_slack_mean: 1169.1979166666667
+due_slack_max: 1677.0
+process_time_min: 29.0
+process_time_mean: 255.728
+process_time_max: 450.0
+seed: 1106
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

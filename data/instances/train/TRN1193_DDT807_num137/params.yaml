@@ -1,0 +1,39 @@
+instance_id: TRN1193_DDT807_num137
+tier: train
+source: generated
+file: TRN1193_DDT807_num137.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 137
+ddt: 807
+orders_per_product:
+- 20
+- 40
+- 26
+- 27
+- 24
+arrival_first: 1.0
+arrival_last: 2749.0
+inter_arrival_mean: 20.205882352941178
+due_slack_min: 488.0
+due_slack_mean: 875.1386861313869
+due_slack_max: 1250.0
+process_time_min: 35.0
+process_time_mean: 235.072
+process_time_max: 445.0
+seed: 1193
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

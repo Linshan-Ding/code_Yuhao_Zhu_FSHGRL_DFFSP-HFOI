@@ -1,0 +1,39 @@
+instance_id: TRN1014_DDT1526_num71
+tier: train
+source: generated
+file: TRN1014_DDT1526_num71.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 71
+ddt: 1526
+orders_per_product:
+- 16
+- 17
+- 10
+- 11
+- 17
+arrival_first: 1.0
+arrival_last: 1355.0
+inter_arrival_mean: 19.34285714285714
+due_slack_min: 923.0
+due_slack_mean: 1567.112676056338
+due_slack_max: 2309.0
+process_time_min: 27.0
+process_time_mean: 250.4
+process_time_max: 449.0
+seed: 1014
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+arrival_model: uniform
+inter_arrival_range:
+- 1
+- 40

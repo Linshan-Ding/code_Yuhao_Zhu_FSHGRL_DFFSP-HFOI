@@ -1,9 +1,12 @@
 # Independent runs per method class (scripts read these; a class with 1 run gets a fixed, recorded seed).
-ours: 3                   # FSHGRL, per instance
-ablations: 3              # FSHGRL-NF, FSHGRL-NG, per instance
-learned_baselines: 1      # A2C, DQN, DDQN, per instance (same num_envs / max_iterations budget as ours)
+ours: 3                   # FSHGRL
+ablations: 3              # ablation variants (scripts/run_04 VARIANTS)
+learned_baselines: 1      # learned baselines (scripts/run_05 BASELINES); same num_envs / max_iterations budget as ours
 rules_random: 10          # Random and RRC episodes per instance (deterministic rules run once)
 eval:
-  checkpoint: best_greedy_checkpoint.pt   # model selection by the greedy objective on the training instance
-  sampled_episodes: 10                    # sampled episodes per instance in addition to the greedy one
-  batch_episodes: 1                       # sampled episodes per lockstep batch (1 = independent episodes)
+  checkpoint: auto        # auto = best_val_checkpoint.pt (generalization) / best_greedy_checkpoint.pt (per-instance)
+  tiers: auto             # auto = instance.eval_tiers of the configuration (generalization paradigm only)
+  sampled_episodes: 10    # sampled episodes per instance in addition to the greedy one
+  batch_episodes: 1       # sampled episodes per lockstep batch (1 = independent episodes)
+pilot:
+  min_win_share: 0.6667   # generalization gate: FSHGRL must reach the best rule on this share of the val instances
