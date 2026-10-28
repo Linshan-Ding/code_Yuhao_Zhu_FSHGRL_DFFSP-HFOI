@@ -1,0 +1,8 @@
+{
+  "golden_commit": "ff8b5fb95ab09499c74ce61b8d8825ada23c0faf",
+  "python": "3.13.16",
+  "torch": "2.14.1+cu130",
+  "numpy": "2.5.3",
+  "instance": "DDT500_num50.txt",
+  "note": "v2 reference: fluid mask through the HiGHS backend, validation on the first two val instances, CPU with OMP/MKL threads pinned to 1"
+}
