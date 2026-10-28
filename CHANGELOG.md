@@ -76,5 +76,6 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
 - V10 文档与定稿：`docs/reproduce.md`（修订版复现手册：档位、门控、训练、规则与精确求解、评测、出表、三台 RTX 5060 的预算分配、
   检查清单）、`docs/experiment-spec.md`（v2 规格）、`docs/run-matrix.md`、`docs/pilot-log.md`（门控轮次表）、`docs/claim-verdicts.md`、
   README 十节改写为泛化型流程；`configs/runs.yaml` 对比方法 3 run（`learned_baselines`）、附加基线 1 run（`learned_baselines_extra`）；
-  本机验证：`python -m pytest tests`、`python -m tests.equivalence --golden v2`、冒烟；`run_08` 实跑 80 个小算例 × MILP-A/B
+  `pytest.ini` 把等价性回归的工作树（`tests/golden*/_work`）排除在测试收集之外；本机验证：`python -m pytest tests`（73 个）、
+  `python -m tests.equivalence --golden v2`、冒烟（57 s，HiGHS 掩码）；`run_08` 实跑 80 个小算例 × MILP-A/B
   全部最优、回放一致 160/160、穷举一致 40/40（其余因结构规模跳过）、MILP-A 与 MILP-B 最优值相等；标签 `v2.0-revision`。
