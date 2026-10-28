@@ -33,10 +33,6 @@ class ProfiledSimulator(TrainingSimulator):
 
     @property
     def fluid_backend(self) -> str:
-        """``gurobi`` (LP solved by Gurobi), ``heuristic_fallback`` (cached_lp requested but gurobipy missing),
-        ``heuristic`` or ``off``."""
-        if self.fluid_mode == "off":
-            return "off"
-        if self.fluid_mode != "cached_lp":
-            return "heuristic"
-        return "gurobi" if self._load_gurobi() is not None else "heuristic_fallback"
+        """``gurobi`` / ``scipy`` (LP solved), ``heuristic_fallback`` (cached_lp requested but no solver),
+        ``heuristic`` or ``off`` (see ``TrainingSimulator.fluid_backend_used``)."""
+        return self.fluid_backend_used

@@ -179,6 +179,16 @@ def evaluate_fixed_set(policy, instance_files, train_paras: dict, reference: dic
     return rows
 
 
+def fluid_backend_of(train_paras: dict, instance_files) -> str:
+    """Name of the fluid backend a simulator of this configuration uses (for the snapshot)."""
+    try:
+        from environment.simulator import TrainingSimulator
+
+        return TrainingSimulator(parse_instance_file(instance_files[0]), train_paras).fluid_backend_used
+    except Exception:
+        return "unknown"
+
+
 def paradigm_name(instance_files) -> str:
     return "per_instance" if len(instance_files) == 1 else "fixed_set"
 
@@ -210,6 +220,7 @@ def build_snapshot(args, train_paras: dict, model_paras: dict, instance_files, r
         "python": platform.python_version(),
         "torch": torch.__version__,
         "gurobipy_available": gurobi_available,
+        "fluid_backend": fluid_backend_of(train_paras, instance_files),
         "model_paras": model_paras,
         "train_paras": train_paras,
     }
@@ -482,6 +493,7 @@ def main():
                 "train_fulfillment_mean": fulfillment_metrics["fulfillment_rate_mean"],
                 "fixed_fulfillment_mean": fixed_fulfillment_mean,
                 "eval_seconds": eval_seconds,
+                **rollout.mask_summary(),
             })
             if checkpoint_every > 0 and iteration % checkpoint_every == 0:
                 save_checkpoint(result_dir / f"checkpoint_epoch{iteration:04d}.pt", model, iteration,

@@ -43,7 +43,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 STATS_KEYS = ("fulfillment_rate", "discarded_count", "completed_count", "fluid_solve_count", "fluid_solve_seconds",
-              "fluid_cache_hit_count", "fluid_fallback_count", "transition_count", "obs_build_seconds", "step_seconds")
+              "fluid_cache_hit_count", "fluid_fallback_count", "transition_count", "obs_build_seconds", "step_seconds",
+              "fluid_mask_fallback_count", "fluid_mask_unavailable_count", "candidate_pairs_before",
+              "candidate_pairs_after", "mask_decision_count")
 START_METHODS = ("spawn", "fork", "forkserver")
 THREAD_ENV = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS")
 _PROTOCOL = pickle.HIGHEST_PROTOCOL

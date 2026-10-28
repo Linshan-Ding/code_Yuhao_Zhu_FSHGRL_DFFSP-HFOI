@@ -45,6 +45,7 @@ def collect_vectorized_rollouts(policy, instance_path: Path, train_paras: dict,
                     buffer.fluid_solve_seconds += simulator.fluid_solve_seconds
                     buffer.fluid_cache_hit_count += simulator.fluid_cache_hit_count
                     buffer.fluid_fallback_count += simulator.fluid_fallback_count
+                    buffer.add_mask_stats(simulator)
                     buffer.episode_transition_counts.append(simulator.transition_count)
                     buffer.episode_seconds.append(time.perf_counter() - episode_start_times[index])
                     buffer.obs_build_seconds += simulator.obs_build_seconds
@@ -106,9 +107,13 @@ def _episode_record(simulator: TrainingSimulator, total_reward: float, wall_seco
         "fluid_solve_seconds": float(simulator.fluid_solve_seconds),
         "fluid_cache_hit_count": int(simulator.fluid_cache_hit_count),
         "fluid_fallback_count": int(simulator.fluid_fallback_count),
+        # v2 mask statistics (per decision of this episode)
+        "candidate_pairs_mean": simulator.candidate_pairs_before / max(int(simulator.mask_decision_count), 1),
+        "masked_pairs_mean": simulator.candidate_pairs_after / max(int(simulator.mask_decision_count), 1),
+        "mask_fallback_rate": simulator.fluid_mask_fallback_count / max(int(simulator.mask_decision_count), 1),
         # provided by environment/profiled.py (eval.py); NaN / empty with the plain simulator
         "fluid_feature_seconds": float(getattr(simulator, "fluid_feature_seconds", float("nan"))),
-        "fluid_backend": str(getattr(simulator, "fluid_backend", "")),
+        "fluid_backend": str(getattr(simulator, "fluid_backend", simulator.fluid_backend_used)),
     }
 
 
@@ -216,6 +221,7 @@ def collect_vectorized_rollouts_parallel(policy, instance_path: Path, train_para
                     buffer.fluid_solve_seconds += episode["fluid_solve_seconds"]
                     buffer.fluid_cache_hit_count += episode["fluid_cache_hit_count"]
                     buffer.fluid_fallback_count += episode["fluid_fallback_count"]
+                    buffer.add_mask_stats(episode)
                     buffer.episode_transition_counts.append(episode["transition_count"])
                     buffer.episode_seconds.append(time.perf_counter() - episode_start_times[index])
                     buffer.obs_build_seconds += episode["obs_build_seconds"]

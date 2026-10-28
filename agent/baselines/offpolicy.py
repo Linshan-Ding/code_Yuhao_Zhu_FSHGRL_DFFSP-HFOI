@@ -131,6 +131,7 @@ def collect_offpolicy(policy, spec, train_paras: dict, num_envs: int, epsilon: f
                     buffer.fluid_solve_seconds += simulator.fluid_solve_seconds
                     buffer.fluid_cache_hit_count += simulator.fluid_cache_hit_count
                     buffer.fluid_fallback_count += simulator.fluid_fallback_count
+                    buffer.add_mask_stats(simulator)
                     buffer.episode_transition_counts.append(simulator.transition_count)
                     buffer.episode_seconds.append(time.perf_counter() - episode_start_times[index])
                     buffer.obs_build_seconds += simulator.obs_build_seconds
@@ -303,6 +304,7 @@ def train_offpolicy(args, config: dict, train_paras: dict, instance_files, rollo
                 "train_fulfillment_mean": fulfillment_metrics["fulfillment_rate_mean"],
                 "fixed_fulfillment_mean": fixed_fulfillment_mean,
                 "eval_seconds": eval_seconds,
+                **buffer.mask_summary(),
             })
             if checkpoint_every > 0 and iteration % checkpoint_every == 0:
                 save_checkpoint(result_dir / f"checkpoint_epoch{iteration:04d}.pt", agent, iteration,

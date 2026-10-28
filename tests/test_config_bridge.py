@@ -63,12 +63,12 @@ def test_model_paras_match_legacy_json():
 def test_ablation_overlays_change_only_their_keys():
     base = to_legacy_config(load_config())
     nf = to_legacy_config(load_config(["instance.yaml", "env.yaml", "algo.yaml", "ablation/nf.yaml"]))
-    assert nf["train_paras"]["fluid_mode"] == "off"
+    assert nf["train_paras"]["fluid_features"] == "off" and nf["train_paras"]["fluid_mask"] is False
     ng = to_legacy_config(load_config(["instance.yaml", "env.yaml", "algo.yaml", "ablation/ng.yaml"]))
     assert ng["train_paras"]["model_type"] == "mlp"
     for paras in (nf, ng):
         for key in TRAIN_KEYS:
-            if key in ("fluid_mode", "experiment_name"):
+            if key in ("fluid_mode", "fluid_features", "fluid_mask", "experiment_name"):
                 continue
             assert _same(paras["train_paras"][key], base["train_paras"][key]), key
 

@@ -54,6 +54,11 @@ class EnvCfg:
     progress_reward_coeff: float = 0.0
     order_top_k: int = 5
     fluid_mode: str = "cached_lp"
+    fluid_backend: str = "auto"           # auto | gurobi | scipy | heuristic (LP solver of cached_lp)
+    fluid_features: str = "on"            # on | off: the two fluid node features
+    fluid_mask: bool = True               # candidate pairs restricted to u* > fluid_mask_threshold (with fallback)
+    fluid_mask_threshold: float = 1.0e-5
+    fluid_recompute: str = "decision"     # decision (every new state) | event (legacy: after arrivals / discards only)
     fluid_time_limit: float = 2
     fluid_threads: int = 0
     collector_workers: int = 0            # 0 = simulators in the trainer process; N > 0 = N worker processes

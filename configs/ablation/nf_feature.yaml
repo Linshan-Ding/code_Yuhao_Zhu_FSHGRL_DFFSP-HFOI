@@ -1,0 +1,7 @@
+# FSHGRL-NFe: fluid node features off, fluid candidate mask on (the LP is still solved for the mask).
+env:
+  fluid_features: "off"
+  fluid_mask: true
+algo:
+  train:
+    experiment_name: ab_nfe

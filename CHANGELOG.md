@@ -19,3 +19,15 @@
   （`tests/test_collector.py`、`python -m tests.equivalence --collector-workers 3`）；`tools/profile_collector.py` 定档；默认关闭。
 - C12 仓库迁移：完整历史（含原仓库初始提交 `c030dfa`）推送为 `Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI` 的 `main`，
   以后以该仓库为论文对应的代码仓库；原仓库只保留历史。
+
+# v2（分支 `claude/v2-generalization`，泛化型范式；修订方案 v2 的 A.1 代码冻结清单）
+
+v2 是新的实验版本：V1 保持默认路径与 c030dfa 逐位一致（`python -m tests.equivalence` 以旧语义覆盖层验证），
+V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金文件为基准。
+
+- V1 流体引导拆成两种用法并实现候选掩码（`environment/simulator.py`）：`env.fluid_features on|off`（两列流体节点特征）、
+  `env.fluid_mask`（保留 u* > `fluid_mask_threshold` 的合法 (机器, 工序类型) 对，空集回退全部合法对，计数 `fluid_mask_fallback_count`）、
+  `env.fluid_backend auto|gurobi|scipy|heuristic`（HiGHS 通过 `scipy.optimize.linprog` 求同一 LP，无许可证也能得到精确解与掩码）、
+  `env.fluid_recompute decision|event`（每个新状态重解 LP，按状态签名缓存；`event` 为旧行为）；`log.csv` 与 `eval_results.csv` 新增
+  `candidate_pairs_mean / masked_pairs_mean / mask_fallback_rate`，`config_snapshot.yaml` 记录实际求解后端；
+  消融配置 `configs/ablation/{nf,nf_feature,nf_mask}.yaml`；`tests/test_fluid_mask.py`。

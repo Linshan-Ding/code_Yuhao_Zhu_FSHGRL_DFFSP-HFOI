@@ -25,7 +25,9 @@ OTHER = BENCHMARK / "DDT600_num50" / "DDT600_num50.txt"
 BUFFER_LISTS = ("action_indexes", "env_actions", "log_probs", "values", "rewards", "dones", "trajectory_ids")
 BUFFER_STATS = ("fulfillment_rates", "episode_transition_counts", "discard_count", "completion_count",
                 "fluid_solve_count", "fluid_cache_hit_count", "fluid_fallback_count", "policy_forward_count",
-                "avg_action_tokens", "max_action_tokens", "padding_ratio", "actor_batch_size_mean")
+                "avg_action_tokens", "max_action_tokens", "padding_ratio", "actor_batch_size_mean",
+                "fluid_mask_fallback_count", "fluid_mask_unavailable_count", "candidate_pairs_before",
+                "candidate_pairs_after", "mask_decision_count")
 
 
 def _paras(model_type="hgnn", **overrides):
@@ -86,10 +88,15 @@ def test_pool_matches_in_process_buffer_fluid_off_and_fallback():
         reference, candidate = _collect_both(config, paras, policy, pool)
         assert_buffers_identical(reference, candidate)
         assert len(reference) > 0 and reference.policy_forward_count > 0
-        config, paras = _paras(fluid_mode="cached_lp")          # heuristic fallback without gurobipy
+        config, paras = _paras(fluid_mode="cached_lp", fluid_backend="heuristic", fluid_mask=False)   # fallback path
         reference, candidate = _collect_both(config, paras, policy, pool, instance=OTHER, seed=7, base=20)
         assert_buffers_identical(reference, candidate)
         assert candidate.fluid_fallback_count > 0 and candidate.trajectory_ids[0] == 20
+        config, paras = _paras(fluid_mode="cached_lp", fluid_backend="scipy", fluid_mask=True)       # masked path
+        reference, candidate = _collect_both(config, paras, policy, pool, instance=OTHER, seed=9, base=40)
+        assert_buffers_identical(reference, candidate)
+        assert candidate.fluid_solve_count > 0 and candidate.mask_decision_count > 0
+        assert candidate.candidate_pairs_after <= candidate.candidate_pairs_before
     assert not pool.alive
 
 

@@ -51,6 +51,7 @@ TRAIN_OVERRIDES = {
     "num_envs": 2, "num_workers": 2, "minibatch_size": 128, "max_minibatch_tokens": 0,
     "max_iterations": 3, "viz": False, "resume": "none", "rollout_device": "cpu",
     "update_device": "cpu", "instance_selection": "fixed", "fluid_mode": "cached_lp",
+    "fluid_mask": False, "fluid_backend": "auto", "fluid_recompute": "event",   # v2 keys: legacy semantics
 }
 OBS_TENSOR_KEYS = ("raw_opes", "raw_mas", "due_dates", "order_mask", "order_counts",
                    "valid_pairs", "eligible", "proc_time", "ope_ma_adj", "ope_pre_adj", "ope_sub_adj")

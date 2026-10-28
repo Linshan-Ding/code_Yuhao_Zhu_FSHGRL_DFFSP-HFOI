@@ -23,7 +23,8 @@ comparable decision times.
 Columns of eval_results.csv: the contract columns ``instance_id, method, run_id, tier, scale, obj_model,
 obj_ref, gap, feasible, infer_time_ms`` (``obj = 1 - fulfilment rate``, see result/metrics.py) followed by
 ``decode, episode, eval_batch, fulfillment_rate, completed, discarded, total_orders, decision_count,
-policy_ms, obs_ms, fluid_ms, sim_ms, fluid_backend, ddt, checkpoint, checkpoint_iteration`` and, for
+policy_ms, obs_ms, fluid_ms, sim_ms, fluid_backend, candidate_pairs_mean, masked_pairs_mean,
+mask_fallback_rate, ddt, checkpoint, checkpoint_iteration`` and, for
 collected per-instance runs, ``epochs, wall_time_s, obj_best`` (``decode = incumbent``).
 """
 from __future__ import annotations
@@ -56,8 +57,9 @@ from train import load_config as load_train_config, resolve_torch_device  # noqa
 COLS = [
     "instance_id", "method", "run_id", "tier", "scale", "obj_model", "obj_ref", "gap", "feasible", "infer_time_ms",
     "decode", "episode", "eval_batch", "fulfillment_rate", "completed", "discarded", "total_orders",
-    "decision_count", "policy_ms", "obs_ms", "fluid_ms", "sim_ms", "fluid_backend", "ddt", "checkpoint",
-    "checkpoint_iteration", "epochs", "wall_time_s", "obj_best",
+    "decision_count", "policy_ms", "obs_ms", "fluid_ms", "sim_ms", "fluid_backend", "candidate_pairs_mean",
+    "masked_pairs_mean", "mask_fallback_rate", "ddt", "checkpoint", "checkpoint_iteration", "epochs",
+    "wall_time_s", "obj_best",
 ]
 
 
@@ -143,6 +145,9 @@ def episode_row(record: dict, path: Path, meta: dict, reference: dict, method: s
         "fluid_ms": record["fluid_feature_seconds"] * 1000.0,
         "sim_ms": record["simulator_step_seconds"] * 1000.0,
         "fluid_backend": record["fluid_backend"],
+        "candidate_pairs_mean": record.get("candidate_pairs_mean", ""),
+        "masked_pairs_mean": record.get("masked_pairs_mean", ""),
+        "mask_fallback_rate": record.get("mask_fallback_rate", ""),
         "ddt": ddt if ddt is not None else "",
         "checkpoint": checkpoint,
         "checkpoint_iteration": checkpoint_iteration if checkpoint_iteration is not None else "",
@@ -241,6 +246,9 @@ def collect_runs(args) -> list:
                     "fluid_ms": "",
                     "sim_ms": "",
                     "fluid_backend": "",
+                    "candidate_pairs_mean": "",
+                    "masked_pairs_mean": "",
+                    "mask_fallback_rate": "",
                     "ddt": ddt if ddt is not None else "",
                     "checkpoint": relative_to_root(run_dir),
                     "checkpoint_iteration": train_meta.get("best_greedy_iteration", ""),
