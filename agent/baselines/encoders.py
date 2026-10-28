@@ -15,6 +15,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from agent.normalize import normalize_due_dates, normalize_per_observation
+
 from agent.hgnn import GATedge
 from agent.networks import MLPs
 
@@ -53,7 +55,8 @@ class SparseGraphEncoder(nn.Module):
 
     # -- copied from HGNNScheduler ------------------------------------------------------------------------
     def feature_normalize(self, data: torch.Tensor) -> torch.Tensor:
-        return (data - torch.mean(data)) / (torch.std(data, unbiased=False) + 1e-5)
+        """Per-observation normalisation (v2): statistics over each batch element, not over the batch."""
+        return normalize_per_observation(data)
 
     def get_normalized(self, raw_opes: torch.Tensor, raw_mas: torch.Tensor,
                        proc_time: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -114,10 +117,7 @@ class SparseGraphEncoder(nn.Module):
             features = (h_opes, features[1], features[2])
         h_mas_pooled = torch.mean(h_mas, dim=-2)
         h_opes_pooled = torch.mean(h_opes, dim=-2)
-        due_dates = batch["due_dates"]
-        valid_due_dates = due_dates[batch["order_mask"]]
-        if valid_due_dates.numel() > 0:
-            due_dates = (due_dates - valid_due_dates.mean()) / (valid_due_dates.std(unbiased=False) + 1e-5)
+        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # v2: per observation
         return batch, h_opes, h_mas, h_opes_pooled, h_mas_pooled, due_dates
 
     # -- new ----------------------------------------------------------------------------------------------

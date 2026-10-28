@@ -81,6 +81,10 @@ def check_contract_files(result_dir: Path) -> tuple[list[str], str]:
     curve_rows = row_count("curve.csv")
     log_rows = row_count("log.csv")
     final_rows = row_count("fixed_set_final.csv")
+    if (result_dir / "val_curve.csv").exists():
+        val_rows = row_count("val_curve.csv")
+        if val_rows <= 0 or val_rows % MAX_ITERATIONS != 0:
+            problems.append(f"val_curve.csv has {val_rows} rows, expected a multiple of {MAX_ITERATIONS}")
     if curve_rows != MAX_ITERATIONS:
         problems.append(f"curve.csv has {curve_rows} rows, expected {MAX_ITERATIONS}")
     if log_rows != MAX_ITERATIONS:

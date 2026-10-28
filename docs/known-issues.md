@@ -1,4 +1,7 @@
-# 已知缺陷与论文/代码差异（只记录，不改数值行为）
+# 已知缺陷与论文/代码差异
+
+> **v2 状态**：下列条目描述的是 v1（逐位重现原仓库）的状态；v2（分支 `claude/v2-generalization`，新的实验版本）对其中若干条
+> 做了修复或变更，见文末 **C. v2 处理状态**。
 
 重构的硬约束是"可运行路径的数值行为逐位不变"，因此下列问题一律**保留并记录**；修复任何一条都会改变训练结果，
 应在新的实验版本中进行并重新跑完整矩阵。编号供 README、docs 与审稿回复引用。
@@ -60,3 +63,26 @@
     环境/许可证；`fluid_threads: 0` 加时间限制本就可能跨运行不确定（第 19 条），只有 `fluid_threads: 1` 且不触发时间
     限制时才能期望逐位一致。无 gurobipy 的启发式回退在进程内与多进程下逐位一致（`tests/test_collector.py`）。
     DQN/DDQN 的采集器与贪心评估仍在训练进程内，该键对它们无效。
+
+## C. v2 处理状态（修订方案 v2 的 A.1 代码冻结清单）
+
+| 条目 | v2 处理 |
+|---|---|
+| 1 超参不一致 | `configs/paper.yaml` 为论文配置层（2000 轮、熵系数 0.01、泛化型范式），`train_version: 2`；论文表 6 以其为准 |
+| 2 训练器没有流体剪枝 | **已实现**（V1）：`env.fluid_mask` + `fluid_mask_threshold` 的候选掩码，空集回退；`env.fluid_features` 单独开关两列特征；`fluid_recompute: decision` 每个新状态重解 LP |
+| 3 DRL 对比方法不存在 | V7 新增 HSDDQN（层级 DDQN）与 HGNN-PPO (adapted) 作为可复现对比方法，A2C/DQN/DDQN 保留 |
+| 5 决策时间口径 | 聚合按 `infer_time_ms / decision_count` 计每决策时间（`result/aggregate.py`），论文表格改用该口径 |
+| 6 达成率分母 | 统一为 `completed / total_orders`；`result/aggregate.py` 的整数一致性检查（S·K·η 为整数）防复发（V9） |
+| 7 基准算例与表 5 不符 | 生成器默认分布改为基准统计（到达间隔 rand[1,40] s、每算例一个 DDT、松弛 [0.6,1.55]×DDT），论文表 5 改写 |
+| 8 特征泄漏未来订单 | **已修复**（V3）：`raw_opes[:, 6]` 只统计已到达的未完成订单 |
+| 9 归一化依赖 batch 组成 | **已修复**（V3）：`agent/normalize.py` 按单个观测归一化交期与加工率；`tests/test_known_issue_fixes.py` 验证 batch 无关 |
+| 10 best checkpoint 口径 | **已取代**（V2）：`best_val_checkpoint.pt`（验证集贪心均值最优）为 v2 的模型选择；旧文件仍写出 |
+| 11 fixed 与 round_robin 相同 | 保持；泛化型用 `random` |
+| 12 无效动作静默重映射 | **已修复**（V3）：`step()` 对非法 (机器, 工序类型) 对与越界订单秩抛 `ValueError` |
+| 14 工业案例不可复现 | V5 按论文表 12 的工艺数据提供案例生成器（真实订单流不公开） |
+| 19 Gurobi 路径未验证 | **已变更**（V1）：`fluid_backend: scipy`（HiGHS）求同一 LP，无许可证也能得到精确解；Gurobi 模型原样保留在 `_solve_lp_gurobi` |
+| 21 多进程采集与 Gurobi | 不变；`fluid_backend: scipy` 下各 worker 进程独立求解，无许可证问题 |
+
+等价性回归：V1、V2 仍以 c030dfa 为黄金（旧语义覆盖层）；V3 起以本树冻结提交为黄金（`tests/golden_v2/manifest.json`，
+`python -m tests.equivalence --golden v2`）。
+

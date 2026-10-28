@@ -39,3 +39,7 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   与泛化检查点默认按快照的 `eval_tiers` 评测；`baselines/run_rules.py --tiers`（默认除 train 外全部档位）；脚本按范式分派
   （`_bootstrap.pool_jobs/method_jobs/paradigm`），`run_02` 泛化型门控（`result/pilot.py`，最佳验证轮对规则参考值）；
   `configs/runs.yaml` 的 `eval.checkpoint/tiers: auto`；`tests/test_generalization.py`。
+- V3 已知缺陷修复（数值变化，v2 实验版本的基线）：第 8 条（`raw_opes[:, 6]` 只统计已到达订单）、第 9 条
+  （`agent/normalize.py`：交期与加工率按单个观测归一化，策略输出与 batch 组成无关）、第 12 条（非法动作抛错）、第 10 条
+  （`best_val_checkpoint.pt` 取代旧口径）；等价性回归新增 v2 黄金模式（`python -m tests.equivalence --golden v2`，
+  `tests/golden_v2/manifest.json` 记录冻结提交；参考运行含 HiGHS 掩码与 2 个验证算例）；`tests/test_known_issue_fixes.py`。

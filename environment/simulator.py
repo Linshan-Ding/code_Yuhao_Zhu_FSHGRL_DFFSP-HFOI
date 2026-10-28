@@ -524,9 +524,8 @@ class TrainingSimulator:
                 raw_opes[task_index, 3] = float(np.min(due_remaining))
                 raw_opes[task_index, 4] = float(np.max(due_remaining))
                 raw_opes[task_index, 5] = float(np.std(due_remaining))
-            raw_opes[task_index, 6] = int(np.sum(
-                (self.order_status != self.STATUS_COMPLETED)
-                & (self.order_status != self.STATUS_DISCARDED)
+            raw_opes[task_index, 6] = int(np.sum(          # v2: arrived, unfinished orders only (no future orders)
+                ((self.order_status == self.STATUS_WAITING) | (self.order_status == self.STATUS_PROCESSING))
                 & (self.spec.product_types == product)
                 & (self.order_stage <= stage)
             ))
@@ -595,19 +594,15 @@ class TrainingSimulator:
         machine = action1 // task_count
         task_index = action1 % task_count
         valid_pairs = set(self._eligible_pairs(grouped_orders))
-        if (machine, task_index) not in valid_pairs:
-            if not valid_pairs:
-                self._advance_until_decision_or_done()
-                self.step_seconds += time.perf_counter() - start_time
-                return 0.0
-            machine, task_index = next(iter(valid_pairs))
+        if (machine, task_index) not in valid_pairs:          # v2: no silent remapping (known issue 12)
+            raise ValueError(f"invalid action: (machine {machine}, operation type {task_index}) is not an eligible "
+                             f"pair at t={self.current_time:.0f} ({len(valid_pairs)} eligible pair(s))")
 
         order_indices = grouped_orders.get(task_index, [])
-        if not order_indices:
-            self._advance_until_decision_or_done()
-            self.step_seconds += time.perf_counter() - start_time
-            return 0.0
-        order_index = order_indices[min(max(order_rank, 0), len(order_indices) - 1)]
+        if not 0 <= order_rank < len(order_indices):
+            raise ValueError(f"invalid action: queue rank {order_rank} out of range for operation type {task_index} "
+                             f"({len(order_indices)} candidate order(s))")
+        order_index = order_indices[order_rank]
         product, stage = self.spec.task_to_product_stage[task_index]
         process_time = float(self.spec.process_times[product, machine])
         finish_time = self.current_time + process_time

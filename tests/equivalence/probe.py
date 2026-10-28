@@ -2,7 +2,7 @@
 
 Usage (from a tree root, i.e. cwd is the repository root of either tree):
 
-    python tests/equivalence/probe.py <out.pt> <legacy_config.json> <instance.txt> [model_type ...]
+    python tests/equivalence/probe.py <out.pt> <legacy_config.json> <instance.txt> <legacy|v2> [model_type ...]
 
 The script resolves modules through a small adapter so that the very same file
 runs in the original tree (legacy module names) and in the refactored tree.
@@ -53,6 +53,8 @@ TRAIN_OVERRIDES = {
     "update_device": "cpu", "instance_selection": "fixed", "fluid_mode": "cached_lp",
     "fluid_mask": False, "fluid_backend": "auto", "fluid_recompute": "event",   # v2 keys: legacy semantics
 }
+V2_OVERRIDES = dict(TRAIN_OVERRIDES, fluid_backend="scipy", fluid_mask=True, fluid_features="on",
+                    fluid_recompute="decision", fluid_mask_threshold=1e-5)
 OBS_TENSOR_KEYS = ("raw_opes", "raw_mas", "due_dates", "order_mask", "order_counts",
                    "valid_pairs", "eligible", "proc_time", "ope_ma_adj", "ope_pre_adj", "ope_sub_adj")
 
@@ -172,11 +174,13 @@ def probe_buffer() -> dict:
 
 
 def main(argv: list[str]) -> None:
-    out_path, config_path, instance_path, *model_types = argv
+    out_path, config_path, instance_path, mode, *model_types = argv
+    if mode not in ("legacy", "v2"):
+        raise SystemExit("probe mode must be 'legacy' or 'v2'")
     with open(config_path, "r", encoding="utf-8") as file:
         config = json.load(file)
     train_paras = dict(config["train_paras"])
-    train_paras.update(TRAIN_OVERRIDES)
+    train_paras.update(TRAIN_OVERRIDES if mode == "legacy" else V2_OVERRIDES)
 
     results: dict = {}
     spec = parse_instance_file(instance_path)

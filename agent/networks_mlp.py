@@ -9,6 +9,8 @@ import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from agent.normalize import normalize_due_dates, normalize_per_observation
 from torch.distributions import Categorical
 from agent.mlp import MLPCritic, MLPActor
 
@@ -105,8 +107,8 @@ class MLPScheduler(nn.Module):
     # ============= 归一化辅助函数 =============
 
     def feature_normalize(self, data: torch.Tensor) -> torch.Tensor:
-        """对单个实例特征归一化"""
-        return (data - torch.mean(data)) / (torch.std(data, unbiased=False) + 1e-5)
+        """Per-observation normalisation (v2): statistics over each batch element, not over the batch."""
+        return normalize_per_observation(data)
 
     def get_normalized(self,
                        raw_opes: torch.Tensor,
@@ -207,10 +209,7 @@ class MLPScheduler(nn.Module):
         h_mas_pooled = torch.mean(h_mas, dim=-2)
         h_opes_pooled = torch.mean(h_opes, dim=-2)
 
-        due_dates = batch["due_dates"]
-        valid_due_dates = due_dates[batch["order_mask"]]
-        if valid_due_dates.numel() > 0:
-            due_dates = (due_dates - valid_due_dates.mean()) / (valid_due_dates.std(unbiased=False) + 1e-5)
+        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # v2: per observation
 
         state_values = self.critic(torch.cat((h_opes_pooled, h_mas_pooled,
                                               batch["current_rate"].view(len(obs_batch), 1)), dim=-1)).squeeze(-1)
