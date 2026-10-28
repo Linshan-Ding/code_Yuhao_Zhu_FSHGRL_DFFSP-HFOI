@@ -1,7 +1,8 @@
 # 复现手册（v2，泛化型范式）
 
 本文件是修订版实验（审稿人 1 修改方案 v2 的 C 线）的完整复现步骤：从干净检出到论文全部表格。所有命令在工程根目录执行，
-零参数；每条命令的产物与对应论文表格见 §8 与 README §10。代码冻结于标签 `v2.0-revision`（分支 `claude/v2-generalization`）。
+零参数；每条命令的产物与对应论文表格见 §8 与 README §10。代码冻结于分支 `claude/v2-generalization` 的末端提交，作者在其上打标签
+`v2.0-revision` 后以该标签为准（`git tag -a v2.0-revision -m "revision code freeze"` 与 `git push origin v2.0-revision`）。
 
 ## 0. 版本与自检
 
