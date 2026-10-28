@@ -13,10 +13,11 @@ if str(ROOT) not in sys.path:
 
 from baselines.milp_exact import (RESULT_COLS, Schedule, brute_force, build_model, build_problem,  # noqa: E402
                                   extract_schedule, left_shift, replay, resolve_backend, solve, solve_instance,
-                                  verify, write_results)
+                                  stage_schedule_count, verify, write_results)
 from data.instance_io import parse_instance_file  # noqa: E402
 
 TINY = ROOT / "data" / "instances" / "tiny" / "TNY5000_DDT500_num4" / "TNY5000_DDT500_num4.txt"
+TINY5 = ROOT / "data" / "instances" / "tiny5" / "TNF5500_DDT500_num6" / "TNF5500_DDT500_num6.txt"
 
 
 def _write(tmp_path: Path, name: str, lines) -> Path:
@@ -67,7 +68,7 @@ def test_micro_optimum_both_variants_verify_replay_and_brute_force(micro):
         assert replayed["eta"] == pytest.approx(1.0) and replayed["on_time"] == [0, 1, 2]
         assert replayed["starts"][(2, 1)] == 30.0                         # the simulator reproduces the timing
         exhaustive = brute_force(problem, variant)
-        assert exhaustive["on_time"] == 3 and exhaustive["nodes"] > 0
+        assert exhaustive["on_time"] == 3 and exhaustive["nodes"] > 0 and exhaustive["status"] == "ok"
 
 
 def test_hopeless_order_is_abandoned_by_b_and_processed_late_by_a(hopeless):
@@ -109,6 +110,7 @@ def test_tiny_instance_end_to_end_and_output_contract(tmp_path):
     assert [row["variant"] for row in rows] == ["A", "B"]
     for row in rows:
         assert row["status"] == "optimal" and row["replay_ok"] is True and row["brute_force_ok"] is True
+        assert row["brute_force_status"] == "ok" and row["brute_force_nodes"] > 0
         assert row["completed_opt"] == 3 and row["eta_opt"] == pytest.approx(0.75)
         assert row["verifier_eta"] == row["replay_eta"] == row["brute_force_eta"] == pytest.approx(0.75)
         assert row["S"] == 4 and row["n_ops"] == 12 and row["n_binary"] == 64 and row["backend"] == "highs"
@@ -120,6 +122,19 @@ def test_tiny_instance_end_to_end_and_output_contract(tmp_path):
     table = pd.read_csv(out)
     assert list(table.columns) == RESULT_COLS and len(table) == 2
     assert np.allclose(table["eta_opt"] * table["S"], table["completed_opt"])  # S * eta is an integer
+
+
+def test_brute_force_gates(micro):
+    problem = build_problem(parse_instance_file(micro))
+    assert stage_schedule_count(problem, [0, 1, 2]) == 6                   # 3 orders, one machine: 3! sequences
+    tiny5 = build_problem(parse_instance_file(TINY5))
+    assert stage_schedule_count(tiny5, list(range(6))) == 720 * 210        # 6! x C(10, 4): far beyond the gate
+    assert brute_force(tiny5, "A")["status"] == "skipped_size"
+    budget = brute_force(problem, "B", max_nodes=5)
+    assert budget["status"] == "budget" and budget["on_time"] is None and budget["nodes"] == 6
+    rows = solve_instance(TINY5, ("B",), "highs", 60.0, brute_force_max_orders=6, tier="tiny5")
+    assert rows[0]["status"] == "optimal" and rows[0]["brute_force_status"] == "skipped_size"
+    assert rows[0]["brute_force_ok"] == "" and rows[0]["brute_force_eta"] == ""
 
 
 def test_backend_resolution():

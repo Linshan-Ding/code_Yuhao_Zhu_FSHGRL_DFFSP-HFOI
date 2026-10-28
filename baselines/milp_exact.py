@@ -28,7 +28,10 @@ Checks on every solution:
   MILP-A's late operations, which frees capacity); the replay keeps every candidate order (order_top_k 0);
 * brute force (S <= --brute-force-max-orders): exhaustive enumeration of machine assignments and machine
   sequences, stage by stage with left-shift timing and a bound, over every subset of processed orders; its
-  optimum must equal the MILP optimum of both variants.
+  optimum must equal the MILP optimum of both variants. The enumeration is attempted only when every stage
+  has at most --brute-force-max-stage-schedules sequenced assignments (n! x C(n + m - 1, m - 1) for n orders
+  on m machines: 5040 for the tiny structure at S = 6, 151 200 for the benchmark structure) and is abandoned
+  after --brute-force-max-nodes search nodes (brute_force_status: ok | mismatch | skipped_size | budget).
 
 Output ``result/milp/milp_results.csv``, one row per instance x variant: instance, tier, S, n_ops (|K|),
 n_binary, n_pairs (sequencing pairs), variant, completed_opt, eta_opt, status, gap, solve_s, backend,
@@ -60,7 +63,10 @@ DEFAULT_TIERS = ("tiny", "tiny5")
 DEFAULT_OUT = ROOT / "result" / "milp" / "milp_results.csv"
 RESULT_COLS = ["instance", "tier", "S", "n_ops", "n_binary", "n_pairs", "variant", "completed_opt", "eta_opt",
                "status", "gap", "solve_s", "backend", "big_L", "c_ub", "time_limit_s", "verifier_eta", "replay_eta",
-               "replay_ok", "brute_force_eta", "brute_force_ok", "brute_force_nodes", "brute_force_s"]
+               "replay_ok", "brute_force_eta", "brute_force_ok", "brute_force_status", "brute_force_nodes",
+               "brute_force_s"]
+BRUTE_FORCE_MAX_STAGE_SCHEDULES = 10_000
+BRUTE_FORCE_MAX_NODES = 50_000_000
 REPLAY_PARAS = {"order_top_k": 0, "fluid_mode": "off", "discard_penalty": 1.0, "progress_reward_coeff": 0.0}
 EPS = 1e-6
 
@@ -483,7 +489,25 @@ def _stage_schedules(problem: Problem, stage: int, orders: Sequence[int]):
             yield list(zip(machines, sequences))
 
 
-def brute_force_subset(problem: Problem, orders: Sequence[int], best_so_far: int, counter: list) -> int:
+class BruteForceBudget(Exception):
+    """Raised when the enumeration exceeds its node budget."""
+
+
+def stage_schedule_count(problem: Problem, orders: Sequence[int]) -> int:
+    """Upper bound of the sequenced assignments of one stage: n! x C(n + m - 1, m - 1) with m the largest
+    eligible machine set of the stage's operations (exact when every order is eligible on the same machines)."""
+    from math import comb, factorial
+
+    n = len(orders)
+    worst = 0
+    for stage in range(problem.stages):
+        m = max((len(problem.eligible[(order, stage)]) for order in orders), default=1)
+        worst = max(worst, factorial(n) * comb(n + m - 1, m - 1))
+    return worst
+
+
+def brute_force_subset(problem: Problem, orders: Sequence[int], best_so_far: int, counter: list,
+                       max_nodes: int = BRUTE_FORCE_MAX_NODES) -> int:
     """Maximum on-time count when exactly ``orders`` are processed (left-shift timing, exhaustive)."""
     orders = list(orders)
     if not orders:
@@ -499,6 +523,8 @@ def brute_force_subset(problem: Problem, orders: Sequence[int], best_so_far: int
 
     def recurse(stage: int, ready: Dict[int, float]) -> None:
         counter[0] += 1
+        if counter[0] > max_nodes:
+            raise BruteForceBudget(f"brute force abandoned after {max_nodes} nodes")
         if stage > last:
             count = sum(1 for order in orders if ready[order] <= problem.due(order) + EPS)
             best[0] = max(best[0], count)
@@ -523,29 +549,42 @@ def brute_force_subset(problem: Problem, orders: Sequence[int], best_so_far: int
     return best[0]
 
 
-def brute_force(problem: Problem, variant: str) -> dict:
-    """Optimum of the variant by enumeration: A = all orders processed; B = best over the processed subsets."""
+def brute_force(problem: Problem, variant: str, max_stage_schedules: int = BRUTE_FORCE_MAX_STAGE_SCHEDULES,
+                max_nodes: int = BRUTE_FORCE_MAX_NODES) -> dict:
+    """Optimum of the variant by enumeration: A = all orders processed; B = best over the processed subsets.
+    ``status``: ok | skipped_size (a stage has more than ``max_stage_schedules`` sequenced assignments) |
+    budget (more than ``max_nodes`` search nodes)."""
     started = time.perf_counter()
     counter = [0]
     orders = list(range(problem.n_orders))
-    if variant == "A":
-        best = brute_force_subset(problem, orders, 0, counter)
-    else:
-        best = 0
-        for size in range(len(orders), 0, -1):                 # larger subsets first (tighter incumbent)
-            if size <= best:
-                break
-            for subset in itertools.combinations(orders, size):
-                best = max(best, brute_force_subset(problem, subset, best, counter))
-                if best == size:
+    size = stage_schedule_count(problem, orders)
+    if size > max_stage_schedules:
+        return {"on_time": None, "eta": None, "nodes": 0, "seconds": 0.0, "status": "skipped_size",
+                "stage_schedules": size}
+    try:
+        if variant == "A":
+            best = brute_force_subset(problem, orders, 0, counter, max_nodes)
+        else:
+            best = 0
+            for count in range(len(orders), 0, -1):            # larger subsets first (tighter incumbent)
+                if count <= best:
                     break
+                for subset in itertools.combinations(orders, count):
+                    best = max(best, brute_force_subset(problem, subset, best, counter, max_nodes))
+                    if best == count:
+                        break
+    except BruteForceBudget:
+        return {"on_time": None, "eta": None, "nodes": counter[0], "seconds": time.perf_counter() - started,
+                "status": "budget", "stage_schedules": size}
     return {"on_time": best, "eta": best / max(problem.n_orders, 1), "nodes": counter[0],
-            "seconds": time.perf_counter() - started}
+            "seconds": time.perf_counter() - started, "status": "ok", "stage_schedules": size}
 
 
 # -- driver ------------------------------------------------------------------------------------------------------
 def solve_instance(path: Path, variants: Sequence[str], backend: str, time_limit: float,
-                   brute_force_max_orders: int, tier: str = "", threads: int = 1, verbose: bool = True) -> List[dict]:
+                   brute_force_max_orders: int, tier: str = "", threads: int = 1, verbose: bool = True,
+                   brute_force_max_stage_schedules: int = BRUTE_FORCE_MAX_STAGE_SCHEDULES,
+                   brute_force_max_nodes: int = BRUTE_FORCE_MAX_NODES) -> List[dict]:
     spec = parse_instance_file(path)
     problem = build_problem(spec)
     rows = []
@@ -557,7 +596,8 @@ def solve_instance(path: Path, variants: Sequence[str], backend: str, time_limit
                "eta_opt": "", "status": result["status"], "gap": result["gap"], "solve_s": round(result["solve_s"], 3),
                "backend": result["backend"], "big_L": problem.big_l, "c_ub": problem.c_ub,
                "time_limit_s": time_limit, "verifier_eta": "", "replay_eta": "", "replay_ok": "",
-               "brute_force_eta": "", "brute_force_ok": "", "brute_force_nodes": "", "brute_force_s": ""}
+               "brute_force_eta": "", "brute_force_ok": "", "brute_force_status": "", "brute_force_nodes": "",
+               "brute_force_s": ""}
         if result["values"] is not None:
             objective = result["objective"]
             completed = int(round(objective))
@@ -572,17 +612,21 @@ def solve_instance(path: Path, variants: Sequence[str], backend: str, time_limit
                   else replayed["eta"] >= row["eta_opt"] - EPS)
             row["replay_ok"] = bool(ok)
             if result["status"] == "optimal" and problem.n_orders <= brute_force_max_orders:
-                exhaustive = brute_force(problem, variant)
-                row["brute_force_eta"] = exhaustive["eta"]
-                row["brute_force_ok"] = bool(exhaustive["on_time"] == completed)
+                exhaustive = brute_force(problem, variant, brute_force_max_stage_schedules, brute_force_max_nodes)
+                row["brute_force_status"] = exhaustive["status"]
                 row["brute_force_nodes"] = exhaustive["nodes"]
                 row["brute_force_s"] = round(exhaustive["seconds"], 3)
+                if exhaustive["status"] == "ok":
+                    row["brute_force_eta"] = exhaustive["eta"]
+                    row["brute_force_ok"] = bool(exhaustive["on_time"] == completed)
+                    if not row["brute_force_ok"]:
+                        row["brute_force_status"] = "mismatch"
         rows.append(row)
         if verbose:
             print(f"[MILP] {path.stem:22s} MILP-{variant} S={problem.n_orders:3d} |K|={len(problem.ops):3d} "
                   f"bin={model.n_binary:5d} {result['status']:10s} eta={row['eta_opt'] if row['eta_opt'] != '' else 'nan'} "
                   f"gap={row['gap']} {result['solve_s']:.1f}s replay_ok={row['replay_ok']} "
-                  f"brute={row['brute_force_ok']}", flush=True)
+                  f"brute={row['brute_force_status'] or '-'}", flush=True)
     return rows
 
 
@@ -602,8 +646,12 @@ def main() -> None:
     parser.add_argument("--backend", default="auto", help="auto | gurobi | highs")
     parser.add_argument("--time-limit", type=float, default=600.0, help="seconds per solve (0 = none)")
     parser.add_argument("--threads", type=int, default=1, help="Gurobi threads")
-    parser.add_argument("--brute-force-max-orders", type=int, default=4,
+    parser.add_argument("--brute-force-max-orders", type=int, default=6,
                         help="exhaustive cross-check on instances with at most this many orders (0 = off)")
+    parser.add_argument("--brute-force-max-stage-schedules", type=int, default=BRUTE_FORCE_MAX_STAGE_SCHEDULES,
+                        help="skip the enumeration when a stage has more sequenced assignments than this")
+    parser.add_argument("--brute-force-max-nodes", type=int, default=BRUTE_FORCE_MAX_NODES,
+                        help="abandon the enumeration after this many search nodes")
     parser.add_argument("--out", default=str(DEFAULT_OUT))
     args = parser.parse_args()
 
@@ -624,16 +672,19 @@ def main() -> None:
     for path in files:
         tier = str(index.get(path.stem, {}).get("tier", ""))
         rows.extend(solve_instance(path, args.variants, backend, args.time_limit, args.brute_force_max_orders,
-                                   tier=tier, threads=args.threads))
+                                   tier=tier, threads=args.threads,
+                                   brute_force_max_stage_schedules=args.brute_force_max_stage_schedules,
+                                   brute_force_max_nodes=args.brute_force_max_nodes))
     out_path = Path(args.out)
     out_path = out_path if out_path.is_absolute() else ROOT / out_path
     write_results(rows, out_path)
     optimal = sum(1 for row in rows if row["status"] == "optimal")
     replay_ok = sum(1 for row in rows if row["replay_ok"] is True)
     brute = [row for row in rows if row["brute_force_ok"] != ""]
+    skipped = sum(1 for row in rows if row["brute_force_status"] in ("skipped_size", "budget"))
     print(f"[MILP] {len(rows)} solves: {optimal} optimal, replay consistent {replay_ok}/{len(rows)}, "
-          f"brute force consistent {sum(1 for r in brute if r['brute_force_ok'])}/{len(brute)}, "
-          f"{(time.perf_counter() - started) / 60:.1f} min -> {out_path}")
+          f"brute force consistent {sum(1 for r in brute if r['brute_force_ok'])}/{len(brute)} "
+          f"({skipped} skipped by size / budget), {(time.perf_counter() - started) / 60:.1f} min -> {out_path}")
 
 
 if __name__ == "__main__":

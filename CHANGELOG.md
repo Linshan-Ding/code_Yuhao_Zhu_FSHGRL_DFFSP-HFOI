@@ -65,3 +65,9 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   紧 big-L 并记录；验证器左移重定时、`ScheduleFollowingSimulator` 仿真器回放、S ≤ 6 的穷举交叉核对；
   产物 `result/milp/milp_results.csv`）、`scripts/run_08_milp_check.py`（档位 tiny 与 tiny5，`run_all` 的 milp 阶段）、
   `tests/test_milp_exact.py`；两变体最优值相等的论证见 `docs/baselines.md`。
+- V9 聚合与出表：`result/aggregate.py` 新增整数一致性检查（每个 (算例, 方法, 解码) 组 S × episode 数 × 平均 η 必为按期订单数，
+  `integer_check.csv`，违反即中止；意见 14 的防复发机检）、点估计携带 `completed` 与 `total_orders`、`generalization.csv`
+  （每 (方法, 档位) 的零样本汇总：K、η 均值 ± 标准差、`completed_mean`、每决策时间、该档位最优确定性规则及逐算例胜/平/负）、
+  配对检验与消融/优势表限定在基准档（`--paired-tier`）；`paper_assets/scripts/make_tables.py` 新增 `generalization_<tier>.tex`、
+  `hyperparameters.tex`（表 6 由配置生成）、`instance_statistics.tex`（基准算例统计，由 params.yaml 生成）、`milp_small.tex`
+  （精确求解检查 + 最优规则），基准档对比表按档位过滤，v2 表同时落 CSV；`tests/test_aggregate.py`。

@@ -40,6 +40,7 @@ METHOD_LABELS = {
     "fifo": "FIFO", "spt": "SPT", "mor": "MOR", "mwkr": "MWKR", "random": "Random", "rrc": "RRC",
 }
 RULE_METHODS = ("fifo", "spt", "mor", "mwkr", "random", "rrc")
+DETERMINISTIC_RULE_METHODS = ("fifo", "spt", "mor", "mwkr")
 DRL_METHODS = ("hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn")
 ABLATION_METHODS = ("nfe", "nm", "nf", "ng", "na")     # 2 x 2 fluid factor design + encoder + attention
 
