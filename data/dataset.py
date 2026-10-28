@@ -106,6 +106,20 @@ def describe_instance(path: str | Path, tier: str = "benchmark", source: str = "
     inter_arrival = np.diff(np.sort(arrivals)) if arrivals.size > 1 else np.zeros(0)
     positive_times = spec.process_times[spec.process_times > 0].astype(np.float64)
     orders_per_product = np.bincount(spec.product_types, minlength=spec.product_count)
+    gap_mean = float(inter_arrival.mean()) if inter_arrival.size else 0.0
+    gap_cv = float(inter_arrival.std() / gap_mean) if inter_arrival.size and gap_mean > 0 else 0.0
+    burst, longest = 0, 0
+    for gap in inter_arrival:                       # longest run of gaps at most a quarter of the mean gap
+        burst = burst + 1 if gap <= 0.25 * gap_mean else 0
+        longest = max(longest, burst)
+    p_mean = float(positive_times.mean()) if positive_times.size else 0.0
+    load_ratio = (p_mean * spec.stage_count) / (gap_mean * spec.machine_count) if gap_mean > 0 else 0.0
+    stage_loads = []
+    for stage, machines in enumerate(spec.stage_machines):
+        stage_times = spec.process_times[:, list(machines)].astype(np.float64)
+        stage_positive = stage_times[stage_times > 0]
+        if stage_positive.size and gap_mean > 0:
+            stage_loads.append(float(stage_positive.mean()) / (gap_mean * len(machines)))
     return {
         "instance_id": path.stem,
         "tier": tier,
@@ -120,7 +134,12 @@ def describe_instance(path: str | Path, tier: str = "benchmark", source: str = "
         "orders_per_product": [int(v) for v in orders_per_product],
         "arrival_first": float(arrivals.min()) if arrivals.size else 0.0,
         "arrival_last": float(arrivals.max()) if arrivals.size else 0.0,
-        "inter_arrival_mean": float(inter_arrival.mean()) if inter_arrival.size else 0.0,
+        "inter_arrival_mean": gap_mean,
+        "inter_arrival_cv": gap_cv,
+        "inter_arrival_max": float(inter_arrival.max()) if inter_arrival.size else 0.0,
+        "max_burst": int(longest + 1) if inter_arrival.size else 0,
+        "load_ratio": float(load_ratio),
+        "load_ratio_bottleneck": float(max(stage_loads)) if stage_loads else 0.0,
         "due_slack_min": float(slack.min()) if slack.size else 0.0,
         "due_slack_mean": float(slack.mean()) if slack.size else 0.0,
         "due_slack_max": float(slack.max()) if slack.size else 0.0,

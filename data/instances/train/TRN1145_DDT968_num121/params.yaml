@@ -22,6 +22,11 @@ orders_per_product:
 arrival_first: 1.0
 arrival_last: 2178.0
 inter_arrival_mean: 18.141666666666666
+inter_arrival_cv: 0.636940077558399
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.718779972439137
+load_ratio_bottleneck: 2.8350206706476806
 due_slack_min: 591.0
 due_slack_mean: 1047.504132231405
 due_slack_max: 1495.0
@@ -33,7 +38,13 @@ ddt_range:
 - 500
 - 1600
 slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
 arrival_model: uniform
+rho_target: null
+mean_gap_target: null
 inter_arrival_range:
 - 1
 - 40

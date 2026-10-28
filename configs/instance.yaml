@@ -35,3 +35,65 @@ instance:
         n_orders: [50, 100, 150]
         ddt: [500, 600, 900, 1200, 1600]
         seeds: 2
+    arrival:                          # arrival-regime tier (S = 100, DDT = 900): load levels and arrival models
+      tier: arrival
+      prefix: ARR
+      seed: 3000
+      cases:
+        - {n_orders: 100, ddt: 900, arrival: {model: uniform, rho: 0.8}}
+        - {n_orders: 100, ddt: 900, arrival: {model: uniform, rho: 1.2}}
+        - {n_orders: 100, ddt: 900, arrival: {model: uniform, rho: 1.8}}
+        - {n_orders: 100, ddt: 900, arrival: {model: uniform, rho: 2.6}}
+        - {n_orders: 100, ddt: 900, arrival: {model: exponential, rho: 1.8}}
+        - {n_orders: 100, ddt: 900, arrival: {model: bursty, rho: 1.8, burst_size: 10, burst_gap: 2}}
+    arrival_train:                    # arrival-diverse training pool (load 0.8-2.6, three arrival models)
+      tier: arrival_train
+      prefix: ATR
+      seed: 4000
+      n: 120
+      arrival_mix: true
+    tiny:                             # exact-solver check (baselines/milp_exact.py): 2 products x 3 stages x 2 machines
+      tier: tiny
+      prefix: TNY
+      seed: 5000
+      structure: {n_products: 2, n_stages: 3, machines_per_stage: 2}
+      grid:
+        n_orders: [4, 6, 8, 10, 12]
+        ddt: [500, 1500]
+        seeds: 5
+    tiny5:                            # exact-solver check with the benchmark structure (5 x 5 x 5), few orders
+      tier: tiny5
+      prefix: TNF
+      seed: 5500
+      grid:
+        n_orders: [6, 8, 10]
+        ddt: [500, 1500]
+        seeds: 5
+    case_train:                       # industrial case (data/case/process.yaml, minutes): training pool
+      tier: case_train
+      prefix: CTR
+      seed: 6000
+      n: 100
+      structure: {case: true}
+      ddt_range: [600, 1200]
+      arrival: {model: uniform, rho: 1.8}
+    case_val:                         # industrial case: validation grid
+      tier: case_val
+      prefix: CVA
+      seed: 6500
+      structure: {case: true}
+      arrival: {model: uniform, rho: 1.8}
+      grid:
+        n_orders: [50, 150]
+        ddt: [600, 1200]
+        seeds: 2
+    case_eval:                        # industrial case: the nine evaluation configurations of the manuscript
+      tier: case_eval
+      prefix: CEV
+      seed: 7000
+      structure: {case: true}
+      arrival: {model: uniform, rho: 1.8}
+      grid:
+        n_orders: [50, 100, 150]
+        ddt: [600, 900, 1200]
+        seeds: 1

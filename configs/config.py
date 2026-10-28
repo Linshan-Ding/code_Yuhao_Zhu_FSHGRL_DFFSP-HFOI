@@ -39,6 +39,10 @@ class GeneratorCfg:
     slack_rule: str = "ddt_uniform"       # ddt_uniform (one DDT per instance, slack in slack_rel_range x DDT) | per_order
     slack_rel_range: list = field(default_factory=lambda: [0.6, 1.55])
     n_orders_range: list = field(default_factory=lambda: [50, 150])
+    arrival_model: str = "uniform"        # uniform | exponential | bursty (data/generator.py sample_arrivals)
+    burst_size: int = 10                  # bursty: orders per burst
+    burst_gap: float = 2.0                # bursty: gap inside a burst (time units)
+    burst_jitter: float = 0.5             # bursty: relative jitter of the gap between bursts
 
 
 @dataclass

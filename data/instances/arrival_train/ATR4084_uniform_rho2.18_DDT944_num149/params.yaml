@@ -1,0 +1,50 @@
+instance_id: ATR4084_uniform_rho2.18_DDT944_num149
+tier: arrival_train
+source: generated
+file: ATR4084_uniform_rho2.18_DDT944_num149.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 149
+ddt: 944
+orders_per_product:
+- 31
+- 27
+- 28
+- 37
+- 26
+arrival_first: 1.0
+arrival_last: 3557.0
+inter_arrival_mean: 24.027027027027028
+inter_arrival_cv: 0.5166907882606726
+inter_arrival_max: 44.0
+max_burst: 3
+load_ratio: 2.0367064116985376
+load_ratio_bottleneck: 2.332040494938133
+due_slack_min: 570.0
+due_slack_mean: 1011.0469798657718
+due_slack_max: 1460.0
+process_time_min: 31.0
+process_time_mean: 244.68
+process_time_max: 450.0
+seed: 4084
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: 2.18
+mean_gap_target: 22.447706422018346
+inter_arrival_range:
+- 1
+- 44

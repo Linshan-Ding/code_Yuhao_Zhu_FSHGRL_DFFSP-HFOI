@@ -45,3 +45,9 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   `tests/golden_v2/manifest.json` 记录冻结提交；参考运行含 HiGHS 掩码与 2 个验证算例）；`tests/test_known_issue_fixes.py`。
 - V4 消融变体 `nfe`（去流体特征）、`nm`（去流体掩码）、`na`（去候选自注意力）进入 `scripts/run_04`（与 `nf`、`ng` 共 5 个变体）、
   `result/stats.py` 的标签与 `ABLATION_METHODS`、`run_07` 的方法清单、消融表与收敛图；DRL 对比方法标签预留 `hsddqn`、`hgnn_ppo`（V7）。
+- V5 生成器扩展（`data/generator.py`）：到达模型 uniform / exponential / bursty，`rho`（目标负荷率 = 平均工序时间×阶段数 /
+  （平均间隔×机器数））或 `mean_gap`，`--slack-rel`、`--ddt-fixed`、结构覆盖 `--n-products/--n-stages/--machines-per-stage`，
+  工业案例结构 `data/case/process.yaml` + `data/case_structure.py`（论文表 12 的工艺数据，分钟）；池规格支持 `cases`、`grid`、
+  `n`（含 `arrival_mix`）；新档位 arrival（6 个：ρ 0.8/1.2/1.8/2.6 均匀、指数、突发）、arrival_train（120，混合到达）、
+  tiny（2×3×2，50）、tiny5（5×5×5 少订单，30）、case_train（100）、case_val（8）、case_eval（9 个论文配置）；
+  `params.yaml` 新增 `inter_arrival_cv`、`max_burst`、`load_ratio`、`load_ratio_bottleneck`。

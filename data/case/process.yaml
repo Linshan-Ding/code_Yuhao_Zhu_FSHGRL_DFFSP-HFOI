@@ -1,0 +1,22 @@
+# Industrial 3D-printing flexible flow shop: process and resource data of the manuscript's case table
+# (three order types, six stages, alternative machines with processing times in minutes). Only the public
+# process data is reproduced here; the real order streams of the shop are not public, so case instances are
+# generated with the same order model as the synthetic tiers (data/generator.py, pool kind "case").
+unit: minute
+stages:                      # machine groups in stage order; machine ids are global and listed per stage
+  - {name: model checking and slicing, machines: [S1, S2, S3]}
+  - {name: build-platform / powder-bed preparation, machines: [P1, P2, P3, P4, P5]}
+  - {name: printing, machines: [FDM1, FDM2, FDM3, SLA1, SLA2, SLA3, SLS1, SLS2, SLS3]}
+  - {name: support / powder removal and resin cleaning, machines: [R1, R2, C1, C2, R3, R4]}
+  - {name: surface finishing / UV post-curing / heat treatment, machines: [SF1, SF2, U1, U2, H1, H2]}
+  - {name: inspection, machines: [Q1, Q2]}
+products:
+  - name: customized polymer fixture
+    times: {S1: 38, S2: 42, S3: 45, P1: 26, P2: 30, P3: 34, FDM1: 210, FDM2: 225, FDM3: 240,
+            R1: 35, R2: 40, SF1: 46, SF2: 52, Q1: 32, Q2: 36}
+  - name: patient-specific medical guide
+    times: {S1: 42, S2: 46, S3: 50, P1: 30, P2: 34, P3: 38, SLA1: 260, SLA2: 275, SLA3: 290,
+            C1: 42, C2: 48, U1: 55, U2: 62, Q1: 40, Q2: 45}
+  - name: lightweight lattice bracket
+    times: {S1: 50, S2: 55, S3: 60, P4: 46, P5: 52, SLS1: 380, SLS2: 405, SLS3: 430,
+            R3: 58, R4: 65, H1: 85, H2: 95, Q1: 48, Q2: 54}

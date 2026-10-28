@@ -111,7 +111,7 @@ def main() -> None:
     if names and names != ["all"]:
         instance_files = instance_files_by_ids(names)
     else:
-        tiers = args.tiers or [p.name for p in tier_directories() if p.name != "train"]
+        tiers = args.tiers or [p.name for p in tier_directories() if not p.name.endswith("train")]
         instance_files = []
         for tier in tiers:
             instance_files.extend(tier_instance_files(tier))

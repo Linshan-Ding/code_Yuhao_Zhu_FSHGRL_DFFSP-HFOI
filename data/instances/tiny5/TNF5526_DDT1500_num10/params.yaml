@@ -1,0 +1,50 @@
+instance_id: TNF5526_DDT1500_num10
+tier: tiny5
+source: generated
+file: TNF5526_DDT1500_num10.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 10
+ddt: 1500
+orders_per_product:
+- 2
+- 3
+- 0
+- 2
+- 3
+arrival_first: 1.0
+arrival_last: 188.0
+inter_arrival_mean: 20.77777777777778
+inter_arrival_cv: 0.4200499868803311
+inter_arrival_max: 36.0
+max_burst: 1
+load_ratio: 2.2236834224598927
+load_ratio_bottleneck: 2.399101604278075
+due_slack_min: 989.0
+due_slack_mean: 1839.3
+due_slack_max: 2288.0
+process_time_min: 34.0
+process_time_mean: 231.016
+process_time_max: 446.0
+seed: 5526
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

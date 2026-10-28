@@ -1,0 +1,45 @@
+instance_id: TNY5047_DDT1500_num12
+tier: tiny
+source: generated
+file: TNY5047_DDT1500_num12.txt
+n_products: 2
+n_stages: 3
+n_machines: 6
+machine_division:
+- 2
+- 2
+- 2
+n_orders: 12
+ddt: 1500
+orders_per_product:
+- 7
+- 5
+arrival_first: 1.0
+arrival_last: 264.0
+inter_arrival_mean: 23.90909090909091
+inter_arrival_cv: 0.33812523308617054
+inter_arrival_max: 33.0
+max_burst: 2
+load_ratio: 4.00126742712294
+load_ratio_bottleneck: 4.365494296577946
+due_slack_min: 1251.0
+due_slack_mean: 1642.5
+due_slack_max: 2272.0
+process_time_min: 30.0
+process_time_mean: 191.33333333333334
+process_time_max: 395.0
+seed: 5047
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

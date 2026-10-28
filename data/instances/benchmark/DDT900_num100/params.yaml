@@ -22,6 +22,11 @@ orders_per_product:
 arrival_first: 1.0
 arrival_last: 1837.0
 inter_arrival_mean: 18.545454545454547
+inter_arrival_cv: 1.0004270949199594
+inter_arrival_max: 111.0
+max_burst: 3
+load_ratio: 2.1595372549019607
+load_ratio_bottleneck: 2.3190588235294114
 due_slack_min: 537.0
 due_slack_mean: 904.44
 due_slack_max: 1345.0

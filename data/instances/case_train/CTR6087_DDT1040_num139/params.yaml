@@ -1,0 +1,50 @@
+instance_id: CTR6087_DDT1040_num139
+tier: case_train
+source: generated
+file: CTR6087_DDT1040_num139.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 139
+ddt: 1040
+orders_per_product:
+- 46
+- 49
+- 44
+arrival_first: 1.0
+arrival_last: 1387.0
+inter_arrival_mean: 10.043478260869565
+inter_arrival_cv: 0.5317279204968273
+inter_arrival_max: 20.0
+max_burst: 3
+load_ratio: 1.9144037780401417
+load_ratio_bottleneck: 3.3373416706750043
+due_slack_min: 627.0
+due_slack_mean: 1107.0503597122301
+due_slack_max: 1603.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6087
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

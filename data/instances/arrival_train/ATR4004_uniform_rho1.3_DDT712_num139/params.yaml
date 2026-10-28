@@ -1,0 +1,50 @@
+instance_id: ATR4004_uniform_rho1.3_DDT712_num139
+tier: arrival_train
+source: generated
+file: ATR4004_uniform_rho1.3_DDT712_num139.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 139
+ddt: 712
+orders_per_product:
+- 24
+- 27
+- 25
+- 27
+- 36
+arrival_first: 1.0
+arrival_last: 5264.0
+inter_arrival_mean: 38.13768115942029
+inter_arrival_cv: 0.5880894968830138
+inter_arrival_max: 74.0
+max_burst: 3
+load_ratio: 1.2878811324339732
+load_ratio_bottleneck: 1.4186494394831846
+due_slack_min: 431.0
+due_slack_mean: 751.043165467626
+due_slack_max: 1102.0
+process_time_min: 27.0
+process_time_mean: 245.584
+process_time_max: 449.0
+seed: 4004
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: 1.3
+mean_gap_target: 37.78215384615385
+inter_arrival_range:
+- 1
+- 75

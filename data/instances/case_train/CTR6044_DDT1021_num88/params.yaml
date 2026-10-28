@@ -1,0 +1,50 @@
+instance_id: CTR6044_DDT1021_num88
+tier: case_train
+source: generated
+file: CTR6044_DDT1021_num88.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 88
+ddt: 1021
+orders_per_product:
+- 26
+- 27
+- 35
+arrival_first: 1.0
+arrival_last: 884.0
+inter_arrival_mean: 10.149425287356323
+inter_arrival_cv: 0.5558593400952246
+inter_arrival_max: 20.0
+max_burst: 2
+load_ratio: 1.8944198496859876
+load_ratio_bottleneck: 3.3025040895935573
+due_slack_min: 617.0
+due_slack_mean: 1066.8181818181818
+due_slack_max: 1580.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6044
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

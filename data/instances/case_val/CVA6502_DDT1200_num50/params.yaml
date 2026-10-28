@@ -1,0 +1,50 @@
+instance_id: CVA6502_DDT1200_num50
+tier: case_val
+source: generated
+file: CVA6502_DDT1200_num50.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 50
+ddt: 1200
+orders_per_product:
+- 21
+- 14
+- 15
+arrival_first: 1.0
+arrival_last: 480.0
+inter_arrival_mean: 9.775510204081632
+inter_arrival_cv: 0.5947880844093666
+inter_arrival_max: 20.0
+max_burst: 3
+load_ratio: 1.966881761245018
+load_ratio_bottleneck: 3.428825485192918
+due_slack_min: 725.0
+due_slack_mean: 1285.38
+due_slack_max: 1842.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6502
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

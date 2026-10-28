@@ -1,0 +1,50 @@
+instance_id: TNF5512_DDT500_num8
+tier: tiny5
+source: generated
+file: TNF5512_DDT500_num8.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 8
+ddt: 500
+orders_per_product:
+- 1
+- 2
+- 3
+- 1
+- 1
+arrival_first: 1.0
+arrival_last: 143.0
+inter_arrival_mean: 20.285714285714285
+inter_arrival_cv: 0.6115823165970476
+inter_arrival_max: 38.0
+max_burst: 1
+load_ratio: 2.1377014084507047
+load_ratio_bottleneck: 2.296394366197183
+due_slack_min: 308.0
+due_slack_mean: 528.75
+due_slack_max: 763.0
+process_time_min: 27.0
+process_time_mean: 216.824
+process_time_max: 450.0
+seed: 5512
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40
