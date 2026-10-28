@@ -6,7 +6,7 @@ from _common import OUT_DIR, RESULT, require
 from result.plot import plot_convergence
 from result.stats import METHOD_LABELS
 
-METHODS = ["ours", "nf", "ng", "a2c", "dqn", "ddqn"]
+METHODS = ["ours", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn"]
 
 
 def main() -> None:

@@ -1,6 +1,6 @@
-# Extra ablation: no self-attention over the candidate actions.
+# FSHGRL-NA: no self-attention over the candidate (machine, operation-type) pairs (fluid guidance unchanged).
 algo:
   attention:
     use_sparse_attention: false
   train:
-    experiment_name: ab_no_sparse_attn
+    experiment_name: ab_na

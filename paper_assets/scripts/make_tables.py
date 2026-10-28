@@ -48,7 +48,7 @@ def ablation() -> None:
         print(f"[SKIP] {path} missing")
         return
     table = pd.read_csv(path)
-    methods = [m for m in ("ours", "nf", "ng") if m in table.columns]
+    methods = [m for m in ("ours", "nfe", "nm", "nf", "ng", "na") if m in table.columns]
     header = ["Configuration (DDT, S)"] + [METHOD_LABELS[m] for m in methods]
     rows = [[f"({int(r['ddt'])}, {int(r['scale'])})"] + [_fmt(r[m]) for m in methods] for _, r in table.iterrows()]
     rows.append(["Mean"] + [_fmt(table[m].mean()) for m in methods])

@@ -43,3 +43,5 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   （`agent/normalize.py`：交期与加工率按单个观测归一化，策略输出与 batch 组成无关）、第 12 条（非法动作抛错）、第 10 条
   （`best_val_checkpoint.pt` 取代旧口径）；等价性回归新增 v2 黄金模式（`python -m tests.equivalence --golden v2`，
   `tests/golden_v2/manifest.json` 记录冻结提交；参考运行含 HiGHS 掩码与 2 个验证算例）；`tests/test_known_issue_fixes.py`。
+- V4 消融变体 `nfe`（去流体特征）、`nm`（去流体掩码）、`na`（去候选自注意力）进入 `scripts/run_04`（与 `nf`、`ng` 共 5 个变体）、
+  `result/stats.py` 的标签与 `ABLATION_METHODS`、`run_07` 的方法清单、消融表与收敛图；DRL 对比方法标签预留 `hsddqn`、`hgnn_ppo`（V7）。
