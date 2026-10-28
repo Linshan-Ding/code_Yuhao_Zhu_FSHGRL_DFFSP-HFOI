@@ -1,0 +1,50 @@
+instance_id: ATR4034_bursty_rho1.26_DDT1484_num66
+tier: arrival_train
+source: generated
+file: ATR4034_bursty_rho1.26_DDT1484_num66.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 66
+ddt: 1484
+orders_per_product:
+- 12
+- 11
+- 15
+- 17
+- 11
+arrival_first: 1.0
+arrival_last: 2329.0
+inter_arrival_mean: 35.815384615384616
+inter_arrival_cv: 3.0522168904021836
+inter_arrival_max: 495.0
+max_burst: 10
+load_ratio: 1.3515532646048112
+load_ratio_bottleneck: 1.4802577319587626
+due_slack_min: 891.0
+due_slack_mean: 1618.6969696969697
+due_slack_max: 2299.0
+process_time_min: 26.0
+process_time_mean: 242.032
+process_time_max: 444.0
+seed: 4034
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: bursty
+rho_target: 1.26
+mean_gap_target: 38.41777777777778
+burst_size: 10
+burst_gap: 2.0
+burst_jitter: 0.5

@@ -1,0 +1,50 @@
+instance_id: CTR6076_DDT1168_num119
+tier: case_train
+source: generated
+file: CTR6076_DDT1168_num119.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 119
+ddt: 1168
+orders_per_product:
+- 38
+- 43
+- 38
+arrival_first: 1.0
+arrival_last: 1194.0
+inter_arrival_mean: 10.110169491525424
+inter_arrival_cv: 0.5839960231315348
+inter_arrival_max: 20.0
+max_burst: 2
+load_ratio: 1.9017755086489367
+load_ratio_bottleneck: 3.315327062183726
+due_slack_min: 701.0
+due_slack_mean: 1236.8823529411766
+due_slack_max: 1807.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6076
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

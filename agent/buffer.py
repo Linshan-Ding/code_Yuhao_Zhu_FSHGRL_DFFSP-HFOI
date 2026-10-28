@@ -29,6 +29,11 @@ class RolloutBuffer:
     fluid_solve_seconds: float = 0.0
     fluid_cache_hit_count: int = 0
     fluid_fallback_count: int = 0
+    fluid_mask_fallback_count: int = 0        # v2 mask statistics (summed over the collected episodes)
+    fluid_mask_unavailable_count: int = 0
+    candidate_pairs_before: int = 0
+    candidate_pairs_after: int = 0
+    mask_decision_count: int = 0
     policy_forward_count: int = 0
     policy_forward_seconds: float = 0.0
     avg_action_tokens: float = 0.0
@@ -52,6 +57,24 @@ class RolloutBuffer:
         self.rewards.append(float(reward))
         self.dones.append(bool(done))
         self.trajectory_ids.append(int(trajectory_id))
+
+    def add_mask_stats(self, source) -> None:
+        """Accumulate the mask counters of a finished simulator (or of a worker's stats dict)."""
+        get = source.get if isinstance(source, dict) else (lambda key, default=0: getattr(source, key, default))
+        self.fluid_mask_fallback_count += int(get("fluid_mask_fallback_count", 0))
+        self.fluid_mask_unavailable_count += int(get("fluid_mask_unavailable_count", 0))
+        self.candidate_pairs_before += int(get("candidate_pairs_before", 0))
+        self.candidate_pairs_after += int(get("candidate_pairs_after", 0))
+        self.mask_decision_count += int(get("mask_decision_count", 0))
+
+    def mask_summary(self) -> dict:
+        """Mean eligible / candidate pairs per decision and the mask fallback rate (log.csv columns)."""
+        decisions = max(int(self.mask_decision_count), 1)
+        return {
+            "candidate_pairs_mean": self.candidate_pairs_before / decisions,
+            "masked_pairs_mean": self.candidate_pairs_after / decisions,
+            "mask_fallback_rate": self.fluid_mask_fallback_count / decisions,
+        }
 
     def fulfillment_summary(self) -> dict:
         if not self.fulfillment_rates:

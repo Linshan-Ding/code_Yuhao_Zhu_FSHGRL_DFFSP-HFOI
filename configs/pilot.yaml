@@ -1,9 +1,9 @@
-# Pilot experiment (scripts/run_02_pilot.py). Disabled: the paradigm is per-instance training on the 15
-# benchmark instances themselves (training set = evaluation set), so a pilot tier would spend the CPU-only
-# budget on instances outside every reported result. Reason recorded in docs/experiment-spec.md (change log)
-# and docs/pilot-log.md. When enabled, the methods below are trained for max_iterations on the pilot
-# instances and the verdict compares the proposed method with the best rule reference.
-enabled: false
-instances: [DDT500_num50, DDT900_num100, DDT1600_num150]
-methods: [ours, a2c, dqn, ddqn]
-max_iterations: 200
+# Pilot experiment (scripts/run_02_pilot.py): the training gate of the generalisation paradigm.
+# FSHGRL is trained once for max_iterations on the training pool with validation; the verdict compares the best
+# validation epoch with the best deterministic rule on the validation instances (reference.csv from run_06):
+# PASS when the mean fulfilment is at least the rules' mean and the policy reaches the reference on at least
+# pilot.min_win_share (configs/runs.yaml) of the validation instances. Rounds are logged in docs/pilot-log.md.
+enabled: true
+methods: [ours]
+max_iterations: 1000
+instances: [DDT500_num50, DDT900_num100, DDT1600_num150]   # per-instance paradigm only

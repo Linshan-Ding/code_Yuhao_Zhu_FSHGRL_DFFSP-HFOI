@@ -1,0 +1,50 @@
+instance_id: TRN1070_DDT756_num114
+tier: train
+source: generated
+file: TRN1070_DDT756_num114.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 114
+ddt: 756
+orders_per_product:
+- 21
+- 23
+- 21
+- 24
+- 25
+arrival_first: 1.0
+arrival_last: 2170.0
+inter_arrival_mean: 19.194690265486727
+inter_arrival_cv: 0.5956555002199638
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.5301163669893962
+load_ratio_bottleneck: 2.9537335177501154
+due_slack_min: 457.0
+due_slack_mean: 821.561403508772
+due_slack_max: 1170.0
+process_time_min: 28.0
+process_time_mean: 242.824
+process_time_max: 450.0
+seed: 1070
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

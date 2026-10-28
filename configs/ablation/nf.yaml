@@ -1,8 +1,8 @@
-# FSHGRL-NF: no fluid guidance. The trainer never prunes candidates by the fluid
-# solution, so removing fluid guidance means switching the two fluid node
-# features off (they become zero columns; the feature width is unchanged).
+# FSHGRL-NF: no fluid guidance at all (features off and mask off); the LP is not solved.
+# The legacy switch `fluid_mode: "off"` means the same thing.
 env:
-  fluid_mode: "off"
+  fluid_features: "off"
+  fluid_mask: false
 algo:
   train:
     experiment_name: ab_nf

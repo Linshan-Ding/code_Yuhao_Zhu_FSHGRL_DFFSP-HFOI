@@ -1,0 +1,7 @@
+# FSHGRL-NM: fluid node features on, fluid candidate mask off (every eligible pair is a candidate).
+env:
+  fluid_features: "on"
+  fluid_mask: false
+algo:
+  train:
+    experiment_name: ab_nm

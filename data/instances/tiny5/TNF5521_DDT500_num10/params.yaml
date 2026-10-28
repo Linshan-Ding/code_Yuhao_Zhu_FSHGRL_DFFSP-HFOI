@@ -1,0 +1,50 @@
+instance_id: TNF5521_DDT500_num10
+tier: tiny5
+source: generated
+file: TNF5521_DDT500_num10.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 10
+ddt: 500
+orders_per_product:
+- 2
+- 1
+- 1
+- 3
+- 3
+arrival_first: 1.0
+arrival_last: 144.0
+inter_arrival_mean: 15.88888888888889
+inter_arrival_cv: 0.8229791815342531
+inter_arrival_max: 39.0
+max_burst: 2
+load_ratio: 2.884632167832168
+load_ratio_bottleneck: 3.2133146853146854
+due_slack_min: 320.0
+due_slack_mean: 553.9
+due_slack_max: 761.0
+process_time_min: 30.0
+process_time_mean: 229.168
+process_time_max: 448.0
+seed: 5521
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

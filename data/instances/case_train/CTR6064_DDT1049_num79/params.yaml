@@ -1,0 +1,50 @@
+instance_id: CTR6064_DDT1049_num79
+tier: case_train
+source: generated
+file: CTR6064_DDT1049_num79.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 79
+ddt: 1049
+orders_per_product:
+- 29
+- 22
+- 28
+arrival_first: 1.0
+arrival_last: 850.0
+inter_arrival_mean: 10.884615384615385
+inter_arrival_cv: 0.5142647946725194
+inter_arrival_max: 20.0
+max_burst: 2
+load_ratio: 1.7664632187600382
+load_ratio_bottleneck: 3.0794398638921607
+due_slack_min: 631.0
+due_slack_mean: 1101.4303797468353
+due_slack_max: 1609.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6064
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

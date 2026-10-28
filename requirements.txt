@@ -9,7 +9,8 @@ matplotlib>=3.7
 seaborn>=0.13
 # Tests
 pytest>=7.0
-# Optional: exact fluid LP (needs a licence); the code falls back to a heuristic without it
+# Optional: Gurobi for the fluid LP and the exact MILP check (needs a licence); without it both use HiGHS
+# through scipy (fluid_backend auto -> scipy), the heuristic fallback only when scipy is missing as well
 # gurobipy>=10.0
 # Optional: live training charts / resource logging
 # visdom>=0.2

@@ -1,0 +1,50 @@
+instance_id: CVA6500_DDT600_num50
+tier: case_val
+source: generated
+file: CVA6500_DDT600_num50.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 50
+ddt: 600
+orders_per_product:
+- 17
+- 18
+- 15
+arrival_first: 1.0
+arrival_last: 498.0
+inter_arrival_mean: 10.142857142857142
+inter_arrival_cv: 0.5422077902794411
+inter_arrival_max: 20.0
+max_burst: 3
+load_ratio: 1.8956466069142126
+load_ratio_bottleneck: 3.3046426708398546
+due_slack_min: 388.0
+due_slack_mean: 659.1
+due_slack_max: 917.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6500
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

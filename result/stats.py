@@ -28,12 +28,21 @@ import pandas as pd
 
 HIGHER_IS_BETTER = {"fulfillment_rate": True, "gap": False, "obj_model": False, "obj_best": False}
 METHOD_LABELS = {
-    "ours": "FSHGRL", "nf": "FSHGRL-NF", "ng": "FSHGRL-NG", "a2c": "A2C", "dqn": "DQN", "ddqn": "DDQN",
+    "ours": "FSHGRL",
+    "ours_arrival": "FSHGRL (arrival-diverse pool)",
+    "ours_case": "FSHGRL (case pool)",
+    "nfe": "FSHGRL-NFe",        # fluid node features off, fluid candidate mask on
+    "nm": "FSHGRL-NM",          # fluid node features on, fluid candidate mask off
+    "nf": "FSHGRL-NF",          # both off
+    "ng": "FSHGRL-NG",          # point-wise MLP encoders instead of the heterogeneous graph
+    "na": "FSHGRL-NA",          # no self-attention over the candidate pairs
+    "hsddqn": "HSDDQN", "hgnn_ppo": "HGNN-PPO", "a2c": "A2C", "dqn": "DQN", "ddqn": "DDQN",
     "fifo": "FIFO", "spt": "SPT", "mor": "MOR", "mwkr": "MWKR", "random": "Random", "rrc": "RRC",
 }
 RULE_METHODS = ("fifo", "spt", "mor", "mwkr", "random", "rrc")
-DRL_METHODS = ("a2c", "dqn", "ddqn")
-ABLATION_METHODS = ("nf", "ng")
+DETERMINISTIC_RULE_METHODS = ("fifo", "spt", "mor", "mwkr")
+DRL_METHODS = ("hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn")
+ABLATION_METHODS = ("nfe", "nm", "nf", "ng", "na")     # 2 x 2 fluid factor design + encoder + attention
 
 
 def method_label(method: str) -> str:

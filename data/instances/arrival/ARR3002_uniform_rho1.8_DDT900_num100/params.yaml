@@ -1,0 +1,50 @@
+instance_id: ARR3002_uniform_rho1.8_DDT900_num100
+tier: arrival
+source: generated
+file: ARR3002_uniform_rho1.8_DDT900_num100.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 100
+ddt: 900
+orders_per_product:
+- 18
+- 17
+- 24
+- 17
+- 24
+arrival_first: 1.0
+arrival_last: 2457.0
+inter_arrival_mean: 24.80808080808081
+inter_arrival_cv: 0.5870172057831098
+inter_arrival_max: 48.0
+max_burst: 2
+load_ratio: 1.7602651465798045
+load_ratio_bottleneck: 2.023211726384365
+due_slack_min: 544.0
+due_slack_mean: 1017.82
+due_slack_max: 1392.0
+process_time_min: 26.0
+process_time_mean: 218.344
+process_time_max: 446.0
+seed: 3002
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 24.260444444444445
+inter_arrival_range:
+- 1
+- 48

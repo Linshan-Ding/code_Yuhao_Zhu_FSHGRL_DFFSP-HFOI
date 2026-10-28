@@ -5,7 +5,15 @@
     python -m tests.equivalence --determinism   # also re-run golden and compare golden vs golden
 
 Golden artefacts are produced from the untouched original commit (c030dfa),
-checked out automatically under tests/golden/_work/src.
+checked out automatically under tests/golden/_work/src (``--golden legacy``), or from the tree's own frozen
+v2 commit recorded in tests/golden_v2/manifest.json (``--golden v2``, the default once that manifest exists):
+
+    python -m tests.equivalence --golden v2 --regenerate-golden   # freeze HEAD (clean tree) as the v2 reference
+    python -m tests.equivalence --golden v2                        # compare the current tree with it
+    python -m tests.equivalence --golden legacy                    # only meaningful up to the V2 commit (legacy semantics)
+
+The v2 reference run trains 3 iterations with the fluid candidate mask through the HiGHS backend and a
+2-instance validation set, so the mask, the LP backend and the validation path are all frozen.
 """
 from __future__ import annotations
 
@@ -20,8 +28,10 @@ from pathlib import Path
 
 from . import candidate
 from .ast_targets import TARGETS
-from .common import (GOLDEN_COMMIT, GOLDEN_DIR, INSTANCE_NAME, LEGACY_CONFIG, MODEL_TYPES, ROOT, WORK_DIR,
-                     compare_checkpoint, compare_csv, compare_nested, pinned_env, run_legacy_train, run_subprocess)
+from .common import (GOLDEN_COMMIT, GOLDEN_DIR, GOLDEN_V2_DIR, INSTANCE_NAME, LEGACY_CONFIG, MANIFEST_V2,
+                     MAX_ITERATIONS, MODEL_TYPES, ROOT, V2_CHECKPOINT_FILES, WORK_DIR, WORK_DIR_V2,
+                     compare_checkpoint, compare_csv, compare_nested, compare_small_csv, pinned_env,
+                     run_legacy_train, run_subprocess, run_v2_train)
 
 CHECKPOINT_FILES = ("best_checkpoint.pt", "last_checkpoint.pt", "ppo_policy_model.pt")
 
@@ -84,13 +94,163 @@ def ensure_golden_run(src: Path, base_config: dict, model_type: str, regenerate:
     return csv_path, pt_dir
 
 
-def run_probe(tree_root: Path, instance_path: Path, out_path: Path) -> dict:
+def run_probe(tree_root: Path, instance_path: Path, out_path: Path, mode: str = "legacy") -> dict:
     import torch
 
     cmd = [sys.executable, str(ROOT / "tests" / "equivalence" / "probe.py"), str(out_path), str(LEGACY_CONFIG),
-           str(instance_path), *MODEL_TYPES]
+           str(instance_path), mode, *MODEL_TYPES]
     run_subprocess(cmd, tree_root, out_path.with_suffix(".log"))
     return torch.load(out_path, map_location="cpu", weights_only=False)
+
+
+# ---------------------------------------------------------------- v2 golden (the tree's own frozen commit)
+
+def git_head(root: Path) -> str:
+    return subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+
+
+def git_dirty(root: Path) -> bool:
+    out = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"],
+                         capture_output=True, text=True).stdout
+    return bool(out.strip())
+
+
+def read_manifest_v2() -> dict:
+    if not MANIFEST_V2.exists():
+        raise SystemExit(f"{MANIFEST_V2} missing: run 'python -m tests.equivalence --golden v2 --regenerate-golden' "
+                         "on a clean tree to freeze the reference")
+    return json.loads(MANIFEST_V2.read_text(encoding="utf-8"))
+
+
+def write_manifest_v2(commit: str) -> None:
+    import numpy
+    import torch
+    manifest = {
+        "golden_commit": commit,
+        "python": platform.python_version(),
+        "torch": torch.__version__,
+        "numpy": numpy.__version__,
+        "instance": INSTANCE_NAME,
+        "note": "v2 reference: fluid mask through the HiGHS backend, validation on the first two val instances, "
+                "CPU with OMP/MKL threads pinned to 1",
+    }
+    GOLDEN_V2_DIR.mkdir(parents=True, exist_ok=True)
+    MANIFEST_V2.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def ensure_golden_source_v2(commit: str) -> Path:
+    src = WORK_DIR_V2 / "src"
+    if (src / "train.py").exists() and git_head(src) == commit:
+        return src
+    if src.exists():
+        shutil.rmtree(src)
+    WORK_DIR_V2.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "clone", "-q", "--no-checkout", str(ROOT), str(src)], check=True)
+    subprocess.run(["git", "-C", str(src), "checkout", "-q", commit], check=True)
+    return src
+
+
+def v2_golden_paths(model_type: str) -> tuple[Path, Path, Path]:
+    return (GOLDEN_V2_DIR / model_type / "train_metrics.csv", GOLDEN_V2_DIR / model_type / "val_curve.csv",
+            WORK_DIR_V2 / f"golden_{model_type}")
+
+
+def store_v2_golden(result_dir: Path, model_type: str) -> None:
+    csv_path, val_path, pt_dir = v2_golden_paths(model_type)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(result_dir / "train_metrics.csv", csv_path)
+    shutil.copyfile(result_dir / "val_curve.csv", val_path)
+    pt_dir.mkdir(parents=True, exist_ok=True)
+    for name in V2_CHECKPOINT_FILES:
+        shutil.copyfile(result_dir / name, pt_dir / name)
+
+
+def ensure_golden_run_v2(src: Path, model_type: str) -> None:
+    """Rebuild the git-ignored golden checkpoints from the frozen commit when they are missing."""
+    csv_path, val_path, pt_dir = v2_golden_paths(model_type)
+    if csv_path.exists() and val_path.exists() and all((pt_dir / name).exists() for name in V2_CHECKPOINT_FILES):
+        return
+    print(f"[golden v2] rebuilding the reference run for model_type={model_type} from the frozen commit ...")
+    result_dir = run_v2_train(src, model_type, f"golden_{model_type}", WORK_DIR_V2 / f"golden_{model_type}.log")
+    mism, _, _ = compare_csv(csv_path, result_dir / "train_metrics.csv") if csv_path.exists() else ([], 0, 0)
+    if mism:
+        raise SystemExit("the frozen commit no longer reproduces tests/golden_v2 train_metrics.csv:\n" + "\n".join(mism[:10]))
+    store_v2_golden(result_dir, model_type)
+
+
+def compare_v2_run(model_type: str, result_dir: Path, tag: str, report: list, failures: list) -> None:
+    csv_path, val_path, pt_dir = v2_golden_paths(model_type)
+    mism, n, e = compare_csv(csv_path, result_dir / "train_metrics.csv")
+    tensors = exact = 0
+    for name in V2_CHECKPOINT_FILES:
+        t, x = compare_checkpoint(pt_dir / name, result_dir / name, mism)
+        tensors += t
+        exact += x
+    mism += compare_small_csv(val_path, result_dir / "val_curve.csv", ("epoch", "instance_id", "obj", "completed"),
+                              "val_curve.csv")
+    report.append(f"L6 end-to-end [{tag}]: {'OK' if not mism else f'{len(mism)} mismatch(es)'} "
+                  f"(float columns exact {e}/{n}; checkpoint tensors exact {exact}/{tensors}; val_curve.csv exact)")
+    failures.extend(f"L6 {tag}: {m}" for m in mism[:30])
+    side_problems, side_summary = candidate.check_contract_files(result_dir)
+    report.append(f"L6 contract files [{tag}]: {'OK' if not side_problems else 'FAIL'} ({side_summary})")
+    failures.extend(f"L6 {tag}: {m}" for m in side_problems)
+
+
+def main_v2(args) -> int:
+    failures: list[str] = []
+    report: list[str] = []
+    WORK_DIR_V2.mkdir(parents=True, exist_ok=True)
+    if args.regenerate_golden:
+        if git_dirty(ROOT) and not args.allow_dirty:
+            raise SystemExit("the working tree has uncommitted changes: commit first (the manifest records HEAD) "
+                             "or pass --allow-dirty for a throw-away reference")
+        commit = git_head(ROOT)
+        print(f"[golden v2] freezing {commit[:12]} as the v2 reference")
+        for model_type in args.model_types:
+            result_dir = run_v2_train(ROOT, model_type, f"golden_{model_type}", WORK_DIR_V2 / f"golden_{model_type}.log")
+            store_v2_golden(result_dir, model_type)
+        run_probe(ROOT, candidate.instance_path(), WORK_DIR_V2 / "probe_golden.pt", mode="v2")
+        write_manifest_v2(commit)
+        report.append(f"v2 reference regenerated from {commit[:12]} ({', '.join(args.model_types)})")
+    manifest = read_manifest_v2()
+    commit = manifest["golden_commit"]
+    src = ensure_golden_source_v2(commit) if not args.regenerate_golden else ROOT
+    report.append(f"L7 AST identity: n/a (v2 reference is commit {commit[:12]} of this tree)")
+
+    golden_probe_path = WORK_DIR_V2 / "probe_golden.pt"
+    import torch
+    if golden_probe_path.exists():
+        golden_probe = torch.load(golden_probe_path, map_location="cpu", weights_only=False)
+    else:
+        golden_probe = run_probe(src, src / "data" / "instances" / "benchmark" / Path(INSTANCE_NAME).stem / INSTANCE_NAME,
+                                 golden_probe_path, mode="v2")
+    candidate_probe = run_probe(ROOT, candidate.instance_path(), WORK_DIR_V2 / "probe_candidate.pt", mode="v2")
+    for layer in golden_probe:
+        layer_mismatches: list[str] = []
+        compare_nested(layer, golden_probe[layer], candidate_probe.get(layer), layer_mismatches)
+        report.append(f"{layer}: {'OK' if not layer_mismatches else f'{len(layer_mismatches)} mismatch(es)'}")
+        failures.extend(layer_mismatches[:20])
+
+    if not args.quick:
+        for model_type in args.model_types:
+            ensure_golden_run_v2(src, model_type)
+            if args.determinism:
+                rerun = run_v2_train(src, model_type, f"golden_{model_type}_rerun", WORK_DIR_V2 / f"golden_{model_type}_rerun.log")
+                compare_v2_run(model_type, rerun, f"{model_type} determinism", report, failures)
+            result_dir = run_v2_train(ROOT, model_type, f"eq2_{model_type}", WORK_DIR_V2 / f"candidate_{model_type}.log")
+            compare_v2_run(model_type, result_dir, model_type, report, failures)
+            if args.collector_workers > 0:
+                result_dir = run_v2_train(ROOT, model_type, f"eq2_{model_type}_cw{args.collector_workers}",
+                                          WORK_DIR_V2 / f"candidate_{model_type}_cw.log", collector_workers=args.collector_workers)
+                compare_v2_run(model_type, result_dir, f"{model_type}, collector_workers={args.collector_workers}", report, failures)
+
+    print("\n".join(report))
+    if failures:
+        print("\nFAILURES:")
+        print("\n".join(failures))
+        return 1
+    print("\nEQUIVALENCE (v2 golden): PASS")
+    return 0
 
 
 def _function_node(tree: ast.Module, qualname: str):
@@ -141,7 +301,14 @@ def main() -> int:
     parser.add_argument("--model-types", nargs="*", default=list(MODEL_TYPES))
     parser.add_argument("--collector-workers", type=int, default=0,
                         help="also run the L6 candidate with N environment worker processes (must match golden too)")
+    parser.add_argument("--golden", choices=["legacy", "v2"], default=None,
+                        help="reference tree: legacy (c030dfa) or v2 (frozen commit of this tree); default v2 when "
+                             "tests/golden_v2/manifest.json exists")
+    parser.add_argument("--allow-dirty", action="store_true", help="regenerate the v2 reference from a dirty tree")
     args = parser.parse_args()
+    golden = args.golden or ("v2" if MANIFEST_V2.exists() else "legacy")
+    if golden == "v2":
+        return main_v2(args)
 
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     src = ensure_golden_source()

@@ -256,7 +256,9 @@ class RunLogger:
 
     LOG_COLS = ["epoch", "env_steps", "wall_time_s", "train_obj_mean", "fixed_obj_mean", "fixed_gap_mean",
                 "policy_loss", "value_loss", "entropy", "clip_frac", "approx_kl", "lr", "sps", "gpu_util",
-                "gpu_mem_gb", "train_fulfillment_mean", "fixed_fulfillment_mean", "eval_seconds"]
+                "gpu_mem_gb", "train_fulfillment_mean", "fixed_fulfillment_mean", "eval_seconds",
+                "candidate_pairs_mean", "masked_pairs_mean", "mask_fallback_rate",
+                "val_obj_mean", "val_fulfillment_mean", "val_seconds"]
     CURVE_COLS = ["epoch", "instance_id", "obj", "obj_best", "gap", "feasible", "wall_time_s"]
     FINAL_COLS = ["instance_id", "obj_best", "obj_greedy_final", "feasible", "epochs", "wall_time_s"]
     VISDOM_SCALARS = ("train_obj_mean", "fixed_obj_mean", "fixed_gap_mean")

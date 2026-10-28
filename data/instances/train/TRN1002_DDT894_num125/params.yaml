@@ -1,0 +1,50 @@
+instance_id: TRN1002_DDT894_num125
+tier: train
+source: generated
+file: TRN1002_DDT894_num125.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 125
+ddt: 894
+orders_per_product:
+- 18
+- 21
+- 23
+- 37
+- 26
+arrival_first: 1.0
+arrival_last: 2606.0
+inter_arrival_mean: 21.008064516129032
+inter_arrival_cv: 0.5188580874872695
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.097708714011516
+load_ratio_bottleneck: 2.282171209213052
+due_slack_min: 545.0
+due_slack_mean: 967.584
+due_slack_max: 1382.0
+process_time_min: 26.0
+process_time_mean: 220.344
+process_time_max: 446.0
+seed: 1002
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

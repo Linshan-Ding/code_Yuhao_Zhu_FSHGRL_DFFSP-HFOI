@@ -28,23 +28,35 @@ DEFAULT_CONFIG_FILES = ("instance.yaml", "env.yaml", "algo.yaml")
 
 @dataclass
 class GeneratorCfg:
-    """Synthetic-instance generator settings (paper Table 5); used by data/generator.py only."""
+    """Synthetic-instance generator settings (data/generator.py). v2 defaults follow the statistics of the 15
+    benchmark files (docs/experiment-spec.md), not the paper's Table 5 (inter-arrival [1, 200] s there)."""
     n_products: int = 5
     n_stages: int = 5
     machines_per_stage: int = 5
     process_time_range: list = field(default_factory=lambda: [25, 450])
-    inter_arrival_range: list = field(default_factory=lambda: [1, 200])
-    ddt_range: list = field(default_factory=lambda: [300, 2500])
-    n_orders_range: list = field(default_factory=lambda: [20, 200])
+    inter_arrival_range: list = field(default_factory=lambda: [1, 40])
+    ddt_range: list = field(default_factory=lambda: [500, 1600])
+    slack_rule: str = "ddt_uniform"       # ddt_uniform (one DDT per instance, slack in slack_rel_range x DDT) | per_order
+    slack_rel_range: list = field(default_factory=lambda: [0.6, 1.55])
+    n_orders_range: list = field(default_factory=lambda: [50, 150])
+    arrival_model: str = "uniform"        # uniform | exponential | bursty (data/generator.py sample_arrivals)
+    burst_size: int = 10                  # bursty: orders per burst
+    burst_gap: float = 2.0                # bursty: gap inside a burst (time units)
+    burst_jitter: float = 0.5             # bursty: relative jitter of the gap between bursts
 
 
 @dataclass
 class InstanceCfg:
     problem: str = "dffsp_hfoi"
+    paradigm: str = "per_instance"        # per_instance (train = test instance) | generalization (pool -> unseen tiers)
     data_dir: str = "data/instances/benchmark"
     patterns: list = field(default_factory=lambda: ["DDT*.txt", "num*.txt", "train_num*.txt"])
     train_instances: list = field(default_factory=lambda: ["DDT500_num100.txt"])
     instance_selection: str = "fixed"
+    val_data_dir: str = "data/instances/val"   # validation instances (generalization: model selection)
+    val_instances: list = field(default_factory=list)   # explicit files; empty = every instance of val_data_dir
+    eval_tiers: list = field(default_factory=lambda: ["benchmark"])   # tiers evaluated by run_07 (generalization)
+    pools: dict = field(default_factory=dict)  # generated tiers (data/generator.py --pool); see configs/instance.yaml
     generator: GeneratorCfg = field(default_factory=GeneratorCfg)
 
 
@@ -54,6 +66,11 @@ class EnvCfg:
     progress_reward_coeff: float = 0.0
     order_top_k: int = 5
     fluid_mode: str = "cached_lp"
+    fluid_backend: str = "auto"           # auto | gurobi | scipy | heuristic (LP solver of cached_lp)
+    fluid_features: str = "on"            # on | off: the two fluid node features
+    fluid_mask: bool = True               # candidate pairs restricted to u* > fluid_mask_threshold (with fallback)
+    fluid_mask_threshold: float = 1.0e-5
+    fluid_recompute: str = "decision"     # decision (every new state) | event (legacy: after arrivals / discards only)
     fluid_time_limit: float = 2
     fluid_threads: int = 0
     collector_workers: int = 0            # 0 = simulators in the trainer process; N > 0 = N worker processes
@@ -112,6 +129,9 @@ class TrainCfg:
     experiment_name: str = "HGNNPPO-NF"
     eval_every: int = 1
     checkpoint_every: int = 0
+    eval_scope: str = "all"               # curve.csv greedy evaluation on all training instances | selected (this iteration's)
+    val_every: int = 0                    # validation-set evaluation every N iterations (0 = off); best_val_checkpoint.pt
+    early_stop_patience: int = 0          # stop when the best validation mean is older than N iterations (0 = off)
 
 
 @dataclass
@@ -242,6 +262,10 @@ def legacy_train_paras(cfg: Config) -> dict:
         "train_patterns": list(cfg.instance.patterns),
         "train_instances": list(cfg.instance.train_instances),
         "instance_selection": cfg.instance.instance_selection,
+        "paradigm": cfg.instance.paradigm,
+        "val_data_dir": cfg.instance.val_data_dir,
+        "val_instances": list(cfg.instance.val_instances),
+        "eval_tiers": list(cfg.instance.eval_tiers),
         "model_type": cfg.algo.model_type,
         "algorithm": cfg.algo.algorithm,
         "train_confirmed": bool(cfg.algo.train_confirmed),

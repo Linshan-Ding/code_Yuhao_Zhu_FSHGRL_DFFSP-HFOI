@@ -1,0 +1,50 @@
+instance_id: CTR6000_DDT1045_num92
+tier: case_train
+source: generated
+file: CTR6000_DDT1045_num92.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 92
+ddt: 1045
+orders_per_product:
+- 35
+- 28
+- 29
+arrival_first: 1.0
+arrival_last: 873.0
+inter_arrival_mean: 9.582417582417582
+inter_arrival_cv: 0.606942881005258
+inter_arrival_max: 20.0
+max_burst: 2
+load_ratio: 2.006515846538782
+load_ratio_bottleneck: 3.4979187903499835
+due_slack_min: 629.0
+due_slack_mean: 1157.2717391304348
+due_slack_max: 1613.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6000
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

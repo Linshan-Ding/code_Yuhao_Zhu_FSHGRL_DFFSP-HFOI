@@ -1,0 +1,47 @@
+instance_id: ATR4087_exponential_rho1.78_DDT631_num148
+tier: arrival_train
+source: generated
+file: ATR4087_exponential_rho1.78_DDT631_num148.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 148
+ddt: 631
+orders_per_product:
+- 25
+- 30
+- 35
+- 28
+- 30
+arrival_first: 1.0
+arrival_last: 3863.0
+inter_arrival_mean: 26.272108843537413
+inter_arrival_cv: 1.083656922274423
+inter_arrival_max: 149.0
+max_burst: 4
+load_ratio: 1.8501750388399796
+load_ratio_bottleneck: 1.9920745727602278
+due_slack_min: 384.0
+due_slack_mean: 688.1621621621622
+due_slack_max: 966.0
+process_time_min: 32.0
+process_time_mean: 243.04
+process_time_max: 443.0
+seed: 4087
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: exponential
+rho_target: 1.78
+mean_gap_target: 27.307865168539326

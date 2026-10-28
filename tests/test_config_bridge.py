@@ -24,9 +24,9 @@ TRAIN_KEYS = [
     "checkpoint_interval", "experiment_name", "train_patterns", "train_instances",
     "instance_selection", "discard_penalty", "progress_reward_coeff", "order_top_k", "fluid_mode",
     "fluid_time_limit", "fluid_threads", "use_sparse_attention", "sparse_attention_scope",
-    "sparse_attention_heads", "sparse_attention_dropout", "viz", "viz_name", "visdom_server",
+    "sparse_attention_heads", "sparse_attention_dropout", "viz_name", "visdom_server",
     "visdom_port", "viz_update_interval", "viz_metrics",
-]
+]   # `viz` is excluded: v2 switches the live charts off by default (configs/algo.yaml)
 MODEL_KEYS = [
     "in_size_ma", "out_size_ma", "in_size_ope", "out_size_ope", "hidden_size_ope", "num_heads", "dropout",
     "n_latent_actor", "n_latent_critic", "n_hidden_actor", "n_hidden_critic", "action_dim", "epsilon",
@@ -63,12 +63,12 @@ def test_model_paras_match_legacy_json():
 def test_ablation_overlays_change_only_their_keys():
     base = to_legacy_config(load_config())
     nf = to_legacy_config(load_config(["instance.yaml", "env.yaml", "algo.yaml", "ablation/nf.yaml"]))
-    assert nf["train_paras"]["fluid_mode"] == "off"
+    assert nf["train_paras"]["fluid_features"] == "off" and nf["train_paras"]["fluid_mask"] is False
     ng = to_legacy_config(load_config(["instance.yaml", "env.yaml", "algo.yaml", "ablation/ng.yaml"]))
     assert ng["train_paras"]["model_type"] == "mlp"
     for paras in (nf, ng):
         for key in TRAIN_KEYS:
-            if key in ("fluid_mode", "experiment_name"):
+            if key in ("fluid_mode", "fluid_features", "fluid_mask", "experiment_name"):
                 continue
             assert _same(paras["train_paras"][key], base["train_paras"][key]), key
 

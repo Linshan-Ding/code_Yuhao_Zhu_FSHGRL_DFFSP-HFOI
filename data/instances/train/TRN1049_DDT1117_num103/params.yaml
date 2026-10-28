@@ -1,0 +1,50 @@
+instance_id: TRN1049_DDT1117_num103
+tier: train
+source: generated
+file: TRN1049_DDT1117_num103.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 103
+ddt: 1117
+orders_per_product:
+- 30
+- 19
+- 15
+- 24
+- 15
+arrival_first: 1.0
+arrival_last: 1967.0
+inter_arrival_mean: 19.274509803921568
+inter_arrival_cv: 0.5687637885303994
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.5020402848423196
+load_ratio_bottleneck: 2.762197355035605
+due_slack_min: 678.0
+due_slack_mean: 1212.0291262135922
+due_slack_max: 1725.0
+process_time_min: 37.0
+process_time_mean: 241.128
+process_time_max: 442.0
+seed: 1049
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

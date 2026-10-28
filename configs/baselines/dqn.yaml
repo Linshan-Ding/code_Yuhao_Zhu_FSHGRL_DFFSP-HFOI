@@ -1,6 +1,10 @@
 # DQN baseline (agent/baselines/dqn.py + offpolicy.py): graph encoder + token Q-head, epsilon-greedy
 # collection, uniform replay, hard target copies. Settings under algo.offpolicy (defaults in configs/algo.yaml).
 # New code; the original repository holds no results to compare against.
+# v2: comparators run without fluid guidance (docs/baselines.md).
+env:
+  fluid_features: "off"
+  fluid_mask: false
 algo:
   algorithm: dqn
   train:

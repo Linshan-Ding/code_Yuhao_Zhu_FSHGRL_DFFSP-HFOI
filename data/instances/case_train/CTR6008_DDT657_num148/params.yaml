@@ -1,0 +1,50 @@
+instance_id: CTR6008_DDT657_num148
+tier: case_train
+source: generated
+file: CTR6008_DDT657_num148.txt
+n_products: 3
+n_stages: 6
+n_machines: 31
+machine_division:
+- 3
+- 5
+- 9
+- 6
+- 6
+- 2
+n_orders: 148
+ddt: 657
+orders_per_product:
+- 55
+- 51
+- 42
+arrival_first: 1.0
+arrival_last: 1616.0
+inter_arrival_mean: 10.986394557823129
+inter_arrival_cv: 0.521637190975223
+inter_arrival_max: 20.0
+max_burst: 3
+load_ratio: 1.7500985083028426
+load_ratio_bottleneck: 3.0509115927072585
+due_slack_min: 401.0
+due_slack_mean: 707.5
+due_slack_max: 1015.0
+process_time_min: 26.0
+process_time_mean: 99.3409090909091
+process_time_max: 430.0
+seed: 6008
+ddt_range:
+- 600
+- 1200
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: minute
+arrival_model: uniform
+rho_target: 1.8
+mean_gap_target: 10.68181818181818
+inter_arrival_range:
+- 1
+- 20
+structure: case

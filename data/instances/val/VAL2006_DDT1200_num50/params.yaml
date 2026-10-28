@@ -1,0 +1,50 @@
+instance_id: VAL2006_DDT1200_num50
+tier: val
+source: generated
+file: VAL2006_DDT1200_num50.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 50
+ddt: 1200
+orders_per_product:
+- 15
+- 11
+- 4
+- 10
+- 10
+arrival_first: 1.0
+arrival_last: 1006.0
+inter_arrival_mean: 20.510204081632654
+inter_arrival_cv: 0.5744577727129997
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.318377711442786
+load_ratio_bottleneck: 2.434300497512438
+due_slack_min: 732.0
+due_slack_mean: 1247.48
+due_slack_max: 1778.0
+process_time_min: 25.0
+process_time_mean: 237.752
+process_time_max: 444.0
+seed: 2006
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

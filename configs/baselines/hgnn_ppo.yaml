@@ -1,0 +1,15 @@
+# HGNN-PPO (adapted): the heterogeneous-graph PPO scheduler on (operation-type, machine) pair actions.
+# Same encoder, actor-critic and PPO update as the proposed method with every FSHGRL element removed:
+# no fluid features, no fluid mask, no self-attention over the candidate pairs, and the order dimension fixed by
+# EDD (order_top_k: 1 keeps the most urgent order per operation type, i.e. the pair action space of the
+# original method). Adaptation scope in docs/baselines.md.
+env:
+  fluid_features: "off"
+  fluid_mask: false
+  order_top_k: 1
+algo:
+  algorithm: ppo
+  attention:
+    use_sparse_attention: false
+  train:
+    experiment_name: hgnn_ppo

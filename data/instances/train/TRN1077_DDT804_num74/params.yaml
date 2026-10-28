@@ -1,0 +1,50 @@
+instance_id: TRN1077_DDT804_num74
+tier: train
+source: generated
+file: TRN1077_DDT804_num74.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 74
+ddt: 804
+orders_per_product:
+- 20
+- 6
+- 23
+- 13
+- 12
+arrival_first: 1.0
+arrival_last: 1402.0
+inter_arrival_mean: 19.19178082191781
+inter_arrival_cv: 0.6105608956554147
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.509574304068522
+load_ratio_bottleneck: 2.7307523197715917
+due_slack_min: 510.0
+due_slack_mean: 820.5405405405405
+due_slack_max: 1218.0
+process_time_min: 25.0
+process_time_mean: 240.816
+process_time_max: 442.0
+seed: 1077
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

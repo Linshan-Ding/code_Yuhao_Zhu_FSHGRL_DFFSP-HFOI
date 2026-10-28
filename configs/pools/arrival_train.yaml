@@ -1,0 +1,8 @@
+# FSHGRL trained on the arrival-diverse pool (load 0.8-2.6, uniform / exponential / bursty arrivals), evaluated
+# on the arrival tier and the benchmark tier (robustness study of the manuscript, Section 5.x). Method id: ours_arrival.
+instance:
+  data_dir: data/instances/arrival_train
+  eval_tiers: [arrival, benchmark]
+algo:
+  train:
+    experiment_name: ours_arrival

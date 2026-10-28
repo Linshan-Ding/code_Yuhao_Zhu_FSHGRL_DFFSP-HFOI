@@ -1,0 +1,50 @@
+instance_id: TRN1169_DDT908_num119
+tier: train
+source: generated
+file: TRN1169_DDT908_num119.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 119
+ddt: 908
+orders_per_product:
+- 25
+- 27
+- 29
+- 17
+- 21
+arrival_first: 1.0
+arrival_last: 2258.0
+inter_arrival_mean: 19.127118644067796
+inter_arrival_cv: 0.6239585627326847
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.4753127159946837
+load_ratio_bottleneck: 2.6856109880372174
+due_slack_min: 548.0
+due_slack_mean: 970.7647058823529
+due_slack_max: 1388.0
+process_time_min: 25.0
+process_time_mean: 236.728
+process_time_max: 446.0
+seed: 1169
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -27,6 +27,8 @@ SAFETY = 0.9              # share of the free GPU memory counted as budget
 POLL = 0.5                # seconds between polls of running jobs
 PROGRESS_EVERY = 300      # seconds between progress tables
 CONFIGS = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]   # the default trio
+if (ROOT / "configs" / "paper.yaml").exists():
+    CONFIGS.append("configs/paper.yaml")                                          # the paper layer (v2)
 
 
 # ------------------------------------------------------------------ console helpers
@@ -141,6 +143,19 @@ def instance_ids(*tiers) -> list:
         sys.exit("[FAIL] data/instances/index.csv missing: run python scripts/run_01_prepare_data.py first")
     with index.open(encoding="utf-8") as file:
         return [row["instance_id"] for row in csv.DictReader(file) if not tiers or row["tier"] in tiers]
+
+
+def paradigm() -> str:
+    """``instance.paradigm`` of the merged configuration the scripts train with (CONFIGS)."""
+    from configs.config import load_config
+
+    return str(load_config([ROOT / c for c in CONFIGS]).instance.paradigm).lower()
+
+
+def eval_tiers_cfg() -> list:
+    from configs.config import load_config
+
+    return [str(t) for t in load_config([ROOT / c for c in CONFIGS]).instance.eval_tiers]
 
 
 def collector_workers_cfg() -> int:
@@ -317,6 +332,25 @@ def run_jobs(jobs, workers: int, gpu_mem_per_job_gb=None, fail_fast: str = "drai
     if bad:
         sys.exit(f"[FAIL] {len(bad)} job(s) failed: {[j.name for j in bad]}; see result/<name>/stdout.log")
     return finished
+
+
+def pool_jobs(method: str, extra_configs, runs: int, prefix: str = "", extra_args=()) -> list:
+    """Generalisation paradigm: one job per run -> result/<prefix><method>/run<k>/ (the training pool, the
+    instance selection and the validation set come from the configuration)."""
+    jobs = []
+    for k in range(1, runs + 1):
+        name = f"{prefix}{method}/run{k}"
+        jobs.append(Job(name, [sys.executable, "train.py", "--config", *CONFIGS, *extra_configs,
+                               "--run-name", name, *seed_args(runs), *extra_args],
+                        output=ROOT / "result" / name / "train_meta.yaml"))
+    return jobs
+
+
+def method_jobs(method: str, extra_configs, instance_list, runs: int, prefix: str = "") -> list:
+    """Jobs of a method under the configured paradigm (per-instance matrix or one job per run)."""
+    if paradigm() == "generalization":
+        return pool_jobs(method, extra_configs, runs, prefix)
+    return training_jobs(method, extra_configs, instance_list, runs, prefix)
 
 
 def training_jobs(method: str, extra_configs, instance_list, runs: int, prefix: str = "") -> list:

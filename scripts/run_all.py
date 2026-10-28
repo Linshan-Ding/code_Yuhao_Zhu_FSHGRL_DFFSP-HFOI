@@ -1,5 +1,6 @@
 """Run every stage in dependency order: data -> pilot (gate; skipped when disabled) -> training (ours,
-ablations, learned baselines) in parallel with the CPU rule baselines -> evaluation -> aggregation.
+ablations, learned baselines) in parallel with the CPU rule baselines and the exact MILP check -> evaluation
+-> aggregation.
 An optional integer argument caps the concurrency of every stage (1 = fully serial)."""
 import subprocess
 import sys
@@ -15,8 +16,9 @@ STAGES = [
     ("pilot", ["run_02_pilot.py"], ["data"]),
     ("train", ["run_03_train_ours.py", "run_04_train_ablations.py", "run_05_train_learned_baselines.py"], ["pilot"]),
     ("rules", ["run_06_run_rules.py"], ["data"]),
+    ("milp", ["run_08_milp_check.py"], ["data"]),
     ("eval", ["run_07_eval_main.py"], ["train", "rules"]),
-    ("aggregate", ["run_09_aggregate_stats.py"], ["eval"]),
+    ("aggregate", ["run_09_aggregate_stats.py"], ["eval", "milp"]),
 ]
 
 done_stages, running, t0, failed = set(), [], time.time(), []

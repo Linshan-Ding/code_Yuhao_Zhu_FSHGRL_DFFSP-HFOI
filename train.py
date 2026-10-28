@@ -25,6 +25,7 @@ from data.dataset import resolve_instance_files, select_instance
 from data.instance_io import parse_instance_file
 from result.logger import RunLogger, TrainingVisualizer, git_commit_hash, write_metrics  # noqa: F401  (re-exported)
 from result.metrics import gap_pct, gpu_utilization, load_reference, objective_from_fulfillment
+from result.validation import ValidationTracker
 from rollout import collect_vectorized_rollouts, collect_vectorized_rollouts_parallel, run_episodes
 
 
@@ -173,13 +174,53 @@ def evaluate_fixed_set(policy, instance_files, train_paras: dict, reference: dic
             "fulfillment_rate": episode["fulfillment_rate"],
             "completed": episode["completed"],
             "discarded": episode["discarded"],
+            "total_orders": episode["total_orders"],
             "decision_count": episode["decision_count"],
             "eval_seconds": episode["wall_seconds"],
         })
     return rows
 
 
-def paradigm_name(instance_files) -> str:
+def resolve_validation_files(train_paras: dict) -> list:
+    """Validation instances (v2): ``val_instances`` of ``val_data_dir``, or every instance file under it;
+    empty (with a notice) when the directory does not exist."""
+    val_dir = resolve_data_dir(str(train_paras.get("val_data_dir") or "data/instances/val"))
+    names = train_paras.get("val_instances") or None
+    if isinstance(names, str):
+        names = parse_instances([names])
+    if not val_dir.exists():
+        print(f"[Validation] directory {val_dir} does not exist: validation disabled "
+              f"(run scripts/run_01_prepare_data.py to generate the pools)")
+        return []
+    return resolve_instance_files(str(val_dir), ["*.txt"], names)
+
+
+def make_validation_tracker(result_dir: Path, train_paras: dict, max_iterations: int, resume: bool) -> ValidationTracker:
+    val_every = int(train_paras.get("val_every", 0) or 0)
+    files = resolve_validation_files(train_paras) if val_every > 0 else []
+    tracker = ValidationTracker(result_dir, files, every=val_every,
+                                patience=int(train_paras.get("early_stop_patience", 0) or 0),
+                                max_iterations=max_iterations, resume=resume)
+    if tracker.enabled:
+        print(f"[Validation] {len(files)} instance(s) every {val_every} iteration(s); "
+              f"early-stop patience {tracker.patience or 'off'}; checkpoint {tracker.checkpoint_path.name}")
+    return tracker
+
+
+def fluid_backend_of(train_paras: dict, instance_files) -> str:
+    """Name of the fluid backend a simulator of this configuration uses (for the snapshot)."""
+    try:
+        from environment.simulator import TrainingSimulator
+
+        return TrainingSimulator(parse_instance_file(instance_files[0]), train_paras).fluid_backend_used
+    except Exception:
+        return "unknown"
+
+
+def paradigm_name(instance_files, train_paras: dict | None = None) -> str:
+    configured = str((train_paras or {}).get("paradigm", "") or "").lower()
+    if configured in ("per_instance", "generalization"):
+        return configured
     return "per_instance" if len(instance_files) == 1 else "fixed_set"
 
 
@@ -196,9 +237,14 @@ def build_snapshot(args, train_paras: dict, model_paras: dict, instance_files, r
         "command": [Path(sys.argv[0]).name, *sys.argv[1:]],
         "config_files": [str(item) for item in (args.config or DEFAULT_CONFIG_FILES)],
         "seed": args.seed,
-        "paradigm": paradigm_name(instance_files),
+        "paradigm": paradigm_name(instance_files, train_paras),
         "instance_selection": train_paras.get("instance_selection", "fixed"),
         "instances": [path.name for path in instance_files],
+        "n_train_instances": len(instance_files),
+        "eval_scope": train_paras.get("eval_scope", "all"),
+        "val_every": int(train_paras.get("val_every", 0) or 0),
+        "val_data_dir": train_paras.get("val_data_dir", ""),
+        "eval_tiers": list(train_paras.get("eval_tiers", []) or []),
         "algorithm": train_paras.get("algorithm", "ppo"),
         "model_type": train_paras.get("model_type", "hgnn"),
         "train_version": train_paras.get("train_version"),
@@ -210,6 +256,7 @@ def build_snapshot(args, train_paras: dict, model_paras: dict, instance_files, r
         "python": platform.python_version(),
         "torch": torch.__version__,
         "gurobipy_available": gurobi_available,
+        "fluid_backend": fluid_backend_of(train_paras, instance_files),
         "model_paras": model_paras,
         "train_paras": train_paras,
     }
@@ -217,7 +264,7 @@ def build_snapshot(args, train_paras: dict, model_paras: dict, instance_files, r
 
 def finalize_run(logger: RunLogger, stop_reason: str, start_iteration: int, last_iteration: int,
                  best_fulfillment_rate: float, best_greedy_obj: float, best_greedy_iteration: int,
-                 train_paras: dict, instance_files) -> None:
+                 train_paras: dict, instance_files, validation: dict | None = None) -> None:
     """Write fixed_set_final.csv and train_meta.yaml (called from the trainer's finally block)."""
     wall_time_s = round(logger.wall_time(), 3)
     logger.write_final(epochs=last_iteration + 1, wall_time_s=wall_time_s)
@@ -230,11 +277,12 @@ def finalize_run(logger: RunLogger, stop_reason: str, start_iteration: int, last
         "best_sampled_fulfillment_rate": best_fulfillment_rate if math.isfinite(best_fulfillment_rate) else None,
         "best_greedy_obj": best_greedy_obj if math.isfinite(best_greedy_obj) else None,
         "best_greedy_iteration": best_greedy_iteration if best_greedy_iteration >= 0 else None,
-        "paradigm": paradigm_name(instance_files),
+        "paradigm": paradigm_name(instance_files, train_paras),
         "eval_set": "train_set",
         "n_instances": len(instance_files),
         "train_version": train_paras.get("train_version"),
         "finished_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        **(validation or {}),
     })
 
 
@@ -324,7 +372,11 @@ def main():
     logger.write_snapshot(build_snapshot(args, train_paras, model_paras, instance_files, rollout_device,
                                          update_device, start_iteration, max_iterations))
     eval_every = int(train_paras.get("eval_every", 1))
+    eval_scope = str(train_paras.get("eval_scope", "all") or "all").lower()
+    if eval_scope not in ("all", "selected"):
+        raise SystemExit("[FAIL] eval_scope must be 'all' or 'selected'")
     checkpoint_every = int(train_paras.get("checkpoint_every", 0))
+    validation = make_validation_tracker(result_dir, train_paras, max_iterations, resume=start_iteration > 0)
     best_greedy_obj = float("inf")
     best_greedy_iteration = -1
     last_iteration = start_iteration - 1
@@ -444,7 +496,8 @@ def main():
                 eval_start_time = time.time()
                 eval_policy = prepare_rollout_policy(model, rollout_device, update_device)
                 saved_forward_stats = getattr(eval_policy, "last_forward_stats", None)
-                greedy_rows = evaluate_fixed_set(eval_policy, instance_files, train_paras, reference)
+                eval_files = instance_files if eval_scope == "all" else [selected_instance]
+                greedy_rows = evaluate_fixed_set(eval_policy, eval_files, train_paras, reference)
                 if saved_forward_stats is not None:
                     eval_policy.last_forward_stats = saved_forward_stats
                 sampled_best_obj = objective_from_fulfillment(fulfillment_metrics["fulfillment_rate_max"])
@@ -464,6 +517,16 @@ def main():
                     best_greedy_iteration = iteration
                     save_checkpoint(best_greedy_checkpoint_path, model, iteration, best_fulfillment_rate,
                                     train_paras, config)
+            val_metrics = {}
+            if validation.due(iteration):                       # v2: validation set, best_val_checkpoint.pt
+                val_policy = prepare_rollout_policy(model, rollout_device, update_device)
+                saved_forward_stats = getattr(val_policy, "last_forward_stats", None)
+                val_metrics = validation.evaluate(
+                    iteration, lambda files: evaluate_fixed_set(val_policy, files, train_paras, reference),
+                    round(logger.wall_time(), 3),
+                    lambda path: save_checkpoint(path, model, iteration, best_fulfillment_rate, train_paras, config))
+                if saved_forward_stats is not None:
+                    val_policy.last_forward_stats = saved_forward_stats
             logger.log(iteration, {
                 "env_steps": logger.env_steps,
                 "wall_time_s": round(logger.wall_time(), 3),
@@ -482,12 +545,22 @@ def main():
                 "train_fulfillment_mean": fulfillment_metrics["fulfillment_rate_mean"],
                 "fixed_fulfillment_mean": fixed_fulfillment_mean,
                 "eval_seconds": eval_seconds,
+                **rollout.mask_summary(),
+                "val_obj_mean": val_metrics.get("val_obj_mean", ""),
+                "val_fulfillment_mean": val_metrics.get("val_fulfillment_mean", ""),
+                "val_seconds": val_metrics.get("val_seconds", ""),
             })
             if checkpoint_every > 0 and iteration % checkpoint_every == 0:
                 save_checkpoint(result_dir / f"checkpoint_epoch{iteration:04d}.pt", model, iteration,
                                 best_fulfillment_rate, train_paras, config)
             last_iteration = iteration
-        stop_reason = "max_iterations"
+            if validation.should_stop(iteration):
+                stop_reason = "early_stop"
+                print(f"[Validation] early stop at iteration {iteration}: best validation mean at "
+                      f"iteration {validation.best_iteration}")
+                break
+        else:
+            stop_reason = "max_iterations"
     except KeyboardInterrupt:
         stop_reason = "interrupted"
         raise
@@ -497,7 +570,8 @@ def main():
     finally:
         try:
             finalize_run(logger, stop_reason, start_iteration, last_iteration, best_fulfillment_rate,
-                         best_greedy_obj, best_greedy_iteration, train_paras, instance_files)
+                         best_greedy_obj, best_greedy_iteration, train_paras, instance_files,
+                         validation.summary() if "validation" in locals() else None)
         except Exception as exc:  # never mask the training error
             print(f"[RunLogger] could not write the run summary: {exc}")
         if collector is not None:

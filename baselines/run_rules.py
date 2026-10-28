@@ -31,7 +31,8 @@ if str(ROOT) not in sys.path:
 import pandas as pd  # noqa: E402
 
 from agent.baselines.rules import DETERMINISTIC_RULES, RULES, RulePolicy, run_rule_episode  # noqa: E402
-from data.dataset import REFERENCE_PATH, benchmark_instance_files, load_index  # noqa: E402
+from data.dataset import (REFERENCE_PATH, benchmark_instance_files, instance_files_by_ids, load_index,  # noqa: E402
+                          tier_directories, tier_instance_files)
 from data.instance_io import parse_instance_file  # noqa: E402
 from environment.profiled import ProfiledSimulator  # noqa: E402
 from eval import COLS, episode_row, parse_instance_names, write_rows  # noqa: E402
@@ -90,7 +91,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--config", nargs="+", default=None, help="YAML overlays (default trio) for the simulator")
     parser.add_argument("--rules", nargs="+", default=["all"], help=f"subset of {RULES} or 'all'")
-    parser.add_argument("--instances", nargs="*", default=None, help="instance ids or 'all' (default)")
+    parser.add_argument("--instances", nargs="*", default=None, help="instance ids (any tier) or 'all' (default)")
+    parser.add_argument("--tiers", nargs="*", default=None,
+                        help="tiers to run (default: every indexed tier except 'train'); ignored with --instances")
     parser.add_argument("--runs-random", type=int, default=10, help="independent runs of random / rrc")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--rrc-mode", choices=["episode", "step"], default="episode")
@@ -105,7 +108,14 @@ def main() -> None:
     if unknown:
         parser.error(f"unknown rules {unknown}; choose from {RULES}")
     names = parse_instance_names(args.instances)
-    instance_files = benchmark_instance_files(None if not names or names == ["all"] else names)
+    if names and names != ["all"]:
+        instance_files = instance_files_by_ids(names)
+    else:
+        tiers = args.tiers or [p.name for p in tier_directories() if not p.name.endswith("train")]
+        instance_files = []
+        for tier in tiers:
+            instance_files.extend(tier_instance_files(tier))
+        print(f"[RULES] tiers {tiers}: {len(instance_files)} instances")
     train_paras = dict(load_config(args.config)["train_paras"])
     index = load_index()
     reference = load_reference()

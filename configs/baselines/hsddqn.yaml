@@ -1,0 +1,12 @@
+# HSDDQN (adapted; agent/baselines/hsddqn.py + offpolicy.py): hierarchical double DQN comparator of Table 10.
+# Level 1 scores the eligible (machine, operation-type) pairs, level 2 the queued orders of the chosen pair;
+# double-DQN targets at both levels, epsilon-greedy collection, uniform replay, hard target copies
+# (algo.offpolicy in configs/algo.yaml). Graph encoder of the proposed method, fluid guidance off.
+# Adaptation scope in docs/baselines.md; new code, no numbers of the original implementation exist.
+env:
+  fluid_features: "off"
+  fluid_mask: false
+algo:
+  algorithm: hsddqn
+  train:
+    experiment_name: hsddqn
