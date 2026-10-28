@@ -61,3 +61,7 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   无流体引导、无候选自注意力、`order_top_k: 1` 即 (工序类型, 机器) 对动作）；全部对比方法的覆盖层关闭流体引导
   （`fluid_features: off`、`fluid_mask: false`）；`run_05`、`run_02` 纳入两者；`docs/baselines.md` 记录改编范围；
   `tests/test_learned_baselines.py` 新增动作可行性、双层 TD 更新、token 编解码、检查点往返与覆盖层测试。
+- V8 精确求解检查 `baselines/milp_exact.py`（论文 3.2 节 MILP 的 MILP-A 原模型与 MILP-B 可放弃变体，Gurobi 优先、HiGHS 备用，
+  紧 big-L 并记录；验证器左移重定时、`ScheduleFollowingSimulator` 仿真器回放、S ≤ 6 的穷举交叉核对；
+  产物 `result/milp/milp_results.csv`）、`scripts/run_08_milp_check.py`（档位 tiny 与 tiny5，`run_all` 的 milp 阶段）、
+  `tests/test_milp_exact.py`；两变体最优值相等的论证见 `docs/baselines.md`。

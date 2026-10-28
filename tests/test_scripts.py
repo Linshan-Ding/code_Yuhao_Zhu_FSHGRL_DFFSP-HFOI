@@ -15,7 +15,7 @@ def test_scripts_compile_and_declare_concurrency():
     names = sorted(p.name for p in SCRIPTS.glob("run_*.py"))
     assert names == ["run_00_smoke.py", "run_01_prepare_data.py", "run_02_pilot.py", "run_03_train_ours.py",
                      "run_04_train_ablations.py", "run_05_train_learned_baselines.py", "run_06_run_rules.py",
-                     "run_07_eval_main.py", "run_09_aggregate_stats.py", "run_all.py"]
+                     "run_07_eval_main.py", "run_08_milp_check.py", "run_09_aggregate_stats.py", "run_all.py"]
     for name in names:
         tree = ast.parse((SCRIPTS / name).read_text(encoding="utf-8"))
         assigned = set()
