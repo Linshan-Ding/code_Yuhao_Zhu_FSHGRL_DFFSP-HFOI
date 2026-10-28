@@ -22,8 +22,8 @@ def instance_path() -> Path:
 def overlay_for(model_type: str, experiment_name: str, collector_workers: int = 0) -> dict:
     """The golden train_paras overrides expressed in the YAML layout (plus the collector when requested)."""
     o = golden_train_overrides(model_type)
-    env = {"fluid_mode": o["fluid_mode"], "fluid_mask": False, "fluid_backend": "auto",
-           "fluid_recompute": "event"}                                                    # legacy semantics
+    env = {"fluid_mode": o["fluid_mode"], "fluid_mask": False, "fluid_backend": "gurobi",
+           "fluid_recompute": "event"}                       # legacy semantics: Gurobi when importable, else heuristic
     if collector_workers > 0:
         env["collector_workers"] = int(collector_workers)
     return {

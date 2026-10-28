@@ -285,13 +285,21 @@ class TrainingSimulator:
     def resolve_fluid_backend(self) -> str:
         """``gurobi`` | ``scipy`` | ``heuristic``: the solver actually used for ``fluid_mode: cached_lp``.
 
-        ``auto`` prefers Gurobi and otherwise keeps the legacy behaviour (heuristic fallback, counted in
-        ``fluid_fallback_count``); ``scipy`` solves the same LP with HiGHS (``scipy.optimize.linprog``), which
-        makes the exact fluid solution, and therefore the mask, available without a Gurobi licence.
+        ``auto`` (v2) prefers Gurobi, then HiGHS through ``scipy.optimize.linprog`` (the same LP, exact
+        without a licence, so the mask is available on every machine), and only then the heuristic fallback
+        (counted in ``fluid_fallback_count``); ``gurobi`` falls back to the heuristic when gurobipy is missing
+        (the legacy behaviour, pinned by the legacy equivalence overlay); ``scipy`` and ``heuristic`` are explicit.
         """
         if self._backend_resolved is None:
             requested = self.fluid_backend_name
-            if requested in ("auto", "gurobi"):
+            if requested == "auto":
+                if self._load_gurobi() is not None:
+                    name = "gurobi"
+                elif self._load_scipy_linprog() is not None:
+                    name = "scipy"
+                else:
+                    name = "heuristic"
+            elif requested == "gurobi":
                 name = "gurobi" if self._load_gurobi() is not None else "heuristic"
             elif requested == "scipy":
                 name = "scipy" if self._load_scipy_linprog() is not None else "heuristic"

@@ -71,3 +71,10 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   配对检验与消融/优势表限定在基准档（`--paired-tier`）；`paper_assets/scripts/make_tables.py` 新增 `generalization_<tier>.tex`、
   `hyperparameters.tex`（表 6 由配置生成）、`instance_statistics.tex`（基准算例统计，由 params.yaml 生成）、`milp_small.tex`
   （精确求解检查 + 最优规则），基准档对比表按档位过滤，v2 表同时落 CSV；`tests/test_aggregate.py`。
+- V9b `env.fluid_backend: auto` 改为 Gurobi → HiGHS（scipy）→ 启发式（此前无 Gurobi 即回退启发式，掩码随之失效）；
+  旧行为由 `fluid_backend: gurobi` 保留，等价性回归的旧语义覆盖层改用它；`configs/env.yaml` 注释与 `docs/known-issues.md` 第 19 条同步。
+- V10 文档与定稿：`docs/reproduce.md`（修订版复现手册：档位、门控、训练、规则与精确求解、评测、出表、三台 RTX 5060 的预算分配、
+  检查清单）、`docs/experiment-spec.md`（v2 规格）、`docs/run-matrix.md`、`docs/pilot-log.md`（门控轮次表）、`docs/claim-verdicts.md`、
+  README 十节改写为泛化型流程；`configs/runs.yaml` 对比方法 3 run（`learned_baselines`）、附加基线 1 run（`learned_baselines_extra`）；
+  本机验证：`python -m pytest tests`、`python -m tests.equivalence --golden v2`、冒烟；`run_08` 实跑 80 个小算例 × MILP-A/B
+  全部最优、回放一致 160/160、穷举一致 40/40（其余因结构规模跳过）、MILP-A 与 MILP-B 最优值相等；标签 `v2.0-revision`。

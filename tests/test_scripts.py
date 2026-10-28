@@ -33,7 +33,8 @@ def test_bootstrap_reads_configs(monkeypatch):
     import _bootstrap
 
     monkeypatch.setattr(sys, "argv", ["x"])
-    assert _bootstrap.n_runs("ours", 3) == 3 and _bootstrap.n_runs("learned_baselines", 1) == 1
+    assert _bootstrap.n_runs("ours", 3) == 3 and _bootstrap.n_runs("learned_baselines", 1) == 3
+    assert _bootstrap.n_runs("learned_baselines_extra", 3) == 1
     assert _bootstrap.n_runs("missing_key", 7) == 7
     assert _bootstrap.seed_args(1) == ["--seed", "1"] and _bootstrap.seed_args(3) == []
     assert _bootstrap.requested_workers(5) == 2          # configs/parallel.yaml max_concurrent

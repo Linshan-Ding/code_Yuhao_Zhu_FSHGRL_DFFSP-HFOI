@@ -1,7 +1,8 @@
 # Independent runs per method class (scripts read these; a class with 1 run gets a fixed, recorded seed).
 ours: 3                   # FSHGRL
 ablations: 3              # ablation variants (scripts/run_04 VARIANTS)
-learned_baselines: 1      # learned baselines (scripts/run_05 BASELINES); same num_envs / max_iterations budget as ours
+learned_baselines: 3      # learned comparators HSDDQN / HGNN-PPO (scripts/run_05 BASELINES); same budget as ours
+learned_baselines_extra: 1   # additional baselines A2C / DQN / DDQN (run_05 EXTRA; not in the manuscript's tables)
 rules_random: 10          # Random and RRC episodes per instance (deterministic rules run once)
 eval:
   checkpoint: auto        # auto = best_val_checkpoint.pt (generalization) / best_greedy_checkpoint.pt (per-instance)

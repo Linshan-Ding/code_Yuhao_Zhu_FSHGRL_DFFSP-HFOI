@@ -80,7 +80,7 @@
 | 11 fixed 与 round_robin 相同 | 保持；泛化型用 `random` |
 | 12 无效动作静默重映射 | **已修复**（V3）：`step()` 对非法 (机器, 工序类型) 对与越界订单秩抛 `ValueError` |
 | 14 工业案例不可复现 | V5 按论文表 12 的工艺数据提供案例生成器（真实订单流不公开） |
-| 19 Gurobi 路径未验证 | **已变更**（V1）：`fluid_backend: scipy`（HiGHS）求同一 LP，无许可证也能得到精确解；Gurobi 模型原样保留在 `_solve_lp_gurobi` |
+| 19 Gurobi 路径未验证 | **已变更**（V1/V9）：`fluid_backend: scipy`（HiGHS）求同一 LP，无许可证也能得到精确解；`auto` 依次取 Gurobi → HiGHS → 启发式（旧的"无 Gurobi 即启发式"行为由 `fluid_backend: gurobi` 保留，等价性回归的旧语义覆盖层使用它）；Gurobi 模型原样保留在 `_solve_lp_gurobi` |
 | 21 多进程采集与 Gurobi | 不变；`fluid_backend: scipy` 下各 worker 进程独立求解，无许可证问题 |
 
 等价性回归：V1、V2 仍以 c030dfa 为黄金（旧语义覆盖层）；V3 起以本树冻结提交为黄金（`tests/golden_v2/manifest.json`，
