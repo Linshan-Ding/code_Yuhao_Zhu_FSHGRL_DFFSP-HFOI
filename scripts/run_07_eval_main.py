@@ -13,7 +13,7 @@ from _bootstrap import (ROOT, Job, done, eval_tiers_cfg, merge_csv, paradigm, re
                         runs_cfg, step)
 
 PARALLEL, RESOURCE, MAX_CONCURRENT, GPU_MEM_PER_JOB_GB = True, "cpu", 3, None
-METHODS = ["ours", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn"]
+METHODS = ["ours", "ours_arrival", "ours_case", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn"]
 EVAL = runs_cfg().get("eval", {}) or {}
 GENERALIZATION = paradigm() == "generalization"
 CHECKPOINT = str(EVAL.get("checkpoint", "auto") or "auto")
@@ -22,7 +22,7 @@ if CHECKPOINT == "auto":
 EPISODES = int(EVAL.get("sampled_episodes", 10))
 BATCH = int(EVAL.get("batch_episodes", 1))
 TIERS = EVAL.get("tiers") or "auto"
-TIERS = eval_tiers_cfg() if TIERS == "auto" else [str(t) for t in TIERS]
+TIERS = None if TIERS == "auto" else [str(t) for t in TIERS]   # None: each run's snapshot names its eval tiers
 MERGED = ROOT / "result" / "eval_results.csv"
 
 t0 = time.time()
@@ -33,7 +33,7 @@ for method in METHODS:
         run_dir = ckpt.parent
         out = run_dir / "eval_results.csv"
         parts.append(out)
-        tier_args = ["--tiers", *TIERS] if GENERALIZATION else []
+        tier_args = ["--tiers", *TIERS] if (GENERALIZATION and TIERS) else []
         label = f"{method}/{run_dir.name}/eval" if GENERALIZATION else f"{method}/{run_dir.parent.name}/{run_dir.name}/eval"
         jobs.append(Job(label,
                         [sys.executable, "eval.py", "--ckpt", ckpt.relative_to(ROOT), "--decode", "both",
@@ -42,7 +42,7 @@ for method in METHODS:
                         output=out))
 if not jobs:
     sys.exit("[FAIL] no trained runs with the expected checkpoint under result/<method>/: run scripts 03-05 first")
-what = f"tiers {TIERS}" if GENERALIZATION else "own instance"
+what = (f"tiers {TIERS}" if TIERS else f"each run's snapshot tiers (default {eval_tiers_cfg()})") if GENERALIZATION else "own instance"
 step(f"evaluate {len(jobs)} checkpoints ({CHECKPOINT}; {what}; greedy + {EPISODES} sampled episodes each)")
 run_jobs(jobs, resolve_workers(MAX_CONCURRENT, RESOURCE, GPU_MEM_PER_JOB_GB, parallel=PARALLEL))
 

@@ -39,7 +39,7 @@ def test_bootstrap_reads_configs(monkeypatch):
     assert _bootstrap.requested_workers(5) == 2          # configs/parallel.yaml max_concurrent
     monkeypatch.setattr(sys, "argv", ["x", "4"])
     assert _bootstrap.requested_workers(5) == 4
-    assert _bootstrap.pilot_enabled() is False
+    assert _bootstrap.pilot_enabled() is True
     assert len(_bootstrap.instance_ids("benchmark")) == 15
     jobs = _bootstrap.training_jobs("ours", [], ["DDT500_num50"], 2)
     assert [j.name for j in jobs] == ["ours/DDT500_num50/run1", "ours/DDT500_num50/run2"]

@@ -27,6 +27,8 @@ SAFETY = 0.9              # share of the free GPU memory counted as budget
 POLL = 0.5                # seconds between polls of running jobs
 PROGRESS_EVERY = 300      # seconds between progress tables
 CONFIGS = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]   # the default trio
+if (ROOT / "configs" / "paper.yaml").exists():
+    CONFIGS.append("configs/paper.yaml")                                          # the paper layer (v2)
 
 
 # ------------------------------------------------------------------ console helpers

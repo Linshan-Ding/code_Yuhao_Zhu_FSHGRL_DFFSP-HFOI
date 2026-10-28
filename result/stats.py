@@ -29,6 +29,8 @@ import pandas as pd
 HIGHER_IS_BETTER = {"fulfillment_rate": True, "gap": False, "obj_model": False, "obj_best": False}
 METHOD_LABELS = {
     "ours": "FSHGRL",
+    "ours_arrival": "FSHGRL (arrival-diverse pool)",
+    "ours_case": "FSHGRL (case pool)",
     "nfe": "FSHGRL-NFe",        # fluid node features off, fluid candidate mask on
     "nm": "FSHGRL-NM",          # fluid node features on, fluid candidate mask off
     "nf": "FSHGRL-NF",          # both off

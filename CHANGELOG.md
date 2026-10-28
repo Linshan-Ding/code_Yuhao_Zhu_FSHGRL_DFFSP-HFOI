@@ -51,3 +51,7 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   `n`（含 `arrival_mix`）；新档位 arrival（6 个：ρ 0.8/1.2/1.8/2.6 均匀、指数、突发）、arrival_train（120，混合到达）、
   tiny（2×3×2，50）、tiny5（5×5×5 少订单，30）、case_train（100）、case_val（8）、case_eval（9 个论文配置）；
   `params.yaml` 新增 `inter_arrival_cv`、`max_burst`、`load_ratio`、`load_ratio_bottleneck`。
+- V6 论文配置层 `configs/paper.yaml`（泛化型范式、训练池/验证集/评测档位、掩码与 HiGHS/Gurobi 后端、2000 轮、每 50 轮验证、
+  逐键标注对应论文表 6 的行），脚本默认加载（`_bootstrap.CONFIGS`）；`configs/pools/{arrival_train,case_train}.yaml`
+  （`ours_arrival`、`ours_case`）；`configs/algo.yaml` `train_version: 2`、`viz: false`；`configs/pilot.yaml` 启用泛化型门控
+  （ours × 1000 轮）；`run_07` 评测档位按各 run 的快照；冒烟脚本改为泛化型流程（42 s）。

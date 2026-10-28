@@ -1,0 +1,50 @@
+# Paper configuration layer (v2, generalisation paradigm). Loaded by every scripts/run_*.py after the default
+# trio (instance.yaml, env.yaml, algo.yaml); each key names the manuscript item it fixes (Table 6 rows, Section 5.1).
+# Variant overlays (configs/ablation/*.yaml, configs/baselines/*.yaml, configs/pools/*.yaml) are applied on top.
+instance:
+  paradigm: generalization            # Sec. 5.1: one policy per method, trained on the generated pool
+  data_dir: data/instances/train      # training pool: 200 generated instances (seeds 1000-1199)
+  patterns: ["*.txt"]
+  train_instances: []                 # empty = every instance of the pool
+  instance_selection: random          # one random pool instance per iteration (8 episodes on it)
+  val_data_dir: data/instances/val    # validation set: 30 generated instances (model selection)
+  val_instances: []
+  eval_tiers: [benchmark, arrival, case_eval]   # unseen evaluation tiers (Tables 7-11, arrival study, case reference)
+env:
+  fluid_mode: cached_lp               # Table 6: fluid capacity-allocation LP
+  fluid_backend: auto                 # Gurobi when installed, otherwise HiGHS (scipy); recorded in config_snapshot.yaml
+  fluid_features: "on"                # Table 6: fluid node features on
+  fluid_mask: true                    # Sec. 4.5: fluid candidate mask on
+  fluid_mask_threshold: 1.0e-5        # Table 6: epsilon_f (positive allocation)
+  fluid_recompute: decision           # Sec. 4.1: LP at every decision with a new state (cached by state)
+  fluid_time_limit: 2                 # Table 6: LP time limit (s)
+  fluid_threads: 1                    # single solver thread: reproducible across machines
+  order_top_k: 5                      # Table 6: candidate orders per operation type (EDD)
+  discard_penalty: 1.0                # Sec. 4.6: reward (dN_c - dN_d) / S
+  progress_reward_coeff: 0.0
+algo:
+  train_version: 2
+  train:
+    max_iterations: 2000              # Table 6: training iterations (D3)
+    num_envs: 8                       # Table 6: episodes per iteration
+    num_workers: 8
+    minibatch_size: 512               # Table 6
+    K_epochs: 3                       # Table 6: PPO epochs
+    eps_clip: 0.2                     # Table 6
+    lr: 0.0003                        # Table 6
+    lr_schedule: none
+    gamma: 1.0                        # Table 6
+    gae_lambda: 0.95                  # Table 6
+    A_coeff: 1.0                      # Table 6: c1
+    vf_coeff: 0.5                     # Table 6: c2
+    entropy_coeff: 0.01               # Table 6: c3 (the archived runs used 0.01)
+    max_grad_norm: 0.5                # Table 6
+    target_kl: 0.03                   # Table 6
+    eval_every: 1                     # curve.csv: greedy episode on this iteration's training instance
+    eval_scope: selected
+    val_every: 50                     # Sec. 5.1: validation every 50 iterations -> best_val_checkpoint.pt
+    early_stop_patience: 0            # off (set e.g. 500 to stop after 500 iterations without improvement)
+    checkpoint_interval: 1
+    resume: auto
+  viz:
+    viz: false

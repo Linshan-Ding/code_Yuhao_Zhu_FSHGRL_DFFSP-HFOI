@@ -2,8 +2,8 @@
 algo:
   algorithm: ppo              # ppo | a2c | dqn | ddqn
   model_type: hgnn            # hgnn (FSHGRL) | mlp (FSHGRL-NG: point-wise encoders instead of the graph)
-  train_confirmed: true       # training-parameter table confirmed (v1 = values of the original implementation)
-  train_version: 1
+  train_confirmed: true       # training-parameter table confirmed (v2 = configs/paper.yaml; v1 = original values)
+  train_version: 2
   model:
     in_size_ma: 5             # raw machine feature width (must match environment/simulator.py)
     out_size_ma: 16           # machine embedding width
@@ -34,10 +34,10 @@ algo:
     eps_clip: 0.2
     A_coeff: 1.0              # policy-loss coefficient (c1)
     vf_coeff: 0.5             # value-loss coefficient (c2)
-    entropy_coeff: 0.01       # entropy coefficient (c3); the paper reports 0 (see docs/known-issues.md)
+    entropy_coeff: 0.01       # entropy coefficient (c3); the archived runs used 0.01 (docs/known-issues.md item 1)
     max_grad_norm: 0.5
     target_kl: 0.03           # early stop of the PPO passes when the approximate KL exceeds this
-    max_iterations: 2000      # training iterations (epochs); the paper reports 1000 (see docs/known-issues.md)
+    max_iterations: 2000      # training iterations (v2 paper configuration; the archived v1 runs used 1000)
     minibatch_size: 512
     max_minibatch_tokens: 0   # optional token budget per minibatch; 0 disables it
     num_envs: 8               # complete episodes collected per iteration
@@ -50,7 +50,7 @@ algo:
     eval_every: 1             # greedy evaluation on the training instance every N iterations (curve.csv); 0 disables
     checkpoint_every: 0       # additionally keep checkpoint_epoch{N:04d}.pt every N iterations; 0 disables
   viz:
-    viz: true                 # live Visdom charts; a missing server only prints a warning
+    viz: false                # live Visdom charts (set true and start `python -m visdom.server`)
     viz_name: HGNN_PPO_Training
     visdom_server: http://localhost
     visdom_port: 8097

@@ -90,9 +90,11 @@ def test_job_builders_follow_the_paradigm(monkeypatch):
     jobs = _bootstrap.pool_jobs("ours", ["configs/ablation/nf.yaml"], 2, prefix="pilot/", extra_args=["--max-iterations", "5"])
     assert [j.name for j in jobs] == ["pilot/ours/run1", "pilot/ours/run2"]
     assert "--instances" not in jobs[0].cmd and "configs/ablation/nf.yaml" in jobs[0].cmd and "--max-iterations" in jobs[0].cmd
-    assert _bootstrap.paradigm() == "per_instance"
-    monkeypatch.setattr(_bootstrap, "paradigm", lambda: "generalization")
+    assert _bootstrap.paradigm() == "generalization"          # configs/paper.yaml is part of CONFIGS
+    assert "configs/paper.yaml" in _bootstrap.CONFIGS
     assert [j.name for j in _bootstrap.method_jobs("nf", [], ["DDT500_num50"], 1)] == ["nf/run1"]
+    monkeypatch.setattr(_bootstrap, "paradigm", lambda: "per_instance")
+    assert [j.name for j in _bootstrap.method_jobs("nf", [], ["DDT500_num50"], 1)] == ["nf/DDT500_num50/run1"]
 
 
 def test_generalization_training_run_with_validation(tmp_path):
