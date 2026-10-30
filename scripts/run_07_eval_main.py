@@ -13,7 +13,7 @@ from _bootstrap import (ROOT, Job, done, eval_tiers_cfg, merge_csv, paradigm, re
                         runs_cfg, step)
 
 PARALLEL, RESOURCE, MAX_CONCURRENT, GPU_MEM_PER_JOB_GB = True, "cpu", 3, None
-METHODS = ["ours", "ours_arrival", "ours_case", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn"]
+METHODS = ["ours", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn"]
 EVAL = runs_cfg().get("eval", {}) or {}
 GENERALIZATION = paradigm() == "generalization"
 CHECKPOINT = str(EVAL.get("checkpoint", "auto") or "auto")

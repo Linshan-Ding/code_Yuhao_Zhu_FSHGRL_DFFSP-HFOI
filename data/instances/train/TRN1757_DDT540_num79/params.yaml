@@ -1,0 +1,50 @@
+instance_id: TRN1757_DDT540_num79
+tier: train
+source: generated
+file: TRN1757_DDT540_num79.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 79
+ddt: 540
+orders_per_product:
+- 22
+- 16
+- 18
+- 9
+- 14
+arrival_first: 1.0
+arrival_last: 1487.0
+inter_arrival_mean: 19.05128205128205
+inter_arrival_cv: 0.624126799902989
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.566546433378196
+load_ratio_bottleneck: 2.744592193808883
+due_slack_min: 347.0
+due_slack_mean: 573.2405063291139
+due_slack_max: 829.0
+process_time_min: 26.0
+process_time_mean: 244.48
+process_time_max: 449.0
+seed: 1757
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

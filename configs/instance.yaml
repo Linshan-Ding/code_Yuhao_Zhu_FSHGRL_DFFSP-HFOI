@@ -8,8 +8,8 @@ instance:
   patterns: ["DDT*.txt", "num*.txt", "train_num*.txt"]   # glob patterns used when train_instances is empty
   train_instances: ["DDT500_num100.txt"]  # fixed instance file(s); `--instances` on the CLI has priority
   instance_selection: fixed           # fixed | round_robin | random (how the instance is picked per iteration)
-  val_data_dir: data/instances/val    # validation tier (generalization: model selection, pilot gate)
-  val_instances: []                   # explicit validation files; empty = every instance of val_data_dir
+  val_data_dir: data/instances/benchmark   # validation instances (generalization: model selection, val_curve.csv)
+  val_instances: [DDT500_num50.txt, DDT1200_num100.txt]   # the paper's two training-curve instances; [] = every file
   eval_tiers: [benchmark]             # tiers evaluated by scripts/run_07 in the generalization paradigm
   generator:                          # data/generator.py; v2 defaults matched to the benchmark statistics
     n_products: 5
@@ -21,20 +21,12 @@ instance:
     slack_rule: ddt_uniform           # order slack uniform in slack_rel_range x DDT (per_order = legacy rule)
     slack_rel_range: [0.6, 1.55]      # benchmark files: slack in about [0.6, 1.55] x DDT
     n_orders_range: [50, 150]
-  pools:                              # generated tiers written by scripts/run_01_prepare_data.py
-    train:                            # training pool of the generalization paradigm
+  pools:                              # generated tiers written by scripts/run_01_prepare_data.py (seeds fixed)
+    train:                            # training pool of the generalisation paradigm: one instance per iteration
       tier: train
       prefix: TRN
-      seed: 1000                      # seeds 1000 .. 1199
-      n: 200
-    val:                              # validation set: S x DDT grid x 2 seeds = 30 instances
-      tier: val
-      prefix: VAL
-      seed: 2000
-      grid:
-        n_orders: [50, 100, 150]
-        ddt: [500, 600, 900, 1200, 1600]
-        seeds: 2
+      seed: 1000                      # seeds 1000 .. 1999
+      n: 1000
     arrival:                          # arrival-regime tier (S = 100, DDT = 900): load levels and arrival models
       tier: arrival
       prefix: ARR
@@ -46,54 +38,11 @@ instance:
         - {n_orders: 100, ddt: 900, arrival: {model: uniform, rho: 2.6}}
         - {n_orders: 100, ddt: 900, arrival: {model: exponential, rho: 1.8}}
         - {n_orders: 100, ddt: 900, arrival: {model: bursty, rho: 1.8, burst_size: 10, burst_gap: 2}}
-    arrival_train:                    # arrival-diverse training pool (load 0.8-2.6, three arrival models)
-      tier: arrival_train
-      prefix: ATR
-      seed: 4000
-      n: 120
-      arrival_mix: true
-    tiny:                             # exact-solver check (baselines/milp_exact.py): 2 products x 3 stages x 2 machines
-      tier: tiny
-      prefix: TNY
+    small:                            # exact-solver check (baselines/milp_exact.py) and mask-threshold sensitivity
+      tier: small                     # (scripts/run_10_sensitivity.py): benchmark structure 5 x 5 x 5, few orders
+      prefix: SML
       seed: 5000
-      structure: {n_products: 2, n_stages: 3, machines_per_stage: 2}
       grid:
-        n_orders: [4, 6, 8, 10, 12]
-        ddt: [500, 1500]
-        seeds: 5
-    tiny5:                            # exact-solver check with the benchmark structure (5 x 5 x 5), few orders
-      tier: tiny5
-      prefix: TNF
-      seed: 5500
-      grid:
-        n_orders: [6, 8, 10]
-        ddt: [500, 1500]
-        seeds: 5
-    case_train:                       # industrial case (data/case/process.yaml, minutes): training pool
-      tier: case_train
-      prefix: CTR
-      seed: 6000
-      n: 100
-      structure: {case: true}
-      ddt_range: [600, 1200]
-      arrival: {model: uniform, rho: 1.8}
-    case_val:                         # industrial case: validation grid
-      tier: case_val
-      prefix: CVA
-      seed: 6500
-      structure: {case: true}
-      arrival: {model: uniform, rho: 1.8}
-      grid:
-        n_orders: [50, 150]
-        ddt: [600, 1200]
-        seeds: 2
-    case_eval:                        # industrial case: the nine evaluation configurations of the manuscript
-      tier: case_eval
-      prefix: CEV
-      seed: 7000
-      structure: {case: true}
-      arrival: {model: uniform, rho: 1.8}
-      grid:
-        n_orders: [50, 100, 150]
-        ddt: [600, 900, 1200]
+        n_orders: [6, 8, 10, 12]
+        ddt: [500, 900, 1500]
         seeds: 1

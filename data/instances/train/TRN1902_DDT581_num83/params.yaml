@@ -1,0 +1,50 @@
+instance_id: TRN1902_DDT581_num83
+tier: train
+source: generated
+file: TRN1902_DDT581_num83.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 83
+ddt: 581
+orders_per_product:
+- 18
+- 10
+- 19
+- 15
+- 21
+arrival_first: 1.0
+arrival_last: 1700.0
+inter_arrival_mean: 20.71951219512195
+inter_arrival_cv: 0.5337967121517926
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.2361916421424364
+load_ratio_bottleneck: 2.5934973513831667
+due_slack_min: 359.0
+due_slack_mean: 604.5060240963855
+due_slack_max: 896.0
+process_time_min: 25.0
+process_time_mean: 231.664
+process_time_max: 449.0
+seed: 1902
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

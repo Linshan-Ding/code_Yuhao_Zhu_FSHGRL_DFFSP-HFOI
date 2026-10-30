@@ -1,0 +1,50 @@
+instance_id: TRN1973_DDT1534_num78
+tier: train
+source: generated
+file: TRN1973_DDT1534_num78.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 78
+ddt: 1534
+orders_per_product:
+- 14
+- 14
+- 18
+- 14
+- 18
+arrival_first: 1.0
+arrival_last: 1633.0
+inter_arrival_mean: 21.194805194805195
+inter_arrival_cv: 0.5044496355759975
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.1226333333333334
+load_ratio_bottleneck: 2.2624411764705883
+due_slack_min: 923.0
+due_slack_mean: 1775.4871794871794
+due_slack_max: 2372.0
+process_time_min: 29.0
+process_time_mean: 224.944
+process_time_max: 448.0
+seed: 1973
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

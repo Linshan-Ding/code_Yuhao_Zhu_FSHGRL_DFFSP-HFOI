@@ -1,0 +1,50 @@
+instance_id: TRN1628_DDT718_num111
+tier: train
+source: generated
+file: TRN1628_DDT718_num111.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 111
+ddt: 718
+orders_per_product:
+- 32
+- 23
+- 22
+- 12
+- 22
+arrival_first: 1.0
+arrival_last: 2147.0
+inter_arrival_mean: 19.509090909090908
+inter_arrival_cv: 0.5851576805404151
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.378542404473439
+load_ratio_bottleneck: 2.5739794967381178
+due_slack_min: 437.0
+due_slack_mean: 750.3603603603603
+due_slack_max: 1111.0
+process_time_min: 32.0
+process_time_mean: 232.016
+process_time_max: 444.0
+seed: 1628
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

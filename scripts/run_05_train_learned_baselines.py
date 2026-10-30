@@ -11,7 +11,7 @@ BASELINES = {"hsddqn": ["configs/baselines/hsddqn.yaml"], "hgnn_ppo": ["configs/
 EXTRA = {"a2c": ["configs/baselines/a2c.yaml"], "dqn": ["configs/baselines/dqn.yaml"],
          "ddqn": ["configs/baselines/ddqn.yaml"]}          # additional baselines; empty the dict to skip them
 TIERS = ("benchmark",)
-N_RUNS = n_runs("learned_baselines", 3)
+N_RUNS = n_runs("learned_baselines", 1)
 N_RUNS_EXTRA = n_runs("learned_baselines_extra", 1)
 
 require_train_confirmed()

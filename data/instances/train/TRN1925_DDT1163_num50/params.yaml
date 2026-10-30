@@ -1,0 +1,50 @@
+instance_id: TRN1925_DDT1163_num50
+tier: train
+source: generated
+file: TRN1925_DDT1163_num50.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 50
+ddt: 1163
+orders_per_product:
+- 8
+- 12
+- 11
+- 13
+- 6
+arrival_first: 1.0
+arrival_last: 989.0
+inter_arrival_mean: 20.163265306122447
+inter_arrival_cv: 0.527760008553943
+inter_arrival_max: 39.0
+max_burst: 2
+load_ratio: 2.2073408906882594
+load_ratio_bottleneck: 2.527368421052632
+due_slack_min: 717.0
+due_slack_mean: 1275.76
+due_slack_max: 1798.0
+process_time_min: 26.0
+process_time_mean: 222.536
+process_time_max: 447.0
+seed: 1925
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -10,7 +10,9 @@ the paper reports as "time (s)" (``infer_time_ms`` stays the whole-episode wall-
 Outputs (all in ``--out-dir``): ``stats_summary.csv`` (mean +- std over runs per method / tier for the
 fulfilment rate and the gap), ``paired_tests.csv`` (Table 11 layout against ``--reference`` on the paired
 tier, benchmark by default), ``ablation_results.csv``, ``advantage_table.csv``, ``friedman.csv``,
-``conv_<method>.csv`` (convergence curves aggregated over instances and runs), and, v2:
+``conv_<method>.csv`` (convergence curves: the validation objective of ``result/<method>/run*/val_curve.csv``
+averaged over the validation instances and runs in the generalisation layout, the incumbent objective of
+``curve.csv`` in the per-instance layout), and, v2:
 ``integer_check.csv`` (every (instance, method, decode) group: S x n_episodes x mean eta must be an integer,
 the count of on-time orders; a violation aborts the aggregation) and ``generalization.csv`` (zero-shot
 results per method and evaluation tier: K runs, mean +- std of eta, completed_mean, the best deterministic
@@ -183,10 +185,14 @@ def aggregate(eval_path: Path, out_dir: Path, reference: str = "ours", paired_ti
             written["friedman"] = out_dir / "friedman.csv"
 
     for method_dir in sorted(p for p in out_dir.iterdir() if p.is_dir()):
-        run_dirs = sorted(glob.glob(str(method_dir / "*" / "run*" / "curve.csv")))
-        if not run_dirs:
-            continue
-        conv = aggregate_curves([Path(p).parent for p in run_dirs], key="obj_best")
+        val_runs = sorted(glob.glob(str(method_dir / "run*" / "val_curve.csv")))      # generalisation layout
+        if val_runs:                     # validation objective (mean over the validation instances) per epoch
+            conv = aggregate_curves([Path(p).parent for p in val_runs], key="obj", filename="val_curve.csv")
+        else:                            # per-instance layout: incumbent objective of the training instance
+            run_dirs = sorted(glob.glob(str(method_dir / "*" / "run*" / "curve.csv")))
+            if not run_dirs:
+                continue
+            conv = aggregate_curves([Path(p).parent for p in run_dirs], key="obj_best")
         conv.to_csv(out_dir / f"conv_{method_dir.name}.csv", index=False)
         written[f"conv_{method_dir.name}"] = out_dir / f"conv_{method_dir.name}.csv"
     return written

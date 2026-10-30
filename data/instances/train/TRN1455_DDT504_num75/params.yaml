@@ -1,0 +1,50 @@
+instance_id: TRN1455_DDT504_num75
+tier: train
+source: generated
+file: TRN1455_DDT504_num75.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 75
+ddt: 504
+orders_per_product:
+- 15
+- 13
+- 16
+- 13
+- 18
+arrival_first: 1.0
+arrival_last: 1448.0
+inter_arrival_mean: 19.554054054054053
+inter_arrival_cv: 0.5562341375845535
+inter_arrival_max: 39.0
+max_burst: 3
+load_ratio: 2.532548997926745
+load_ratio_bottleneck: 2.929315825846579
+due_slack_min: 307.0
+due_slack_mean: 538.1333333333333
+due_slack_max: 764.0
+process_time_min: 29.0
+process_time_mean: 247.608
+process_time_max: 446.0
+seed: 1455
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

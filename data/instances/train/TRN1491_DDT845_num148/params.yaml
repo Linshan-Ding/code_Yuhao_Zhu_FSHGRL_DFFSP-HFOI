@@ -1,0 +1,50 @@
+instance_id: TRN1491_DDT845_num148
+tier: train
+source: generated
+file: TRN1491_DDT845_num148.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 148
+ddt: 845
+orders_per_product:
+- 32
+- 32
+- 23
+- 28
+- 33
+arrival_first: 1.0
+arrival_last: 2877.0
+inter_arrival_mean: 19.564625850340136
+inter_arrival_cv: 0.5979483283504051
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.3582970792767735
+load_ratio_bottleneck: 2.4591321279554936
+due_slack_min: 526.0
+due_slack_mean: 900.2972972972973
+due_slack_max: 1308.0
+process_time_min: 27.0
+process_time_mean: 230.696
+process_time_max: 449.0
+seed: 1491
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

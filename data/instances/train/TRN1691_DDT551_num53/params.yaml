@@ -1,0 +1,50 @@
+instance_id: TRN1691_DDT551_num53
+tier: train
+source: generated
+file: TRN1691_DDT551_num53.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 53
+ddt: 551
+orders_per_product:
+- 12
+- 12
+- 7
+- 13
+- 9
+arrival_first: 1.0
+arrival_last: 1065.0
+inter_arrival_mean: 20.46153846153846
+inter_arrival_cv: 0.5647987979584972
+inter_arrival_max: 39.0
+max_burst: 3
+load_ratio: 2.5558977443609026
+load_ratio_bottleneck: 2.958135338345865
+due_slack_min: 331.0
+due_slack_mean: 520.6603773584906
+due_slack_max: 844.0
+process_time_min: 27.0
+process_time_mean: 261.488
+process_time_max: 450.0
+seed: 1691
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

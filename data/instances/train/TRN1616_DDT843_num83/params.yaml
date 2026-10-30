@@ -1,0 +1,50 @@
+instance_id: TRN1616_DDT843_num83
+tier: train
+source: generated
+file: TRN1616_DDT843_num83.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 83
+ddt: 843
+orders_per_product:
+- 13
+- 14
+- 14
+- 20
+- 22
+arrival_first: 1.0
+arrival_last: 1553.0
+inter_arrival_mean: 18.926829268292682
+inter_arrival_cv: 0.5882177935994309
+inter_arrival_max: 39.0
+max_burst: 3
+load_ratio: 2.251618556701031
+load_ratio_bottleneck: 2.383072164948454
+due_slack_min: 516.0
+due_slack_mean: 915.2530120481928
+due_slack_max: 1303.0
+process_time_min: 25.0
+process_time_mean: 213.08
+process_time_max: 448.0
+seed: 1616
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

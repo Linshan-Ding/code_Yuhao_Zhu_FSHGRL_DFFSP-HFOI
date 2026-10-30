@@ -1,0 +1,50 @@
+instance_id: TRN1835_DDT997_num56
+tier: train
+source: generated
+file: TRN1835_DDT997_num56.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 56
+ddt: 997
+orders_per_product:
+- 8
+- 10
+- 13
+- 13
+- 12
+arrival_first: 1.0
+arrival_last: 1133.0
+inter_arrival_mean: 20.581818181818182
+inter_arrival_cv: 0.5331006767779572
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.3983886925795055
+load_ratio_bottleneck: 2.63339222614841
+due_slack_min: 632.0
+due_slack_mean: 1099.107142857143
+due_slack_max: 1541.0
+process_time_min: 26.0
+process_time_mean: 246.816
+process_time_max: 448.0
+seed: 1835
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

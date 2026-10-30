@@ -1,0 +1,50 @@
+instance_id: TRN1372_DDT806_num149
+tier: train
+source: generated
+file: TRN1372_DDT806_num149.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 149
+ddt: 806
+orders_per_product:
+- 27
+- 29
+- 33
+- 27
+- 33
+arrival_first: 1.0
+arrival_last: 3012.0
+inter_arrival_mean: 20.344594594594593
+inter_arrival_cv: 0.5564182930265189
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.542827764862172
+load_ratio_bottleneck: 2.7226888077050813
+due_slack_min: 485.0
+due_slack_mean: 859.1476510067114
+due_slack_max: 1241.0
+process_time_min: 25.0
+process_time_mean: 258.664
+process_time_max: 450.0
+seed: 1372
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

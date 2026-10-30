@@ -1,0 +1,50 @@
+instance_id: TRN1798_DDT1221_num76
+tier: train
+source: generated
+file: TRN1798_DDT1221_num76.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 76
+ddt: 1221
+orders_per_product:
+- 12
+- 13
+- 15
+- 15
+- 21
+arrival_first: 1.0
+arrival_last: 1378.0
+inter_arrival_mean: 18.36
+inter_arrival_cv: 0.6412314094795994
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.5384749455337694
+load_ratio_bottleneck: 2.9808278867102396
+due_slack_min: 747.0
+due_slack_mean: 1340.7368421052631
+due_slack_max: 1877.0
+process_time_min: 25.0
+process_time_mean: 233.032
+process_time_max: 449.0
+seed: 1798
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

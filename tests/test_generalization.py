@@ -43,10 +43,11 @@ def test_index_covers_every_tier(tmp_path):
 def test_repository_pools_are_indexed():
     index = load_index()
     tiers = {row["tier"] for row in index.values()}
-    assert {"benchmark", "train", "val"} <= tiers
-    assert sum(1 for r in index.values() if r["tier"] == "train") == 200
-    val = [r for r in index.values() if r["tier"] == "val"]
-    assert len(val) == 30 and {r["ddt"] for r in val} == {500, 600, 900, 1200, 1600} and {r["scale"] for r in val} == {50, 100, 150}
+    assert tiers == {"benchmark", "train", "arrival", "small"}
+    assert sum(1 for r in index.values() if r["tier"] == "train") == 1000      # one pool instance per iteration
+    small = [r for r in index.values() if r["tier"] == "small"]
+    assert len(small) == 12 and {r["ddt"] for r in small} == {500, 900, 1500} and {r["scale"] for r in small} == {6, 8, 10, 12}
+    assert sum(1 for r in index.values() if r["tier"] == "arrival") == 6
     assert all(50 <= r["scale"] <= 150 and 500 <= r["ddt"] <= 1600 for r in index.values() if r["tier"] == "train")
 
 
@@ -98,16 +99,17 @@ def test_job_builders_follow_the_paradigm(monkeypatch):
 
 
 def test_generalization_training_run_with_validation(tmp_path):
-    """Two iterations on three pool instances with random selection, validation on two instances every
-    iteration, curve.csv restricted to the selected instance, then eval.py on the val tier of the run."""
+    """Two iterations on three pool instances with random selection, validation on the two benchmark validation
+    instances every iteration, curve.csv restricted to the selected instance, then eval.py on the small tier."""
     overlay = tmp_path / "overlay.yaml"
-    val_ids = [p.stem for p in tier_instance_files("val")[:2]]
+    val_ids = ["DDT500_num50", "DDT1200_num100"]
     train_names = [p.name for p in tier_instance_files("train")[:3]]
     overlay.write_text(yaml.safe_dump({
         "instance": {"paradigm": "generalization", "data_dir": "data/instances/train",
                      "train_instances": train_names,
-                     "instance_selection": "random", "val_instances": [f"{i}.txt" for i in val_ids],
-                     "eval_tiers": ["val"]},
+                     "instance_selection": "random", "val_data_dir": "data/instances/benchmark",
+                     "val_instances": [f"{i}.txt" for i in val_ids],
+                     "eval_tiers": ["small"]},
         "env": {"fluid_backend": "scipy"},
         "algo": {"train": {"val_every": 1, "eval_scope": "selected", "early_stop_patience": 0, "max_iterations": 2,
                            "num_envs": 2, "num_workers": 2, "minibatch_size": 128, "resume": "none",
@@ -134,14 +136,14 @@ def test_generalization_training_run_with_validation(tmp_path):
         meta = yaml.safe_load((run_dir / "train_meta.yaml").read_text(encoding="utf-8"))
         assert meta["paradigm"] == "generalization" and meta["best_val_iteration"] in (0, 1) and meta["n_val_instances"] == 2
         snapshot = yaml.safe_load((run_dir / "config_snapshot.yaml").read_text(encoding="utf-8"))
-        assert snapshot["paradigm"] == "generalization" and snapshot["n_train_instances"] == 3 and snapshot["eval_tiers"] == ["val"]
+        assert snapshot["paradigm"] == "generalization" and snapshot["n_train_instances"] == 3 and snapshot["eval_tiers"] == ["small"]
         out = run_dir / "eval_results.csv"
         completed = subprocess.run([sys.executable, "eval.py", "--ckpt", str(run_dir / "best_val_checkpoint.pt"),
                                     "--decode", "greedy", "--out", str(out)], cwd=str(ROOT), capture_output=True, text=True)
         assert completed.returncode == 0, completed.stdout[-2000:] + completed.stderr[-2000:]
         with out.open(newline="", encoding="utf-8") as file:
             eval_rows = list(csv.DictReader(file))
-        assert [r["instance_id"] for r in eval_rows] == [p.stem for p in tier_instance_files("val")]   # snapshot eval_tiers
-        assert all(r["tier"] == "val" for r in eval_rows)
+        assert [r["instance_id"] for r in eval_rows] == [p.stem for p in tier_instance_files("small")]   # snapshot eval_tiers
+        assert all(r["tier"] == "small" for r in eval_rows)
     finally:
         shutil.rmtree(run_dir, ignore_errors=True)

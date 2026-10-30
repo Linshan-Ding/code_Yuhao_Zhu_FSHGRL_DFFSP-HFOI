@@ -1,0 +1,50 @@
+instance_id: TRN1861_DDT1250_num116
+tier: train
+source: generated
+file: TRN1861_DDT1250_num116.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 116
+ddt: 1250
+orders_per_product:
+- 25
+- 18
+- 21
+- 28
+- 24
+arrival_first: 1.0
+arrival_last: 2365.0
+inter_arrival_mean: 20.556521739130435
+inter_arrival_cv: 0.584960380702799
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.310118443316413
+load_ratio_bottleneck: 2.4759052453468695
+due_slack_min: 753.0
+due_slack_mean: 1365.7068965517242
+due_slack_max: 1929.0
+process_time_min: 26.0
+process_time_mean: 237.44
+process_time_max: 450.0
+seed: 1861
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

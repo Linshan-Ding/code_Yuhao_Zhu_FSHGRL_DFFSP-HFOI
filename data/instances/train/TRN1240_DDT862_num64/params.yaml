@@ -1,0 +1,50 @@
+instance_id: TRN1240_DDT862_num64
+tier: train
+source: generated
+file: TRN1240_DDT862_num64.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 64
+ddt: 862
+orders_per_product:
+- 12
+- 13
+- 13
+- 12
+- 14
+arrival_first: 1.0
+arrival_last: 1423.0
+inter_arrival_mean: 22.571428571428573
+inter_arrival_cv: 0.4904144462736839
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.2629670886075948
+load_ratio_bottleneck: 2.606481012658228
+due_slack_min: 533.0
+due_slack_mean: 881.734375
+due_slack_max: 1312.0
+process_time_min: 25.0
+process_time_mean: 255.392
+process_time_max: 450.0
+seed: 1240
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

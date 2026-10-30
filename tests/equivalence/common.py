@@ -24,7 +24,7 @@ MAX_ITERATIONS = 3
 GOLDEN_V2_DIR = ROOT / "tests" / "golden_v2"
 WORK_DIR_V2 = GOLDEN_V2_DIR / "_work"    # git-ignored: golden checkout, .pt files, logs
 MANIFEST_V2 = GOLDEN_V2_DIR / "manifest.json"
-V2_VAL_INSTANCES = 2                     # validation instances of the reference run (first two of the val tier)
+V2_VAL_INSTANCES = ["DDT500_num50.txt", "DDT1200_num100.txt"]   # validation instances of the reference run (benchmark)
 V2_CHECKPOINT_FILES = ("best_checkpoint.pt", "last_checkpoint.pt", "ppo_policy_model.pt",
                        "best_greedy_checkpoint.pt", "best_val_checkpoint.pt")
 
@@ -86,10 +86,13 @@ def v2_train_overrides(model_type: str) -> dict:
 
 
 def v2_val_instance_names(tree_root: Path) -> list:
-    """File names of the first validation instances (sorted ids) of the val tier of ``tree_root``."""
-    val_dir = tree_root / "data" / "instances" / "val"
-    files = sorted(p for p in val_dir.glob("*/*.txt") if p.stem == p.parent.name)
-    return [p.name for p in files[:V2_VAL_INSTANCES]]
+    """File names of the validation instances of the reference run: the two benchmark instances of the paper's
+    training curves (Section 5.1), which every tree ships."""
+    for name in V2_VAL_INSTANCES:
+        path = tree_root / "data" / "instances" / "benchmark" / Path(name).stem / name
+        if not path.exists():
+            raise FileNotFoundError(f"validation instance {path} missing in {tree_root}")
+    return list(V2_VAL_INSTANCES)
 
 
 def v2_overlay(model_type: str, experiment_name: str, val_names: list, collector_workers: int = 0) -> dict:
@@ -100,7 +103,7 @@ def v2_overlay(model_type: str, experiment_name: str, val_names: list, collector
         env["collector_workers"] = int(collector_workers)
     return {
         "instance": {"train_instances": o["train_instances"], "instance_selection": o["instance_selection"],
-                     "val_instances": list(val_names)},
+                     "val_data_dir": "data/instances/benchmark", "val_instances": list(val_names)},
         "env": env,
         "algo": {
             "model_type": o["model_type"],

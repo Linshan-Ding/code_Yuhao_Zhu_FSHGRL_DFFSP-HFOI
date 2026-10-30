@@ -1,0 +1,50 @@
+instance_id: TRN1310_DDT833_num115
+tier: train
+source: generated
+file: TRN1310_DDT833_num115.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 115
+ddt: 833
+orders_per_product:
+- 20
+- 22
+- 27
+- 27
+- 19
+arrival_first: 1.0
+arrival_last: 2311.0
+inter_arrival_mean: 20.263157894736842
+inter_arrival_cv: 0.5929667802825833
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.240203636363636
+load_ratio_bottleneck: 2.793246753246753
+due_slack_min: 507.0
+due_slack_mean: 906.6086956521739
+due_slack_max: 1280.0
+process_time_min: 26.0
+process_time_mean: 226.968
+process_time_max: 450.0
+seed: 1310
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

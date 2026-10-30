@@ -1,0 +1,50 @@
+instance_id: TRN1985_DDT983_num62
+tier: train
+source: generated
+file: TRN1985_DDT983_num62.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 62
+ddt: 983
+orders_per_product:
+- 11
+- 12
+- 19
+- 11
+- 9
+arrival_first: 1.0
+arrival_last: 1340.0
+inter_arrival_mean: 21.950819672131146
+inter_arrival_cv: 0.5059799817279649
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.08108857356236
+load_ratio_bottleneck: 2.2931262135922332
+due_slack_min: 595.0
+due_slack_mean: 1062.6774193548388
+due_slack_max: 1523.0
+process_time_min: 26.0
+process_time_mean: 228.408
+process_time_max: 443.0
+seed: 1985
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

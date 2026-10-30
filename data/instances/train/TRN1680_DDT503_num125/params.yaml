@@ -1,0 +1,50 @@
+instance_id: TRN1680_DDT503_num125
+tier: train
+source: generated
+file: TRN1680_DDT503_num125.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 125
+ddt: 503
+orders_per_product:
+- 18
+- 22
+- 28
+- 24
+- 33
+arrival_first: 1.0
+arrival_last: 2518.0
+inter_arrival_mean: 20.298387096774192
+inter_arrival_cv: 0.5785628797069475
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.370474056416369
+load_ratio_bottleneck: 2.6457274533174413
+due_slack_min: 304.0
+due_slack_mean: 533.864
+due_slack_max: 769.0
+process_time_min: 34.0
+process_time_mean: 240.584
+process_time_max: 448.0
+seed: 1680
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

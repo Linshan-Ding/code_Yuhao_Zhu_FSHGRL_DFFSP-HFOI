@@ -1,0 +1,50 @@
+instance_id: TRN1452_DDT865_num76
+tier: train
+source: generated
+file: TRN1452_DDT865_num76.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 76
+ddt: 865
+orders_per_product:
+- 14
+- 9
+- 18
+- 22
+- 13
+arrival_first: 1.0
+arrival_last: 1778.0
+inter_arrival_mean: 23.69333333333333
+inter_arrival_cv: 0.4414764573697586
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 1.8888013505908836
+load_ratio_bottleneck: 2.2237478897017446
+due_slack_min: 527.0
+due_slack_mean: 933.0263157894736
+due_slack_max: 1339.0
+process_time_min: 26.0
+process_time_mean: 223.76
+process_time_max: 436.0
+seed: 1452
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

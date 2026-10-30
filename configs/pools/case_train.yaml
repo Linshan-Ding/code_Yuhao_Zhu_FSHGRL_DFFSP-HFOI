@@ -1,9 +1,0 @@
-# FSHGRL trained on the industrial-case pool (process table of data/case/process.yaml, minutes), validated on
-# case_val and evaluated on the nine case configurations (case_eval). Method id: ours_case.
-instance:
-  data_dir: data/instances/case_train
-  val_data_dir: data/instances/case_val
-  eval_tiers: [case_eval]
-algo:
-  train:
-    experiment_name: ours_case

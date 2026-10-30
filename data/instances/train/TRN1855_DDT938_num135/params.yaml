@@ -1,0 +1,50 @@
+instance_id: TRN1855_DDT938_num135
+tier: train
+source: generated
+file: TRN1855_DDT938_num135.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 135
+ddt: 938
+orders_per_product:
+- 23
+- 29
+- 33
+- 26
+- 24
+arrival_first: 1.0
+arrival_last: 2612.0
+inter_arrival_mean: 19.48507462686567
+inter_arrival_cv: 0.5860841299157985
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.4649841440061278
+load_ratio_bottleneck: 2.91669398697817
+due_slack_min: 565.0
+due_slack_mean: 991.4518518518519
+due_slack_max: 1453.0
+process_time_min: 34.0
+process_time_mean: 240.152
+process_time_max: 447.0
+seed: 1855
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

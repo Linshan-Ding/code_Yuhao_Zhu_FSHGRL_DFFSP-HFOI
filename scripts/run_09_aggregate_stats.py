@@ -5,7 +5,8 @@ best deterministic rule), paired_tests.csv (exact Wilcoxon + Holm on the benchma
 layout), ablation_results.csv, advantage_table.csv, friedman.csv, conv_<method>.csv, the figures under
 paper_assets/figures/generated/ and the tables under paper_assets/tables/ (benchmark comparisons, ablation,
 Wilcoxon, one generalization_<tier>.tex per other tier, hyperparameters.tex from the configuration,
-instance_statistics.tex from params.yaml, milp_small.tex from result/milp/milp_results.csv)."""
+instance_statistics.tex from params.yaml, milp_small.tex from result/milp/milp_results.csv and the policy's
+small-tier results, sensitivity.tex from result/sensitivity.csv)."""
 import time
 
 from _bootstrap import ROOT, done, run_py, step
@@ -25,4 +26,5 @@ done(t0, ROOT / "result" / "integer_check.csv", ROOT / "result" / "stats_summary
      ROOT / "result" / "generalization.csv", ROOT / "result" / "paired_tests.csv",
      ROOT / "result" / "ablation_results.csv", ROOT / "paper_assets" / "figures" / "generated",
      ROOT / "paper_assets" / "tables" / "wilcoxon.tex", ROOT / "paper_assets" / "tables" / "hyperparameters.tex",
-     ROOT / "paper_assets" / "tables" / "instance_statistics.tex", ROOT / "paper_assets" / "tables" / "milp_small.tex")
+     ROOT / "paper_assets" / "tables" / "instance_statistics.tex", ROOT / "paper_assets" / "tables" / "milp_small.tex",
+     ROOT / "paper_assets" / "tables" / "sensitivity.tex")

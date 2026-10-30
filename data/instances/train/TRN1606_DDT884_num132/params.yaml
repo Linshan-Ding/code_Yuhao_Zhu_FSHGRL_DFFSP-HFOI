@@ -1,0 +1,50 @@
+instance_id: TRN1606_DDT884_num132
+tier: train
+source: generated
+file: TRN1606_DDT884_num132.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 132
+ddt: 884
+orders_per_product:
+- 30
+- 25
+- 25
+- 26
+- 26
+arrival_first: 1.0
+arrival_last: 2855.0
+inter_arrival_mean: 21.786259541984734
+inter_arrival_cv: 0.5480252057855736
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.1143601962158374
+load_ratio_bottleneck: 2.316322354590049
+due_slack_min: 541.0
+due_slack_mean: 955.9166666666666
+due_slack_max: 1368.0
+process_time_min: 28.0
+process_time_mean: 230.32
+process_time_max: 450.0
+seed: 1606
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: TRN1270_DDT981_num62
+tier: train
+source: generated
+file: TRN1270_DDT981_num62.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 62
+ddt: 981
+orders_per_product:
+- 14
+- 15
+- 6
+- 13
+- 14
+arrival_first: 1.0
+arrival_last: 1175.0
+inter_arrival_mean: 19.24590163934426
+inter_arrival_cv: 0.5866184505219291
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.304989437819421
+load_ratio_bottleneck: 2.579666098807496
+due_slack_min: 602.0
+due_slack_mean: 1012.3387096774194
+due_slack_max: 1516.0
+process_time_min: 29.0
+process_time_mean: 221.808
+process_time_max: 450.0
+seed: 1270
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

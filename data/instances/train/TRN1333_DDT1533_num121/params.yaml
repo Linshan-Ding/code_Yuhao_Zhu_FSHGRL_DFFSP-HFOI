@@ -1,0 +1,50 @@
+instance_id: TRN1333_DDT1533_num121
+tier: train
+source: generated
+file: TRN1333_DDT1533_num121.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 121
+ddt: 1533
+orders_per_product:
+- 18
+- 29
+- 22
+- 24
+- 28
+arrival_first: 1.0
+arrival_last: 2599.0
+inter_arrival_mean: 21.65
+inter_arrival_cv: 0.5366273326761551
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.197284064665127
+load_ratio_bottleneck: 2.6272517321016164
+due_slack_min: 946.0
+due_slack_mean: 1651.2231404958677
+due_slack_max: 2373.0
+process_time_min: 25.0
+process_time_mean: 237.856
+process_time_max: 445.0
+seed: 1333
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: TRN1849_DDT981_num143
+tier: train
+source: generated
+file: TRN1849_DDT981_num143.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 143
+ddt: 981
+orders_per_product:
+- 30
+- 34
+- 32
+- 23
+- 24
+arrival_first: 1.0
+arrival_last: 2837.0
+inter_arrival_mean: 19.971830985915492
+inter_arrival_cv: 0.6015200636000186
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.421971227080395
+load_ratio_bottleneck: 2.7206318758815233
+due_slack_min: 594.0
+due_slack_mean: 1092.937062937063
+due_slack_max: 1521.0
+process_time_min: 27.0
+process_time_mean: 241.856
+process_time_max: 449.0
+seed: 1849
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

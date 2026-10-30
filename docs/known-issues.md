@@ -68,7 +68,7 @@
 
 | 条目 | v2 处理 |
 |---|---|
-| 1 超参不一致 | `configs/paper.yaml` 为论文配置层（2000 轮、熵系数 0.01、泛化型范式），`train_version: 2`；论文表 6 以其为准 |
+| 1 超参不一致 | `configs/paper.yaml` 为论文配置层（1000 轮、熵系数 0.01、泛化型范式、每方法 1 run），`train_version: 2`；论文表 6 由它生成 |
 | 2 训练器没有流体剪枝 | **已实现**（V1）：`env.fluid_mask` + `fluid_mask_threshold` 的候选掩码，空集回退；`env.fluid_features` 单独开关两列特征；`fluid_recompute: decision` 每个新状态重解 LP |
 | 3 DRL 对比方法不存在 | V7 新增 HSDDQN（层级 DDQN）与 HGNN-PPO (adapted) 作为可复现对比方法，A2C/DQN/DDQN 保留 |
 | 5 决策时间口径 | 聚合按 `infer_time_ms / decision_count` 计每决策时间（`result/aggregate.py`），论文表格改用该口径 |
@@ -79,7 +79,7 @@
 | 10 best checkpoint 口径 | **已取代**（V2）：`best_val_checkpoint.pt`（验证集贪心均值最优）为 v2 的模型选择；旧文件仍写出 |
 | 11 fixed 与 round_robin 相同 | 保持；泛化型用 `random` |
 | 12 无效动作静默重映射 | **已修复**（V3）：`step()` 对非法 (机器, 工序类型) 对与越界订单秩抛 `ValueError` |
-| 14 工业案例不可复现 | V5 按论文表 12 的工艺数据提供案例生成器（真实订单流不公开） |
+| 14 工业案例不可复现 | v2 不重做案例实验（2026-10-30 决定）：论文表 13 沿用原稿结果并说明现场使用的就是文中的派工规则，最优规则结果即工业案例的实际运行结果；表 12 的工艺数据作为生成器能力保留（`data/case/process.yaml`），不生成案例档位 |
 | 19 Gurobi 路径未验证 | **已变更**（V1/V9）：`fluid_backend: scipy`（HiGHS）求同一 LP，无许可证也能得到精确解；`auto` 依次取 Gurobi → HiGHS → 启发式（旧的"无 Gurobi 即启发式"行为由 `fluid_backend: gurobi` 保留，等价性回归的旧语义覆盖层使用它）；Gurobi 模型原样保留在 `_solve_lp_gurobi` |
 | 21 多进程采集与 Gurobi | 不变；`fluid_backend: scipy` 下各 worker 进程独立求解，无许可证问题 |
 

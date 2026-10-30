@@ -1,0 +1,50 @@
+instance_id: TRN1420_DDT584_num64
+tier: train
+source: generated
+file: TRN1420_DDT584_num64.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 64
+ddt: 584
+orders_per_product:
+- 10
+- 17
+- 7
+- 20
+- 10
+arrival_first: 1.0
+arrival_last: 1265.0
+inter_arrival_mean: 20.063492063492063
+inter_arrival_cv: 0.49729882446469964
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.0967835443037974
+load_ratio_bottleneck: 2.297107594936709
+due_slack_min: 354.0
+due_slack_mean: 637.875
+due_slack_max: 904.0
+process_time_min: 33.0
+process_time_mean: 210.344
+process_time_max: 448.0
+seed: 1420
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

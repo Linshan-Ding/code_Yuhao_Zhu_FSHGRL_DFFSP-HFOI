@@ -1,6 +1,6 @@
 """Run every stage in dependency order: data -> pilot (gate; skipped when disabled) -> training (ours,
 ablations, learned baselines) in parallel with the CPU rule baselines and the exact MILP check -> evaluation
--> aggregation.
+and the mask-threshold sensitivity -> aggregation.
 An optional integer argument caps the concurrency of every stage (1 = fully serial)."""
 import subprocess
 import sys
@@ -18,7 +18,8 @@ STAGES = [
     ("rules", ["run_06_run_rules.py"], ["data"]),
     ("milp", ["run_08_milp_check.py"], ["data"]),
     ("eval", ["run_07_eval_main.py"], ["train", "rules"]),
-    ("aggregate", ["run_09_aggregate_stats.py"], ["eval", "milp"]),
+    ("sensitivity", ["run_10_sensitivity.py"], ["train", "milp"]),
+    ("aggregate", ["run_09_aggregate_stats.py"], ["eval", "milp", "sensitivity"]),
 ]
 
 done_stages, running, t0, failed = set(), [], time.time(), []

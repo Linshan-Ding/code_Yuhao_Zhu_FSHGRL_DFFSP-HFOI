@@ -124,13 +124,19 @@ def test_configured_pools_cover_the_plan(tmp_path):
 
     cfg = load_config()
     specs = pool_specs(cfg.instance)
-    assert {"train", "val", "arrival", "arrival_train", "tiny", "tiny5", "case_train", "case_val", "case_eval"} <= set(specs)
+    assert set(specs) == {"train", "arrival", "small"}                   # the revision's tiers (2026-10-30)
+    assert specs["train"]["n"] == 1000 and specs["train"]["seed"] == 1000
     arrival = generate_pool("arrival", specs["arrival"], cfg.instance.generator, tmp_path)
     assert len(arrival) == 6 and sum("bursty" in p.stem for p in arrival) == 1 and all("DDT900_num100" in p.stem for p in arrival)
-    mixed = generate_pool("arrival_train", dict(specs["arrival_train"], n=6), cfg.instance.generator, tmp_path)
+    mixed = generate_pool("mixed", {"tier": "mixed", "prefix": "MIX", "seed": 4000, "n": 6, "arrival_mix": True},
+                          cfg.instance.generator, tmp_path)
     models = {yaml.safe_load((p.parent / "params.yaml").read_text())["arrival_model"] for p in mixed}
     assert len(mixed) == 6 and len(models) >= 2
-    tiny = generate_pool("tiny", dict(specs["tiny"], grid={"n_orders": [4], "ddt": [500], "seeds": 1}), cfg.instance.generator, tmp_path)
+    small = generate_pool("small", dict(specs["small"], grid={"n_orders": [6], "ddt": [500], "seeds": 1}),
+                          cfg.instance.generator, tmp_path)
+    spec = parse_instance_file(small[0])
+    assert small[0].stem == "SML5000_DDT500_num6" and spec.machine_count == 25 and spec.total_orders == 6
+    tiny = generate_pool("tiny", {"tier": "tiny", "prefix": "TNY", "seed": 5000,
+                                  "structure": {"n_products": 2, "n_stages": 3, "machines_per_stage": 2},
+                                  "grid": {"n_orders": [4], "ddt": [500], "seeds": 1}}, cfg.instance.generator, tmp_path)
     assert parse_instance_file(tiny[0]).machine_count == 6
-    case = generate_pool("case_eval", specs["case_eval"], cfg.instance.generator, tmp_path)
-    assert len(case) == 9 and all(parse_instance_file(p).machine_count == 31 for p in case)
