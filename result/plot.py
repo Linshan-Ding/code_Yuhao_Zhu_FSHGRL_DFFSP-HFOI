@@ -108,10 +108,16 @@ def plot_convergence(series: Sequence, out_stem=None, ylabel: str = "Objective (
 
 def plot_training_trace(csv_path, out_stem=None, column: str = "fulfillment_rate_mean", x_column: str = "iteration",
                         smooth_window: int = 31, title: str | None = None, percent: bool = True,
-                        width_mm: float = 84, height_mm: float = 56):
+                        width_mm: float = 84, height_mm: float = 56, instance_id: str | None = None):
     """Raw per-iteration trace and its moving average (the look of the former train_curve.py). Reads
-    train_metrics.csv (sampled training rate) or curve.csv (pass column='obj', x_column='epoch')."""
-    frame = pd.read_csv(csv_path).sort_values(x_column)
+    train_metrics.csv (sampled training rate), curve.csv (pass column='obj', x_column='epoch') or val_curve.csv
+    (pass column='fulfillment_rate' and the ``instance_id`` to keep; v2 generalisation paradigm)."""
+    frame = pd.read_csv(csv_path)
+    if instance_id is not None and "instance_id" in frame.columns:
+        frame = frame[frame["instance_id"] == instance_id]
+    if frame.empty:
+        raise ValueError(f"{csv_path}: no rows" + (f" for instance {instance_id}" if instance_id else ""))
+    frame = frame.sort_values(x_column)
     x = frame[x_column]
     y = frame[column].astype(float)
     if column == "obj":

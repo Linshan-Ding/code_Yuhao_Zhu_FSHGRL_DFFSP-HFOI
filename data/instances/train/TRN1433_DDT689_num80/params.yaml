@@ -1,0 +1,50 @@
+instance_id: TRN1433_DDT689_num80
+tier: train
+source: generated
+file: TRN1433_DDT689_num80.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 80
+ddt: 689
+orders_per_product:
+- 21
+- 15
+- 15
+- 14
+- 15
+arrival_first: 1.0
+arrival_last: 1549.0
+inter_arrival_mean: 19.59493670886076
+inter_arrival_cv: 0.6288446970216445
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.3919648578811366
+load_ratio_bottleneck: 2.7194780361757105
+due_slack_min: 423.0
+due_slack_mean: 763.4625
+due_slack_max: 1068.0
+process_time_min: 25.0
+process_time_mean: 234.352
+process_time_max: 450.0
+seed: 1433
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

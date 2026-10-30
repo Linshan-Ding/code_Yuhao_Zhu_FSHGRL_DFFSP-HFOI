@@ -1,0 +1,50 @@
+instance_id: TRN1651_DDT1414_num140
+tier: train
+source: generated
+file: TRN1651_DDT1414_num140.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 140
+ddt: 1414
+orders_per_product:
+- 21
+- 25
+- 33
+- 32
+- 29
+arrival_first: 1.0
+arrival_last: 2953.0
+inter_arrival_mean: 21.237410071942445
+inter_arrival_cv: 0.5598104463495909
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.358630352303523
+load_ratio_bottleneck: 2.4831653116531167
+due_slack_min: 872.0
+due_slack_mean: 1482.1
+due_slack_max: 2186.0
+process_time_min: 28.0
+process_time_mean: 250.456
+process_time_max: 445.0
+seed: 1651
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: TRN1834_DDT521_num65
+tier: train
+source: generated
+file: TRN1834_DDT521_num65.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 65
+ddt: 521
+orders_per_product:
+- 15
+- 14
+- 15
+- 13
+- 8
+arrival_first: 1.0
+arrival_last: 1333.0
+inter_arrival_mean: 20.8125
+inter_arrival_cv: 0.5812420725062457
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.2836276276276273
+load_ratio_bottleneck: 2.726054054054054
+due_slack_min: 316.0
+due_slack_mean: 552.8615384615384
+due_slack_max: 801.0
+process_time_min: 30.0
+process_time_mean: 237.64
+process_time_max: 449.0
+seed: 1834
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

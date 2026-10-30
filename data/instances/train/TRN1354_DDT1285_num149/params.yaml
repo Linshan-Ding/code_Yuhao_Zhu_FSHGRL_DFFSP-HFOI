@@ -1,0 +1,50 @@
+instance_id: TRN1354_DDT1285_num149
+tier: train
+source: generated
+file: TRN1354_DDT1285_num149.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 149
+ddt: 1285
+orders_per_product:
+- 38
+- 23
+- 28
+- 26
+- 34
+arrival_first: 1.0
+arrival_last: 2629.0
+inter_arrival_mean: 17.756756756756758
+inter_arrival_cv: 0.6120216844763734
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.7036468797564686
+load_ratio_bottleneck: 3.036590563165906
+due_slack_min: 773.0
+due_slack_mean: 1373.3758389261745
+due_slack_max: 1978.0
+process_time_min: 27.0
+process_time_mean: 240.04
+process_time_max: 447.0
+seed: 1354
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

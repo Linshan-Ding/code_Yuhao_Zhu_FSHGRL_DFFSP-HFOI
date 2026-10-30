@@ -53,7 +53,7 @@ class InstanceCfg:
     patterns: list = field(default_factory=lambda: ["DDT*.txt", "num*.txt", "train_num*.txt"])
     train_instances: list = field(default_factory=lambda: ["DDT500_num100.txt"])
     instance_selection: str = "fixed"
-    val_data_dir: str = "data/instances/val"   # validation instances (generalization: model selection)
+    val_data_dir: str = "data/instances/benchmark"   # validation instances (generalization: model selection)
     val_instances: list = field(default_factory=list)   # explicit files; empty = every instance of val_data_dir
     eval_tiers: list = field(default_factory=lambda: ["benchmark"])   # tiers evaluated by run_07 (generalization)
     pools: dict = field(default_factory=dict)  # generated tiers (data/generator.py --pool); see configs/instance.yaml

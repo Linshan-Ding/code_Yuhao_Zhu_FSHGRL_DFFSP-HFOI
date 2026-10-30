@@ -1,0 +1,50 @@
+instance_id: TRN1571_DDT1319_num52
+tier: train
+source: generated
+file: TRN1571_DDT1319_num52.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 52
+ddt: 1319
+orders_per_product:
+- 15
+- 12
+- 7
+- 10
+- 8
+arrival_first: 1.0
+arrival_last: 1054.0
+inter_arrival_mean: 20.647058823529413
+inter_arrival_cv: 0.486209416119868
+inter_arrival_max: 38.0
+max_burst: 2
+load_ratio: 2.3828284900284897
+load_ratio_bottleneck: 2.7199999999999998
+due_slack_min: 798.0
+due_slack_mean: 1436.0
+due_slack_max: 2038.0
+process_time_min: 27.0
+process_time_mean: 245.992
+process_time_max: 450.0
+seed: 1571
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

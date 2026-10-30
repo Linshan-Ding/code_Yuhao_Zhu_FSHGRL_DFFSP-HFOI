@@ -1,0 +1,50 @@
+instance_id: TRN1871_DDT753_num77
+tier: train
+source: generated
+file: TRN1871_DDT753_num77.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 77
+ddt: 753
+orders_per_product:
+- 18
+- 16
+- 15
+- 14
+- 14
+arrival_first: 1.0
+arrival_last: 1434.0
+inter_arrival_mean: 18.855263157894736
+inter_arrival_cv: 0.5720333105020464
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.4047609211444523
+load_ratio_bottleneck: 2.9627801814375436
+due_slack_min: 460.0
+due_slack_mean: 808.7012987012987
+due_slack_max: 1163.0
+process_time_min: 31.0
+process_time_mean: 226.712
+process_time_max: 447.0
+seed: 1871
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

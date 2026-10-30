@@ -1,0 +1,50 @@
+instance_id: TRN1926_DDT885_num112
+tier: train
+source: generated
+file: TRN1926_DDT885_num112.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 112
+ddt: 885
+orders_per_product:
+- 26
+- 21
+- 18
+- 21
+- 26
+arrival_first: 1.0
+arrival_last: 2387.0
+inter_arrival_mean: 21.495495495495497
+inter_arrival_cv: 0.5630512823443525
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.2701686504610223
+load_ratio_bottleneck: 2.419855825649622
+due_slack_min: 532.0
+due_slack_mean: 974.6696428571429
+due_slack_max: 1365.0
+process_time_min: 25.0
+process_time_mean: 243.992
+process_time_max: 449.0
+seed: 1926
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

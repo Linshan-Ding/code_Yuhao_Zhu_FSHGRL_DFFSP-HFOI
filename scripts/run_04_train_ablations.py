@@ -12,7 +12,7 @@ VARIANTS = {"nfe": ["configs/ablation/nf_feature.yaml"], "nm": ["configs/ablatio
             "nf": ["configs/ablation/nf.yaml"], "ng": ["configs/ablation/ng.yaml"],
             "na": ["configs/ablation/no_sparse_attn.yaml"]}
 TIERS = ("benchmark",)
-N_RUNS = n_runs("ablations", 3)
+N_RUNS = n_runs("ablations", 1)
 
 require_train_confirmed()
 jobs = []

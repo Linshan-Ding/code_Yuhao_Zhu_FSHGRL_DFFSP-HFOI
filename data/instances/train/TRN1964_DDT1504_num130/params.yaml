@@ -1,0 +1,50 @@
+instance_id: TRN1964_DDT1504_num130
+tier: train
+source: generated
+file: TRN1964_DDT1504_num130.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 130
+ddt: 1504
+orders_per_product:
+- 24
+- 24
+- 21
+- 31
+- 30
+arrival_first: 1.0
+arrival_last: 2610.0
+inter_arrival_mean: 20.224806201550386
+inter_arrival_cv: 0.5594735148499665
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.4367699501724798
+load_ratio_bottleneck: 2.724970486776543
+due_slack_min: 902.0
+due_slack_mean: 1674.0461538461539
+due_slack_max: 2328.0
+process_time_min: 28.0
+process_time_mean: 246.416
+process_time_max: 449.0
+seed: 1964
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

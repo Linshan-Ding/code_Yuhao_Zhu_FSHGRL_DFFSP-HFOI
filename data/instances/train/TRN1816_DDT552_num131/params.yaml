@@ -1,0 +1,50 @@
+instance_id: TRN1816_DDT552_num131
+tier: train
+source: generated
+file: TRN1816_DDT552_num131.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 131
+ddt: 552
+orders_per_product:
+- 25
+- 19
+- 32
+- 26
+- 29
+arrival_first: 1.0
+arrival_last: 2752.0
+inter_arrival_mean: 21.161538461538463
+inter_arrival_cv: 0.49868865448891586
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.405269356597601
+load_ratio_bottleneck: 2.786942929843693
+due_slack_min: 331.0
+due_slack_mean: 601.7709923664122
+due_slack_max: 851.0
+process_time_min: 25.0
+process_time_mean: 254.496
+process_time_max: 449.0
+seed: 1816
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

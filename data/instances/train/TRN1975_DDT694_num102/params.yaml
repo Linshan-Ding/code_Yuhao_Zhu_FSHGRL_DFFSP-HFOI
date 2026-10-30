@@ -1,0 +1,50 @@
+instance_id: TRN1975_DDT694_num102
+tier: train
+source: generated
+file: TRN1975_DDT694_num102.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 102
+ddt: 694
+orders_per_product:
+- 17
+- 15
+- 30
+- 23
+- 17
+arrival_first: 1.0
+arrival_last: 2237.0
+inter_arrival_mean: 22.138613861386137
+inter_arrival_cv: 0.5231900636029256
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.1786368515205723
+load_ratio_bottleneck: 2.451824686940966
+due_slack_min: 421.0
+due_slack_mean: 761.6274509803922
+due_slack_max: 1075.0
+process_time_min: 27.0
+process_time_mean: 241.16
+process_time_max: 446.0
+seed: 1975
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

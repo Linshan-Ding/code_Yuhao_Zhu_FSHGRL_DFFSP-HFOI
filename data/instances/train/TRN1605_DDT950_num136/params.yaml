@@ -1,0 +1,50 @@
+instance_id: TRN1605_DDT950_num136
+tier: train
+source: generated
+file: TRN1605_DDT950_num136.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 136
+ddt: 950
+orders_per_product:
+- 35
+- 22
+- 26
+- 25
+- 28
+arrival_first: 1.0
+arrival_last: 2731.0
+inter_arrival_mean: 20.22222222222222
+inter_arrival_cv: 0.574221828957754
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.163164835164835
+load_ratio_bottleneck: 2.4385054945054945
+due_slack_min: 580.0
+due_slack_mean: 1011.5441176470588
+due_slack_max: 1472.0
+process_time_min: 30.0
+process_time_mean: 218.72
+process_time_max: 449.0
+seed: 1605
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

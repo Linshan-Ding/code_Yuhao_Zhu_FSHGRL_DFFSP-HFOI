@@ -1,0 +1,50 @@
+instance_id: TRN1522_DDT807_num138
+tier: train
+source: generated
+file: TRN1522_DDT807_num138.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 138
+ddt: 807
+orders_per_product:
+- 33
+- 17
+- 32
+- 31
+- 25
+arrival_first: 1.0
+arrival_last: 2655.0
+inter_arrival_mean: 19.37226277372263
+inter_arrival_cv: 0.587634995355644
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.608843406179352
+load_ratio_bottleneck: 2.8795810097965338
+due_slack_min: 484.0
+due_slack_mean: 898.6666666666666
+due_slack_max: 1250.0
+process_time_min: 30.0
+process_time_mean: 252.696
+process_time_max: 449.0
+seed: 1522
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

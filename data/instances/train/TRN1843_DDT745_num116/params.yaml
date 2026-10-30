@@ -1,0 +1,50 @@
+instance_id: TRN1843_DDT745_num116
+tier: train
+source: generated
+file: TRN1843_DDT745_num116.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 116
+ddt: 745
+orders_per_product:
+- 20
+- 28
+- 25
+- 19
+- 24
+arrival_first: 1.0
+arrival_last: 2239.0
+inter_arrival_mean: 19.46086956521739
+inter_arrival_cv: 0.6038781008172048
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.4067989276139414
+load_ratio_bottleneck: 2.7040929401251117
+due_slack_min: 458.0
+due_slack_mean: 835.5344827586207
+due_slack_max: 1155.0
+process_time_min: 26.0
+process_time_mean: 234.192
+process_time_max: 447.0
+seed: 1843
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

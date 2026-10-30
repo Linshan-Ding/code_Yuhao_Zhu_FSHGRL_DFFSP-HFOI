@@ -1,0 +1,4 @@
+# Mask-threshold sensitivity (scripts/run_10_sensitivity.py): evaluation-time overlay, fluid candidate mask off
+# (every eligible pair is a candidate; the fluid node features stay on).
+env:
+  fluid_mask: false

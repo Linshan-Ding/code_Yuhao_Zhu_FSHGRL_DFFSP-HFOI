@@ -1,0 +1,50 @@
+instance_id: TRN1347_DDT880_num74
+tier: train
+source: generated
+file: TRN1347_DDT880_num74.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 74
+ddt: 880
+orders_per_product:
+- 17
+- 14
+- 18
+- 10
+- 15
+arrival_first: 1.0
+arrival_last: 1498.0
+inter_arrival_mean: 20.506849315068493
+inter_arrival_cv: 0.5564145488862133
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.264921309285237
+load_ratio_bottleneck: 2.5088203072812294
+due_slack_min: 535.0
+due_slack_mean: 943.1891891891892
+due_slack_max: 1364.0
+process_time_min: 33.0
+process_time_mean: 232.232
+process_time_max: 447.0
+seed: 1347
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: TRN1867_DDT742_num142
+tier: train
+source: generated
+file: TRN1867_DDT742_num142.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 142
+ddt: 742
+orders_per_product:
+- 33
+- 33
+- 28
+- 30
+- 18
+arrival_first: 1.0
+arrival_last: 2908.0
+inter_arrival_mean: 20.617021276595743
+inter_arrival_cv: 0.5495960825324409
+inter_arrival_max: 40.0
+max_burst: 4
+load_ratio: 2.368528379772962
+load_ratio_bottleneck: 2.696800825593395
+due_slack_min: 449.0
+due_slack_mean: 793.4225352112676
+due_slack_max: 1136.0
+process_time_min: 27.0
+process_time_mean: 244.16
+process_time_max: 449.0
+seed: 1867
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

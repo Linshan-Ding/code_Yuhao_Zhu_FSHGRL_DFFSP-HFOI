@@ -21,9 +21,9 @@ DDQN 结构的改编而非原文复现。各方法的配置覆盖层在 `configs
 
 ## 精确求解检查（`baselines/milp_exact.py`，v2）
 
-论文 3.2 节的 MILP 在小算例档 `tiny`（2 产品 × 3 阶段 × 每阶段 2 机，S ∈ {4, 6, 8, 10, 12}）与 `tiny5`（基准结构 5 × 5 × 5，
-S ∈ {6, 8, 10}）上用精确求解器求解（`scripts/run_08_milp_check.py`；Gurobi 可用时优先，否则 `scipy.optimize.milp` 的 HiGHS），
-产物 `result/milp/milp_results.csv`，每算例两行：
+论文 3.2 节的 MILP 在小算例档 `small`（基准结构 5 × 5 × 5，S ∈ {6, 8, 10, 12} × DDT ∈ {500, 900, 1500}，12 个）上用精确求解器求解
+（`scripts/run_08_milp_check.py`；Gurobi 可用时优先，否则 `scipy.optimize.milp` 的 HiGHS，600 s 时限），产物 `result/milp/milp_results.csv`，
+每算例两行：
 
 | 变体 | 式 (2) | 含义 |
 |---|---|---|
@@ -32,16 +32,23 @@ S ∈ {6, 8, 10}）上用精确求解器求解（`scripts/run_08_milp_check.py`�
 
 两者最优值相等（迟交工序总可以排在全部按期工作之后，故 MILP-B 的最优解可扩展为同值的 MILP-A 解；反之 MILP-A 解去掉迟交订单
 即为 MILP-B 可行解），求解器在每个算例上确认这一点；因此 MILP 最优值是仿真器中任何在线策略（含丢弃约定）的离线全知上界。
-每个解经过三重核对：
+每个解经过核对：
 
 1. **验证器**：按解的机器分配与机器内顺序从零重新定时（左移规则：开工 = max(就绪, 机器空闲)），核对求解器给出的完工时间
    不早于左移完工、z_s = 1 的订单确实按期，并按仿真器口径（C ≤ d）重数按期订单；
 2. **仿真器回放**：`ScheduleFollowingSimulator` 把仿真器的候选集限制为"该机器序列中的下一道工序"，其余规则（到达、到期丢弃、
    开工即迟交则丢弃、机器释放）不变；MILP-B 的回放达成率必须等于最优值，MILP-A 的回放 ≥ 最优值（仿真器丢弃其迟交工序）；
    回放不截断候选订单（`order_top_k: 0`）；
-3. **穷举**（S ≤ 6）：按阶段枚举全部机器分配与机器内排列并左移定时（带上界剪枝），对 MILP-B 再遍历被加工订单的子集；
-   穷举最优值必须等于两个变体的 MILP 最优值。
+3. **穷举**：按阶段枚举全部机器分配与机器内排列并左移定时（带上界剪枝），对 MILP-B 再遍历被加工订单的子集；在 5 × 5 × 5 结构下
+   枚举规模超过门限而跳过（`brute_force_status: skipped_size`），模型本身的穷举核对在测试套件的 2 × 3 × 2 微型算例上进行
+   （`tests/test_milp_exact.py`；V8 阶段曾在 80 个 tiny / tiny5 算例上全部一致）。
 
 big-L 取 L = C_UB + max p，C_UB = max_s a_s + Σ_(s,j) max_m p_sjm 为任何左移调度完工时间的上界，并作为 C_sj 的显式上界一起记录
 （`big_L`、`c_ub` 列）。`n_binary` = |x| + |y| + |z|，`n_pairs` = 式 (5) 的排序变量数。规则基线在同一批算例上的结果来自
-`run_06`（`result/rules.csv`，档位 tiny / tiny5），聚合脚本据此给出规则与上界的差距。
+`run_06`（`result/rules.csv`，档位 small），`make_tables.py` 的 `milp_small.tex` 同时给出 FSHGRL 的贪心 η 与到最优值的差距。
+
+## 剪枝阈值敏感性（`scripts/run_10_sensitivity.py`，v2）
+
+不重训：训练好的 FSHGRL（`result/ours/run1/best_val_checkpoint.pt`）在 small 档上以评测期覆盖层 `configs/sensitivity/eps_<v>.yaml`
+（ε_f ∈ {off, 1e-5, 0.05, 0.1, 0.2}；off = 掩码关闭、特征保留）各跑贪心 1 条 + 采样 10 条，产物 `result/sensitivity.csv`；
+`sensitivity.tex` 报告每个阈值的均值 η、与 MILP 最优值的平均差距、剪枝前/后候选对数、回退率与每决策时间。

@@ -81,3 +81,11 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   全部最优、回放一致 160/160、穷举一致 40/40（其余因结构规模跳过）、MILP-A 与 MILP-B 最优值相等。
   标签 `v2.0-revision` 指向本分支的末端提交，由作者本地创建并推送（`git tag -a v2.0-revision -m "revision code freeze"`，
   `git push origin v2.0-revision`；本会话的凭据只允许推送 `claude/*` 分支，推送标签被拒绝 403）。
+- V11 实验规模定稿（用户决定，2026-10-30，以最小代价完成全部实验）：`configs/paper.yaml` 1000 轮、`instance_selection: round_robin`
+  （第 k 轮用训练池第 k 个算例）、验证集改为基准算例 `DDT500_num50` 与 `DDT1200_num100`（原稿图 7 的两个算例）每 10 轮各一条贪心 episode；
+  `configs/runs.yaml` 每方法 1 run（固定种子 1）；预实验关闭（`configs/pilot.yaml`）；档位改为 train 1000（种子 1000–1999）、arrival 6、
+  small 12（基准结构 S∈{6,8,10,12} × DDT∈{500,900,1500}，精确求解与敏感性共用），删除 val / arrival_train / tiny / tiny5 / case_* 档位、
+  `configs/pools/` 与 `ours_arrival`、`ours_case`（案例研究不重做：论文表 13 沿用原稿，最优派工规则 = 现场做法）；
+  新增 `scripts/run_10_sensitivity.py` 与 `configs/sensitivity/eps_{off,1e-5,0.05,0.1,0.2}.yaml`（评测期阈值扫描，`result/sensitivity.csv`）、
+  `sensitivity.tex`，`milp_small.tex` 增加 FSHGRL η 与差距列；图 7 与收敛曲线改由 `val_curve.csv` 生成（泛化布局）；
+  等价性参考运行的验证算例改为上述两个基准算例并重新冻结黄金；`tests/test_sensitivity.py`；文档与 README 同步。

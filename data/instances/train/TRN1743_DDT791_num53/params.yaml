@@ -1,0 +1,50 @@
+instance_id: TRN1743_DDT791_num53
+tier: train
+source: generated
+file: TRN1743_DDT791_num53.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 53
+ddt: 791
+orders_per_product:
+- 11
+- 9
+- 14
+- 8
+- 11
+arrival_first: 1.0
+arrival_last: 1134.0
+inter_arrival_mean: 21.78846153846154
+inter_arrival_cv: 0.479026111524676
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.161217299205649
+load_ratio_bottleneck: 2.3891544571932917
+due_slack_min: 499.0
+due_slack_mean: 852.0377358490566
+due_slack_max: 1184.0
+process_time_min: 26.0
+process_time_mean: 235.448
+process_time_max: 450.0
+seed: 1743
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: SML5000_DDT500_num6
+tier: small
+source: generated
+file: SML5000_DDT500_num6.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 6
+ddt: 500
+orders_per_product:
+- 1
+- 1
+- 2
+- 0
+- 2
+arrival_first: 1.0
+arrival_last: 66.0
+inter_arrival_mean: 13.0
+inter_arrival_cv: 0.5978264377761676
+inter_arrival_max: 27.0
+max_burst: 1
+load_ratio: 3.683446153846154
+load_ratio_bottleneck: 4.040615384615385
+due_slack_min: 354.0
+due_slack_mean: 569.5
+due_slack_max: 761.0
+process_time_min: 26.0
+process_time_mean: 239.424
+process_time_max: 449.0
+seed: 5000
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

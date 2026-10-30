@@ -135,8 +135,10 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
     hyper = pd.read_csv(tables / "hyperparameters.csv")
     values = dict(zip(hyper["parameter"], hyper["value"].astype(str)))
     assert values["Candidate orders per operation type $k$ (EDD)"] == "5"
-    assert values["Iterations / episodes per iteration"] == "2000 / 8"
-    assert values["Training pool / validation set / benchmark test set"] == "200 / 30 / 15 instances"
+    assert values["Iterations / episodes per iteration"] == "1000 / 8"
+    assert values["Training pool / validation / test"] == "1000 generated / 2 benchmark ((500, 50), (1200, 100)) / 15 benchmark"
+    assert values["Training instance per iteration"] == "the next pool instance (each used once)"
+    assert values["Other unseen tiers (arrival / small)"] == "6 / 12 instances"
     assert values["Candidate self-attention: heads / feature width / normalisation"] == "1 / 66 / LayerNorm"
     stats = pd.read_csv(tables / "instance_statistics.csv")
     assert len(stats) == 15 and stats["load_ratio"].between(1.0, 3.0).all()
@@ -157,5 +159,6 @@ def test_hyperparameter_rows_follow_the_configuration():
     assert rows["HGNN layers / attention heads per layer"] == "3 / 1"
     assert rows["Candidate self-attention: heads / feature width / normalisation"] == "off"
     assert rows["Iterations / episodes per iteration"] == "10 / 2"
-    assert rows["Training pool / validation set / benchmark test set"] == "7 / 2 / 15 instances"
+    assert rows["Training pool / validation / test"] == "7 generated / 2 benchmark (val tier) / 15 benchmark"
+    assert rows["Training instance per iteration"] == "random draw from the pool"
     assert rows["Decoding / independent runs $K$"] == "greedy 1 + sampled 4 episodes / 1"

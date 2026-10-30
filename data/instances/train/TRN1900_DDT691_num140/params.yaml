@@ -1,0 +1,50 @@
+instance_id: TRN1900_DDT691_num140
+tier: train
+source: generated
+file: TRN1900_DDT691_num140.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 140
+ddt: 691
+orders_per_product:
+- 24
+- 38
+- 27
+- 27
+- 24
+arrival_first: 1.0
+arrival_last: 2854.0
+inter_arrival_mean: 20.52517985611511
+inter_arrival_cv: 0.5779594929541136
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.4704874868559408
+load_ratio_bottleneck: 2.881144058885384
+due_slack_min: 417.0
+due_slack_mean: 758.75
+due_slack_max: 1071.0
+process_time_min: 26.0
+process_time_mean: 253.536
+process_time_max: 449.0
+seed: 1900
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

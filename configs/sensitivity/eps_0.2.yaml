@@ -1,0 +1,5 @@
+# Mask-threshold sensitivity (scripts/run_10_sensitivity.py): evaluation-time overlay, epsilon_f = 0.2
+# (a pair is a candidate when its fluid allocation u* exceeds the threshold; empty sets fall back to all pairs).
+env:
+  fluid_mask: true
+  fluid_mask_threshold: 0.2

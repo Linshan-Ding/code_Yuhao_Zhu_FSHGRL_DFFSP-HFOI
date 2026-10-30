@@ -1,0 +1,50 @@
+instance_id: TRN1276_DDT810_num65
+tier: train
+source: generated
+file: TRN1276_DDT810_num65.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 65
+ddt: 810
+orders_per_product:
+- 8
+- 12
+- 15
+- 16
+- 14
+arrival_first: 1.0
+arrival_last: 1492.0
+inter_arrival_mean: 23.296875
+inter_arrival_cv: 0.4961693382188078
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 1.9051482226693492
+load_ratio_bottleneck: 1.9978645204560697
+due_slack_min: 486.0
+due_slack_mean: 876.4
+due_slack_max: 1248.0
+process_time_min: 26.0
+process_time_mean: 221.92
+process_time_max: 447.0
+seed: 1276
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

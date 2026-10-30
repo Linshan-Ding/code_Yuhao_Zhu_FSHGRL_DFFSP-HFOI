@@ -1,0 +1,50 @@
+instance_id: TRN1280_DDT1278_num148
+tier: train
+source: generated
+file: TRN1280_DDT1278_num148.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 148
+ddt: 1278
+orders_per_product:
+- 36
+- 21
+- 34
+- 26
+- 31
+arrival_first: 1.0
+arrival_last: 3146.0
+inter_arrival_mean: 21.39455782312925
+inter_arrival_cv: 0.573663715879825
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.2596400635930043
+load_ratio_bottleneck: 2.3946276629570753
+due_slack_min: 774.0
+due_slack_mean: 1398.1554054054054
+due_slack_max: 1981.0
+process_time_min: 28.0
+process_time_mean: 241.72
+process_time_max: 450.0
+seed: 1280
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

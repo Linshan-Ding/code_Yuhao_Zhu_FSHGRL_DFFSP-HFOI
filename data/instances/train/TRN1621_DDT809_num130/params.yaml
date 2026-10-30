@@ -1,0 +1,50 @@
+instance_id: TRN1621_DDT809_num130
+tier: train
+source: generated
+file: TRN1621_DDT809_num130.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 130
+ddt: 809
+orders_per_product:
+- 22
+- 29
+- 29
+- 24
+- 26
+arrival_first: 1.0
+arrival_last: 2740.0
+inter_arrival_mean: 21.232558139534884
+inter_arrival_cv: 0.5393426889801834
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.3006930996714128
+load_ratio_bottleneck: 2.434751369112815
+due_slack_min: 485.0
+due_slack_mean: 841.4307692307692
+due_slack_max: 1243.0
+process_time_min: 25.0
+process_time_mean: 244.248
+process_time_max: 448.0
+seed: 1621
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

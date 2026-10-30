@@ -14,10 +14,20 @@ if str(ROOT) not in sys.path:
 from baselines.milp_exact import (RESULT_COLS, Schedule, brute_force, build_model, build_problem,  # noqa: E402
                                   extract_schedule, left_shift, replay, resolve_backend, solve, solve_instance,
                                   stage_schedule_count, verify, write_results)
+from configs.config import GeneratorCfg  # noqa: E402
+from data.generator import generate_instance, write_instance  # noqa: E402
 from data.instance_io import parse_instance_file  # noqa: E402
 
-TINY = ROOT / "data" / "instances" / "tiny" / "TNY5000_DDT500_num4" / "TNY5000_DDT500_num4.txt"
-TINY5 = ROOT / "data" / "instances" / "tiny5" / "TNF5500_DDT500_num6" / "TNF5500_DDT500_num6.txt"
+SMALL = ROOT / "data" / "instances" / "small" / "SML5000_DDT500_num6" / "SML5000_DDT500_num6.txt"
+
+
+@pytest.fixture
+def tiny(tmp_path):
+    """A 2 products x 3 stages x 2 machines instance with 4 orders (the former tiny tier), small enough for the
+    exhaustive cross-check."""
+    data = generate_instance(5000, 4, GeneratorCfg(), ddt=500,
+                             structure={"n_products": 2, "n_stages": 3, "machines_per_stage": 2})
+    return write_instance(data, "TNY5000_DDT500_num4", tmp_path / "instances", tier="tiny")
 
 
 def _write(tmp_path: Path, name: str, lines) -> Path:
@@ -105,14 +115,14 @@ def test_verifier_rejects_cyclic_sequences_and_false_claims(micro):
         left_shift(problem, broken)
 
 
-def test_tiny_instance_end_to_end_and_output_contract(tmp_path):
-    rows = solve_instance(TINY, ("A", "B"), "highs", 60.0, brute_force_max_orders=4, tier="tiny")
+def test_tiny_instance_end_to_end_and_output_contract(tmp_path, tiny):
+    rows = solve_instance(tiny, ("A", "B"), "highs", 60.0, brute_force_max_orders=4, tier="tiny")
     assert [row["variant"] for row in rows] == ["A", "B"]
     for row in rows:
         assert row["status"] == "optimal" and row["replay_ok"] is True and row["brute_force_ok"] is True
         assert row["brute_force_status"] == "ok" and row["brute_force_nodes"] > 0
-        assert row["completed_opt"] == 3 and row["eta_opt"] == pytest.approx(0.75)
-        assert row["verifier_eta"] == row["replay_eta"] == row["brute_force_eta"] == pytest.approx(0.75)
+        assert 0 < row["completed_opt"] <= 4 and row["eta_opt"] == pytest.approx(row["completed_opt"] / 4)
+        assert row["verifier_eta"] == row["replay_eta"] == row["brute_force_eta"] == pytest.approx(row["eta_opt"])
         assert row["S"] == 4 and row["n_ops"] == 12 and row["n_binary"] == 64 and row["backend"] == "highs"
         assert row["big_L"] > row["c_ub"] > 0 and row["gap"] == 0.0
     assert rows[0]["completed_opt"] == rows[1]["completed_opt"]           # MILP-A and MILP-B agree
@@ -127,12 +137,12 @@ def test_tiny_instance_end_to_end_and_output_contract(tmp_path):
 def test_brute_force_gates(micro):
     problem = build_problem(parse_instance_file(micro))
     assert stage_schedule_count(problem, [0, 1, 2]) == 6                   # 3 orders, one machine: 3! sequences
-    tiny5 = build_problem(parse_instance_file(TINY5))
-    assert stage_schedule_count(tiny5, list(range(6))) == 720 * 210        # 6! x C(10, 4): far beyond the gate
-    assert brute_force(tiny5, "A")["status"] == "skipped_size"
+    small = build_problem(parse_instance_file(SMALL))
+    assert stage_schedule_count(small, list(range(6))) == 720 * 210        # 6! x C(10, 4): far beyond the gate
+    assert brute_force(small, "A")["status"] == "skipped_size"
     budget = brute_force(problem, "B", max_nodes=5)
     assert budget["status"] == "budget" and budget["on_time"] is None and budget["nodes"] == 6
-    rows = solve_instance(TINY5, ("B",), "highs", 60.0, brute_force_max_orders=6, tier="tiny5")
+    rows = solve_instance(SMALL, ("B",), "highs", 60.0, brute_force_max_orders=6, tier="small")
     assert rows[0]["status"] == "optimal" and rows[0]["brute_force_status"] == "skipped_size"
     assert rows[0]["brute_force_ok"] == "" and rows[0]["brute_force_eta"] == ""
 

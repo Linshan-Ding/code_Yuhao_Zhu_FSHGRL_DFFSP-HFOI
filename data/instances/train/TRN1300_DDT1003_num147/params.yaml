@@ -1,0 +1,50 @@
+instance_id: TRN1300_DDT1003_num147
+tier: train
+source: generated
+file: TRN1300_DDT1003_num147.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 147
+ddt: 1003
+orders_per_product:
+- 40
+- 31
+- 23
+- 24
+- 29
+arrival_first: 1.0
+arrival_last: 3121.0
+inter_arrival_mean: 21.36986301369863
+inter_arrival_cv: 0.5574104062060068
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.1759241025641023
+load_ratio_bottleneck: 2.3446102564102564
+due_slack_min: 602.0
+due_slack_mean: 1053.5986394557824
+due_slack_max: 1550.0
+process_time_min: 25.0
+process_time_mean: 232.496
+process_time_max: 450.0
+seed: 1300
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

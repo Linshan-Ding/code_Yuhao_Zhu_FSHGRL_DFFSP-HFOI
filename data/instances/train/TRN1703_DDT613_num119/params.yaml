@@ -1,0 +1,50 @@
+instance_id: TRN1703_DDT613_num119
+tier: train
+source: generated
+file: TRN1703_DDT613_num119.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 119
+ddt: 613
+orders_per_product:
+- 26
+- 31
+- 25
+- 17
+- 20
+arrival_first: 1.0
+arrival_last: 2269.0
+inter_arrival_mean: 19.220338983050848
+inter_arrival_cv: 0.6411298627014798
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.44199647266314
+load_ratio_bottleneck: 2.8594708994708995
+due_slack_min: 375.0
+due_slack_mean: 633.1680672268908
+due_slack_max: 943.0
+process_time_min: 26.0
+process_time_mean: 234.68
+process_time_max: 443.0
+seed: 1703
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

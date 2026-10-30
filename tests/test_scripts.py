@@ -15,7 +15,8 @@ def test_scripts_compile_and_declare_concurrency():
     names = sorted(p.name for p in SCRIPTS.glob("run_*.py"))
     assert names == ["run_00_smoke.py", "run_01_prepare_data.py", "run_02_pilot.py", "run_03_train_ours.py",
                      "run_04_train_ablations.py", "run_05_train_learned_baselines.py", "run_06_run_rules.py",
-                     "run_07_eval_main.py", "run_08_milp_check.py", "run_09_aggregate_stats.py", "run_all.py"]
+                     "run_07_eval_main.py", "run_08_milp_check.py", "run_09_aggregate_stats.py",
+                     "run_10_sensitivity.py", "run_all.py"]
     for name in names:
         tree = ast.parse((SCRIPTS / name).read_text(encoding="utf-8"))
         assigned = set()
@@ -25,7 +26,7 @@ def test_scripts_compile_and_declare_concurrency():
                     names = target.elts if isinstance(target, ast.Tuple) else [target]
                     assigned |= {n.id for n in names if isinstance(n, ast.Name)}
         if name in ("run_02_pilot.py", "run_03_train_ours.py", "run_04_train_ablations.py",
-                    "run_05_train_learned_baselines.py", "run_07_eval_main.py"):
+                    "run_05_train_learned_baselines.py", "run_07_eval_main.py", "run_10_sensitivity.py"):
             assert {"PARALLEL", "RESOURCE", "MAX_CONCURRENT"} <= assigned, name
 
 
@@ -33,14 +34,14 @@ def test_bootstrap_reads_configs(monkeypatch):
     import _bootstrap
 
     monkeypatch.setattr(sys, "argv", ["x"])
-    assert _bootstrap.n_runs("ours", 3) == 3 and _bootstrap.n_runs("learned_baselines", 1) == 3
-    assert _bootstrap.n_runs("learned_baselines_extra", 3) == 1
+    assert _bootstrap.n_runs("ours", 3) == 1 and _bootstrap.n_runs("ablations", 3) == 1      # one run per method
+    assert _bootstrap.n_runs("learned_baselines", 3) == 1 and _bootstrap.n_runs("learned_baselines_extra", 3) == 1
     assert _bootstrap.n_runs("missing_key", 7) == 7
     assert _bootstrap.seed_args(1) == ["--seed", "1"] and _bootstrap.seed_args(3) == []
     assert _bootstrap.requested_workers(5) == 2          # configs/parallel.yaml max_concurrent
     monkeypatch.setattr(sys, "argv", ["x", "4"])
     assert _bootstrap.requested_workers(5) == 4
-    assert _bootstrap.pilot_enabled() is True
+    assert _bootstrap.pilot_enabled() is False                          # no pilot gate in the revision experiments
     assert len(_bootstrap.instance_ids("benchmark")) == 15
     jobs = _bootstrap.training_jobs("ours", [], ["DDT500_num50"], 2)
     assert [j.name for j in jobs] == ["ours/DDT500_num50/run1", "ours/DDT500_num50/run2"]

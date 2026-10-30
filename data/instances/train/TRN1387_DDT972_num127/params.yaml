@@ -1,0 +1,50 @@
+instance_id: TRN1387_DDT972_num127
+tier: train
+source: generated
+file: TRN1387_DDT972_num127.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 127
+ddt: 972
+orders_per_product:
+- 35
+- 17
+- 27
+- 24
+- 24
+arrival_first: 1.0
+arrival_last: 2318.0
+inter_arrival_mean: 18.38888888888889
+inter_arrival_cv: 0.5902073853442367
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.423028398791541
+load_ratio_bottleneck: 2.8060422960725075
+due_slack_min: 590.0
+due_slack_mean: 1029.5669291338584
+due_slack_max: 1489.0
+process_time_min: 28.0
+process_time_mean: 222.784
+process_time_max: 445.0
+seed: 1387
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

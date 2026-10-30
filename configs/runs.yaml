@@ -1,7 +1,8 @@
-# Independent runs per method class (scripts read these; a class with 1 run gets a fixed, recorded seed).
-ours: 3                   # FSHGRL
-ablations: 3              # ablation variants (scripts/run_04 VARIANTS)
-learned_baselines: 3      # learned comparators HSDDQN / HGNN-PPO (scripts/run_05 BASELINES); same budget as ours
+# Runs per method class (scripts read these). Every learned method is trained once (decision of 2026-10-30):
+# a class with 1 run gets the fixed seed 1, recorded in config_snapshot.yaml.
+ours: 1                   # FSHGRL
+ablations: 1              # ablation variants (scripts/run_04 VARIANTS)
+learned_baselines: 1      # learned comparators HSDDQN / HGNN-PPO (scripts/run_05 BASELINES); same budget as ours
 learned_baselines_extra: 1   # additional baselines A2C / DQN / DDQN (run_05 EXTRA; not in the manuscript's tables)
 rules_random: 10          # Random and RRC episodes per instance (deterministic rules run once)
 eval:
@@ -10,4 +11,4 @@ eval:
   sampled_episodes: 10    # sampled episodes per instance in addition to the greedy one
   batch_episodes: 1       # sampled episodes per lockstep batch (1 = independent episodes)
 pilot:
-  min_win_share: 0.6667   # generalization gate: FSHGRL must reach the best rule on this share of the val instances
+  min_win_share: 0.6667   # generalization gate (configs/pilot.yaml, disabled): share of val instances to reach the best rule

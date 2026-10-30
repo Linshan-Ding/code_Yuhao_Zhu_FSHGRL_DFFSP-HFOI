@@ -1,0 +1,50 @@
+instance_id: TRN1786_DDT1499_num93
+tier: train
+source: generated
+file: TRN1786_DDT1499_num93.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 93
+ddt: 1499
+orders_per_product:
+- 17
+- 18
+- 20
+- 18
+- 20
+arrival_first: 1.0
+arrival_last: 1814.0
+inter_arrival_mean: 19.706521739130434
+inter_arrival_cv: 0.59895002972898
+inter_arrival_max: 38.0
+max_burst: 2
+load_ratio: 2.347649200220629
+load_ratio_bottleneck: 2.491357970215113
+due_slack_min: 911.0
+due_slack_mean: 1604.215053763441
+due_slack_max: 2318.0
+process_time_min: 27.0
+process_time_mean: 231.32
+process_time_max: 448.0
+seed: 1786
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

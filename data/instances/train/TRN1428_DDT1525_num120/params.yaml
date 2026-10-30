@@ -1,0 +1,50 @@
+instance_id: TRN1428_DDT1525_num120
+tier: train
+source: generated
+file: TRN1428_DDT1525_num120.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 120
+ddt: 1525
+orders_per_product:
+- 21
+- 22
+- 36
+- 21
+- 20
+arrival_first: 1.0
+arrival_last: 2360.0
+inter_arrival_mean: 19.823529411764707
+inter_arrival_cv: 0.614932044518956
+inter_arrival_max: 40.0
+max_burst: 2
+load_ratio: 2.3427513353115725
+load_ratio_bottleneck: 2.4968308605341245
+due_slack_min: 919.0
+due_slack_mean: 1617.25
+due_slack_max: 2357.0
+process_time_min: 26.0
+process_time_mean: 232.208
+process_time_max: 446.0
+seed: 1428
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

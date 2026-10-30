@@ -1,0 +1,50 @@
+instance_id: TRN1860_DDT812_num143
+tier: train
+source: generated
+file: TRN1860_DDT812_num143.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 143
+ddt: 812
+orders_per_product:
+- 26
+- 34
+- 32
+- 29
+- 22
+arrival_first: 1.0
+arrival_last: 2777.0
+inter_arrival_mean: 19.549295774647888
+inter_arrival_cv: 0.6064510957269696
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.5014916426512968
+load_ratio_bottleneck: 2.7929394812680113
+due_slack_min: 506.0
+due_slack_mean: 837.2657342657343
+due_slack_max: 1256.0
+process_time_min: 25.0
+process_time_mean: 244.512
+process_time_max: 449.0
+seed: 1860
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40

@@ -1,0 +1,50 @@
+instance_id: TRN1495_DDT650_num53
+tier: train
+source: generated
+file: TRN1495_DDT650_num53.txt
+n_products: 5
+n_stages: 5
+n_machines: 25
+machine_division:
+- 5
+- 5
+- 5
+- 5
+- 5
+n_orders: 53
+ddt: 650
+orders_per_product:
+- 12
+- 12
+- 10
+- 7
+- 12
+arrival_first: 1.0
+arrival_last: 1040.0
+inter_arrival_mean: 19.98076923076923
+inter_arrival_cv: 0.528611780085109
+inter_arrival_max: 40.0
+max_burst: 3
+load_ratio: 2.5535753609239653
+load_ratio_bottleneck: 2.8891780558229065
+due_slack_min: 390.0
+due_slack_mean: 691.377358490566
+due_slack_max: 999.0
+process_time_min: 26.0
+process_time_mean: 255.112
+process_time_max: 449.0
+seed: 1495
+ddt_range:
+- 500
+- 1600
+slack_rule: ddt_uniform
+slack_rel_range:
+- 0.6
+- 1.55
+time_unit: second
+arrival_model: uniform
+rho_target: null
+mean_gap_target: null
+inter_arrival_range:
+- 1
+- 40
