@@ -13,13 +13,13 @@ instance:
   eval_tiers: [benchmark, arrival, small]   # unseen tiers: Tables 7-11 (benchmark), arrival study, exact check / sensitivity
 env:
   fluid_mode: cached_lp               # Table 6: fluid capacity-allocation LP
-  fluid_backend: auto                 # Gurobi when installed, otherwise HiGHS (scipy); recorded in config_snapshot.yaml
+  fluid_backend: scipy                # Table 6: HiGHS (scipy.optimize.linprog); recorded in config_snapshot.yaml
   fluid_features: "on"                # Table 6: fluid node features on
   fluid_mask: true                    # Sec. 4.5: fluid candidate mask on
   fluid_mask_threshold: 1.0e-5        # Table 6: epsilon_f (positive allocation)
   fluid_recompute: decision           # Sec. 4.1: LP at every decision with a new state (cached by state)
   fluid_time_limit: 2                 # Table 6: LP time limit (s)
-  fluid_threads: 1                    # single solver thread: reproducible across machines
+  fluid_threads: 1                    # gurobi backend only; no effect on HiGHS (single-threaded, deterministic)
   order_top_k: 5                      # Table 6: candidate orders per operation type (EDD)
   discard_penalty: 1.0                # Sec. 4.6: reward (dN_c - dN_d) / S
   progress_reward_coeff: 0.0

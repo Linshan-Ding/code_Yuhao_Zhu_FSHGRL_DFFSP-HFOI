@@ -51,8 +51,8 @@ TRAIN_OVERRIDES = {
     "num_envs": 2, "num_workers": 2, "minibatch_size": 128, "max_minibatch_tokens": 0,
     "max_iterations": 3, "viz": False, "resume": "none", "rollout_device": "cpu",
     "update_device": "cpu", "instance_selection": "fixed", "fluid_mode": "cached_lp",
-    "fluid_mask": False, "fluid_backend": "gurobi", "fluid_recompute": "event",   # v2 keys: legacy semantics
-    # (gurobi = Gurobi when importable, else the heuristic fallback, as the original code behaved)
+    "fluid_mask": False, "fluid_backend": "heuristic", "fluid_recompute": "event",   # v2 keys: legacy semantics
+    # (the heuristic fallback of the original code; Gurobi is not supported)
 }
 V2_OVERRIDES = dict(TRAIN_OVERRIDES, fluid_backend="scipy", fluid_mask=True, fluid_features="on",
                     fluid_recompute="decision", fluid_mask_threshold=1e-5)

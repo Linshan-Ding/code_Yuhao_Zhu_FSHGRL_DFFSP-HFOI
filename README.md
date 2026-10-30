@@ -27,8 +27,8 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
   `order_top_k`（5）个订单；
 - 流体引导（`configs/env.yaml`）：每个新状态求解一次容量分配 LP（按状态签名缓存），其解有两种用法——`fluid_features`
   两列工序类型节点特征，`fluid_mask` 候选掩码（只保留 u* > `fluid_mask_threshold` = 1e-5 的合法对，空集回退全部合法对，
-  回退次数记入 `log.csv`）；求解后端 `fluid_backend: auto` 依次取 Gurobi → HiGHS（`scipy.optimize.linprog`，精确、无许可证）
-  → 启发式，实际后端写入 `config_snapshot.yaml`；
+  回退次数记入 `log.csv`）；求解后端 `fluid_backend: scipy`：HiGHS（`scipy.optimize.linprog`，精确、无许可证、单线程确定性），
+  Gurobi 不再支持（仅为未受支持的显式选项），实际后端写入 `config_snapshot.yaml`；
 - 状态：工序类型节点（12 维）与机器节点（5 维）的异质图，另有候选订单的剩余交期，交期与加工率**按单个观测**归一化；
 - 奖励：`(完成增量 - discard_penalty × 丢弃增量) / S`，整条 episode 的累计奖励等于 `2 eta - 1`（`tests/test_rules.py`）；
   订单一旦无法按期完成即被丢弃；非法动作抛错。
@@ -58,7 +58,7 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
 ## 2. 环境配置
 
 Python 3.10 以上（本次验证 3.13）；CPU 即可运行，有 NVIDIA GPU 时 PPO 更新默认放在 `cuda:0`（CUDA 不可用自动回退 CPU）。
-可选依赖：`gurobipy`（流体 LP 与 MILP 的首选求解器；没有时两者都用 HiGHS）、`visdom`、`psutil`。
+流体 LP 与 MILP 都用 scipy 自带的 HiGHS（Gurobi 不再支持）；可选依赖：`visdom`、`psutil`。
 
 ```
 pip install -r requirements.txt

@@ -22,7 +22,7 @@ DDQN 结构的改编而非原文复现。各方法的配置覆盖层在 `configs
 ## 精确求解检查（`baselines/milp_exact.py`，v2）
 
 论文 3.2 节的 MILP 在小算例档 `small`（基准结构 5 × 5 × 5，S ∈ {6, 8, 10, 12} × DDT ∈ {500, 900, 1500}，12 个）上用精确求解器求解
-（`scripts/run_08_milp_check.py`；Gurobi 可用时优先，否则 `scipy.optimize.milp` 的 HiGHS，600 s 时限），产物 `result/milp/milp_results.csv`，
+（`scripts/run_08_milp_check.py`；求解器为 `scipy.optimize.milp` 的 HiGHS，600 s 时限；Gurobi 不再支持），产物 `result/milp/milp_results.csv`，
 每算例两行：
 
 | 变体 | 式 (2) | 含义 |

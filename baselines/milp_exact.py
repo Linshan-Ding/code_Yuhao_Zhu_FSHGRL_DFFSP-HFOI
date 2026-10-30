@@ -15,8 +15,9 @@ variants:
   restricted to its on-time orders is MILP-B feasible); the solver confirms this on every instance.
 
 Big-L: C_UB = max_s a_s + sum_(s,j) max_m p_sjm bounds every left-shifted completion time, every C_sj gets
-the explicit upper bound C_UB and L = C_UB + max p; both are recorded. The solver is Gurobi when gurobipy is
-importable, otherwise HiGHS through scipy.optimize.milp (exact, no licence).
+the explicit upper bound C_UB and L = C_UB + max p; both are recorded. The solver is HiGHS through
+scipy.optimize.milp (exact, no licence); the original Gurobi model stays as an explicit, unsupported option
+(--backend gurobi).
 
 Checks on every solution:
 * verifier: the machine assignment and machine sequences of the solution are re-timed from scratch by the
@@ -287,19 +288,13 @@ def solve_gurobi(model: Model, time_limit: float, threads: int = 1) -> dict:
 
 
 def resolve_backend(name: str) -> str:
-    name = (name or "auto").lower()
-    if name == "auto":
-        try:
-            import gurobipy  # noqa: F401
-
-            return "gurobi"
-        except Exception:
-            return "highs"
-    if name in ("highs", "scipy"):
+    """``highs`` (default; ``auto`` and ``scipy`` are aliases) or ``gurobi`` (explicit, unsupported)."""
+    name = (name or "highs").lower()
+    if name in ("highs", "scipy", "auto"):
         return "highs"
     if name == "gurobi":
         return "gurobi"
-    raise ValueError("backend must be auto, gurobi or highs")
+    raise ValueError("backend must be highs (auto / scipy) or gurobi")
 
 
 def solve(model: Model, backend: str, time_limit: float, threads: int = 1) -> dict:
@@ -643,9 +638,9 @@ def main() -> None:
     parser.add_argument("--instances", nargs="*", default=None, help="instance ids (default: --tiers)")
     parser.add_argument("--tiers", nargs="*", default=list(DEFAULT_TIERS))
     parser.add_argument("--variants", nargs="+", default=list(VARIANTS), choices=list(VARIANTS))
-    parser.add_argument("--backend", default="auto", help="auto | gurobi | highs")
+    parser.add_argument("--backend", default="highs", help="highs (default; auto / scipy are aliases) | gurobi (unsupported)")
     parser.add_argument("--time-limit", type=float, default=600.0, help="seconds per solve (0 = none)")
-    parser.add_argument("--threads", type=int, default=1, help="Gurobi threads")
+    parser.add_argument("--threads", type=int, default=1, help="solver threads (gurobi backend only)")
     parser.add_argument("--brute-force-max-orders", type=int, default=6,
                         help="exhaustive cross-check on instances with at most this many orders (0 = off)")
     parser.add_argument("--brute-force-max-stage-schedules", type=int, default=BRUTE_FORCE_MAX_STAGE_SCHEDULES,

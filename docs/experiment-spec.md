@@ -14,7 +14,7 @@
   `DDT500_num50`、`DDT1200_num100`（原稿图 7 的两个算例）上各跑一条贪心 episode（`val_curve.csv` = 图 7 的数据）。
 - 模型选择：`best_val_checkpoint.pt`（两算例贪心均值最优轮）。注意这两个算例也在测试集内，5.1 节须如实写明。
 - 流体引导：`fluid_features on` + `fluid_mask true`（u* > ε_f = 1e-5 的合法 (机器, 工序类型) 对，空集回退），`fluid_recompute decision`，
-  后端 Gurobi → HiGHS → 启发式（`config_snapshot.yaml` 记录实际后端）。
+  后端 HiGHS（`fluid_backend: scipy`；Gurobi 不再支持；`config_snapshot.yaml` 记录实际后端）。
 - 不设预实验（`configs/pilot.yaml` `enabled: false`）；不做工业案例实验（论文表 13 沿用原稿，最优派工规则 = 现场做法）。
 
 ## 1. 算例（`docs/reproduce.md` §2 的档位表）
@@ -90,4 +90,5 @@ completed, total_orders, wall_time_s`）、`log.csv`（含掩码统计与验证�
 | v2 V8 | `baselines/milp_exact.py`：MILP-A/B、验证器、回放、穷举 | 意见 3 |
 | v2 V9 | 整数一致性检查、`generalization.csv`、超参表与算例统计表由配置/参数生成、MILP 表 | 意见 2/10/14 |
 | v2 V9b | `fluid_backend: auto` 改为 Gurobi → HiGHS → 启发式 | 无 Gurobi 的机器上掩码不再静默失效 |
+| v2 V12 | Gurobi 不再可用：流体 LP 与 MILP 一律用 HiGHS（`fluid_backend: scipy`，MILP 默认 `highs`），`auto` 不再选 Gurobi | 用户确认（2026-10-30） |
 | v2 V11 | 规模定稿：1000 轮、每方法 1 run、训练池 1000（每轮一个）、验证 = 两个基准算例每 10 轮、档位 train/arrival/small、无预实验、无案例实验、敏感性改为评测期阈值扫描 | 用户决定（2026-10-30），最小代价完成全部实验 |

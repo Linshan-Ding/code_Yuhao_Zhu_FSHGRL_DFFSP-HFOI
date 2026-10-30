@@ -33,8 +33,11 @@ class TrainingSimulator:
         #   fluid_features  on | off   the two fluid node features (raw_opes[:, 8:10]); off = zero columns
         #   fluid_mask      bool       candidate (machine, operation-type) pairs restricted to u* > threshold,
         #                              fallback to every eligible pair when nothing is retained (cached_lp only)
-        #   fluid_backend   auto | gurobi | scipy | heuristic   LP solver; auto = gurobi when importable, else the
-        #                              legacy heuristic fallback (fluid_fallback_count counts the attempts)
+        #   fluid_backend   scipy | auto | heuristic | gurobi   LP solver: scipy = HiGHS through scipy.optimize.linprog
+        #                              (the solver of record: exact, no licence, single-threaded and deterministic);
+        #                              auto = HiGHS when scipy is importable, else the heuristic fallback
+        #                              (fluid_fallback_count counts the attempts); gurobi = the original Gurobi model,
+        #                              unsupported (heuristic fallback without gurobipy)
         # fluid_mode: off keeps its legacy meaning (features off, mask off, no LP).
         self.fluid_backend_name = str(train_paras.get("fluid_backend", "auto")).lower()
         if self.fluid_backend_name not in self.FLUID_BACKENDS:
@@ -283,22 +286,18 @@ class TrainingSimulator:
         return linprog
 
     def resolve_fluid_backend(self) -> str:
-        """``gurobi`` | ``scipy`` | ``heuristic``: the solver actually used for ``fluid_mode: cached_lp``.
+        """``scipy`` | ``heuristic`` | ``gurobi``: the solver actually used for ``fluid_mode: cached_lp``.
 
-        ``auto`` (v2) prefers Gurobi, then HiGHS through ``scipy.optimize.linprog`` (the same LP, exact
-        without a licence, so the mask is available on every machine), and only then the heuristic fallback
-        (counted in ``fluid_fallback_count``); ``gurobi`` falls back to the heuristic when gurobipy is missing
-        (the legacy behaviour, pinned by the legacy equivalence overlay); ``scipy`` and ``heuristic`` are explicit.
+        ``scipy`` (the solver of record since V12) solves the LP with HiGHS through ``scipy.optimize.linprog``
+        (exact, no licence, so the mask is available on every machine); ``auto`` is HiGHS when scipy is
+        importable and otherwise the heuristic fallback (counted in ``fluid_fallback_count``); ``gurobi`` is the
+        original Gurobi model, unsupported, falling back to the heuristic when gurobipy is missing; ``heuristic``
+        is explicit.
         """
         if self._backend_resolved is None:
             requested = self.fluid_backend_name
             if requested == "auto":
-                if self._load_gurobi() is not None:
-                    name = "gurobi"
-                elif self._load_scipy_linprog() is not None:
-                    name = "scipy"
-                else:
-                    name = "heuristic"
+                name = "scipy" if self._load_scipy_linprog() is not None else "heuristic"
             elif requested == "gurobi":
                 name = "gurobi" if self._load_gurobi() is not None else "heuristic"
             elif requested == "scipy":

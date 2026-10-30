@@ -202,17 +202,17 @@ def hyperparameter_rows(config: dict | None = None, runs: dict | None = None, co
     d_ope, d_ma = int(model.get("out_size_ope", 16)), int(model.get("out_size_ma", 16))
     heads = list(model.get("num_heads", [1, 1]))
     attn_dim = 2 * (d_ope + d_ma) + 2                        # actor feature: (ope, ma, pooled ope, pooled ma, due, rate)
-    backend = str(env.get("fluid_backend", "auto"))
-    backend_text = {"auto": "Gurobi when installed, else HiGHS", "gurobi": "Gurobi", "scipy": "HiGHS (scipy)",
-                    "highs": "HiGHS (scipy)", "heuristic": "heuristic"}.get(backend, backend)
+    backend = str(env.get("fluid_backend", "scipy"))
+    backend_text = {"scipy": "HiGHS (scipy.optimize.linprog)", "highs": "HiGHS (scipy.optimize.linprog)",
+                    "auto": "HiGHS (scipy), heuristic fallback", "gurobi": "Gurobi (unsupported)",
+                    "heuristic": "heuristic"}.get(backend, backend)
     eval_cfg = runs.get("eval", {}) or {}
     val_list = [str(v) for v in (inst.get("val_instances") or [])]
     val_count = len(val_list) if val_list else counts.get("val", "--")
     val_names = ", ".join(_config_label(Path(v).stem) for v in val_list) if val_list else "val tier"
     rows = [
         ("Environment and action", "Candidate orders per operation type $k$ (EDD)", env.get("order_top_k", 5)),
-        ("Environment and action", "Fluid LP solver / time limit (s) / threads",
-         f"{backend_text} / {env.get('fluid_time_limit', 2)} / {env.get('fluid_threads', 0) or 'default'}"),
+        ("Environment and action", "Fluid LP solver / time limit (s)", f"{backend_text} / {env.get('fluid_time_limit', 2)}"),
         ("Environment and action", "Fluid node features / candidate mask",
          f"{env.get('fluid_features', 'on')} / {'on' if env.get('fluid_mask', True) else 'off'}"),
         ("Environment and action", "Mask threshold $\\varepsilon_f$", env.get("fluid_mask_threshold", 1e-5)),
