@@ -131,7 +131,7 @@ def write_manifest_v2(commit: str) -> None:
         "torch": torch.__version__,
         "numpy": numpy.__version__,
         "instance": INSTANCE_NAME,
-        "note": "v2 reference: fluid mask through the HiGHS backend, validation on the first two val instances, "
+        "note": "v2 reference: fluid mask through the HiGHS backend, validation on the benchmark instances DDT500_num50 and DDT1200_num100, "
                 "CPU with OMP/MKL threads pinned to 1",
     }
     GOLDEN_V2_DIR.mkdir(parents=True, exist_ok=True)
