@@ -81,6 +81,9 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   全部最优、回放一致 160/160、穷举一致 40/40（其余因结构规模跳过）、MILP-A 与 MILP-B 最优值相等。
   标签 `v2.0-revision` 指向本分支的末端提交，由作者本地创建并推送（`git tag -a v2.0-revision -m "revision code freeze"`，
   `git push origin v2.0-revision`；本会话的凭据只允许推送 `claude/*` 分支，推送标签被拒绝 403）。
+- V12 Gurobi 不再可用（用户确认，2026-10-30）：流体 LP 与 MILP 一律用 scipy 自带的 HiGHS——`configs/env.yaml`、`configs/paper.yaml`
+  `fluid_backend: scipy`（`auto` 改为 HiGHS → 启发式，`gurobi` 仅为未受支持的显式选项），`baselines/milp_exact.py` 默认后端 `highs`；
+  等价性回归的旧语义覆盖层改用 `heuristic`；超参表的求解器行改为 "HiGHS (scipy.optimize.linprog) / 时限"；文档与 README 同步。
 - V11 实验规模定稿（用户决定，2026-10-30，以最小代价完成全部实验）：`configs/paper.yaml` 1000 轮、`instance_selection: round_robin`
   （第 k 轮用训练池第 k 个算例）、验证集改为基准算例 `DDT500_num50` 与 `DDT1200_num100`（原稿图 7 的两个算例）每 10 轮各一条贪心 episode；
   `configs/runs.yaml` 每方法 1 run（固定种子 1）；预实验关闭（`configs/pilot.yaml`）；档位改为 train 1000（种子 1000–1999）、arrival 6、

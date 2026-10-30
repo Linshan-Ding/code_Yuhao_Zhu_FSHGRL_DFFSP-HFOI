@@ -139,6 +139,7 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
     assert values["Training pool / validation / test"] == "1000 generated / 2 benchmark ((500, 50), (1200, 100)) / 15 benchmark"
     assert values["Training instance per iteration"] == "the next pool instance (each used once)"
     assert values["Other unseen tiers (arrival / small)"] == "6 / 12 instances"
+    assert values["Fluid LP solver / time limit (s)"] == "HiGHS (scipy.optimize.linprog) / 2"
     assert values["Candidate self-attention: heads / feature width / normalisation"] == "1 / 66 / LayerNorm"
     stats = pd.read_csv(tables / "instance_statistics.csv")
     assert len(stats) == 15 and stats["load_ratio"].between(1.0, 3.0).all()
@@ -147,14 +148,14 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
 def test_hyperparameter_rows_follow_the_configuration():
     import make_tables as mt
 
-    config = {"env": {"order_top_k": 3, "fluid_backend": "gurobi", "fluid_mask": False},
+    config = {"env": {"order_top_k": 3, "fluid_backend": "scipy", "fluid_mask": False},
               "algo": {"model": {"out_size_ope": 8, "out_size_ma": 8, "num_heads": [1, 1, 1]},
                        "attention": {"use_sparse_attention": False},
                        "train": {"max_iterations": 10, "num_envs": 2}}}
     rows = {p: v for _, p, v in mt.hyperparameter_rows(config, {"ours": 1, "eval": {"sampled_episodes": 4}},
                                                           {"train": 7, "val": 2, "benchmark": 15})}
     assert rows["Candidate orders per operation type $k$ (EDD)"] == 3
-    assert rows["Fluid LP solver / time limit (s) / threads"].startswith("Gurobi / 2 /")
+    assert rows["Fluid LP solver / time limit (s)"] == "HiGHS (scipy.optimize.linprog) / 2"
     assert rows["Fluid node features / candidate mask"] == "on / off"
     assert rows["HGNN layers / attention heads per layer"] == "3 / 1"
     assert rows["Candidate self-attention: heads / feature width / normalisation"] == "off"

@@ -66,7 +66,7 @@ class EnvCfg:
     progress_reward_coeff: float = 0.0
     order_top_k: int = 5
     fluid_mode: str = "cached_lp"
-    fluid_backend: str = "auto"           # auto | gurobi | scipy | heuristic (LP solver of cached_lp)
+    fluid_backend: str = "scipy"          # scipy (HiGHS, the solver of record) | auto | heuristic | gurobi (unsupported)
     fluid_features: str = "on"            # on | off: the two fluid node features
     fluid_mask: bool = True               # candidate pairs restricted to u* > fluid_mask_threshold (with fallback)
     fluid_mask_threshold: float = 1.0e-5

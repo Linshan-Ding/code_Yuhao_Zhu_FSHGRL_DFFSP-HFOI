@@ -22,9 +22,9 @@ python -m tests.equivalence --golden v2
 
 ## 1. 环境
 
-Python ≥ 3.10（验证 3.13），`pip install -r requirements.txt`。流体 LP 的求解器由 `env.fluid_backend` 决定：`auto`
-依次取 Gurobi（`gurobipy` 可导入）→ HiGHS（`scipy.optimize.linprog`，精确、无许可证）→ 启发式回退；论文运行用
-`fluid_threads: 1` 保证跨机一致，实际后端写入每个 run 的 `config_snapshot.yaml`（`fluid_backend`）与 `eval_results.csv`。
+Python ≥ 3.10（验证 3.13），`pip install -r requirements.txt`。流体 LP 与 MILP 的求解器都是 scipy 自带的 HiGHS
+（`fluid_backend: scipy`，`scipy.optimize.linprog`；MILP 用 `scipy.optimize.milp`）：精确、无许可证、单线程确定性，跨机器数值一致；
+Gurobi 不再支持（`gurobi` 只是未受支持的显式选项）。实际后端写入每个 run 的 `config_snapshot.yaml`（`fluid_backend`）与 `eval_results.csv`。
 GPU：PPO 更新默认 `cuda:0`，不可用时回退 CPU；采集始终在 CPU。
 
 ## 2. 数据（`python scripts/run_01_prepare_data.py`）
@@ -131,7 +131,7 @@ python scripts/run_10_sensitivity.py
 ## 9. 复现检查清单
 
 - 每个 run 的 `config_snapshot.yaml`：`git_commit` 为冻结提交，`train_version: 2`，`paradigm: generalization`，`seed: 1`，
-  `fluid_backend` 为 gurobi 或 scipy（不是 heuristic_fallback）；`train_meta.yaml` 的停止原因为 `max_iterations`；
+  `fluid_backend` 为 scipy（不是 heuristic_fallback）；`train_meta.yaml` 的停止原因为 `max_iterations`；
 - `result/integer_check.csv` 全部 `ok`；`result/eval_results.csv` 的 `fluid_backend` 列与训练一致；
 - `result/milp/milp_results.csv`：全部 `optimal`（否则报告 gap），`replay_ok` 全真，MILP-A 与 MILP-B 的 `eta_opt` 相等；
 - `result/sensitivity.csv` 含 5 个阈值 × 12 算例 × 11 episode；

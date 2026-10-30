@@ -70,8 +70,7 @@ def test_scipy_lp_matches_a_hand_solved_optimum():
 def test_backend_resolution_and_counters():
     spec = parse_instance_file(INSTANCE)
     auto = TrainingSimulator(spec, _paras(fluid_backend="auto"))
-    expected = "gurobi" if TrainingSimulator._load_gurobi() is not None else "scipy"
-    assert auto.resolve_fluid_backend() == expected                       # v2: HiGHS before the heuristic
+    assert auto.resolve_fluid_backend() == "scipy"                        # V12: auto = HiGHS (Gurobi unsupported)
     legacy = TrainingSimulator(spec, _paras(fluid_backend="gurobi"))
     assert legacy.resolve_fluid_backend() == ("gurobi" if TrainingSimulator._load_gurobi() is not None else "heuristic")
     scipy_sim = TrainingSimulator(spec, _paras())

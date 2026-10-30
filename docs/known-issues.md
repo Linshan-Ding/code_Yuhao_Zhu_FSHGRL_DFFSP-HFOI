@@ -58,6 +58,8 @@
 19. **Gurobi 路径未在本机验证**：本机无 `gurobipy`，`cached_lp` 在所有验证运行中走启发式回退（`fluid_backend` 列为
     `heuristic_fallback`）；LP 求解代码以 AST 逐字比对保证与原仓库一致（`tests/equivalence/ast_targets.py`）。
     即使安装了 Gurobi，`fluid_threads: 0` 下求解器自身的多线程也可能带来跨机器的微小差异。
+    **v2（V12）**：Gurobi 已确认不可用，流体 LP 与 MILP 一律使用 scipy 的 HiGHS（`fluid_backend: scipy`，单线程确定性），
+    Gurobi 模型只作为不受支持的显式选项保留。
 20. **Windows 上 rollout 设备**：原仓库把 rollout 固定在 CPU 以规避显卡驱动 TDR 重启，重构保留该默认。
 21. **多进程采集与 Gurobi**：`env.collector_workers > 0` 时流体 LP 在 worker 进程内求解，每个 worker 各需一个 Gurobi
     环境/许可证；`fluid_threads: 0` 加时间限制本就可能跨运行不确定（第 19 条），只有 `fluid_threads: 1` 且不触发时间
@@ -80,8 +82,8 @@
 | 11 fixed 与 round_robin 相同 | 保持；泛化型用 `random` |
 | 12 无效动作静默重映射 | **已修复**（V3）：`step()` 对非法 (机器, 工序类型) 对与越界订单秩抛 `ValueError` |
 | 14 工业案例不可复现 | v2 不重做案例实验（2026-10-30 决定）：论文表 13 沿用原稿结果并说明现场使用的就是文中的派工规则，最优规则结果即工业案例的实际运行结果；表 12 的工艺数据作为生成器能力保留（`data/case/process.yaml`），不生成案例档位 |
-| 19 Gurobi 路径未验证 | **已变更**（V1/V9）：`fluid_backend: scipy`（HiGHS）求同一 LP，无许可证也能得到精确解；`auto` 依次取 Gurobi → HiGHS → 启发式（旧的"无 Gurobi 即启发式"行为由 `fluid_backend: gurobi` 保留，等价性回归的旧语义覆盖层使用它）；Gurobi 模型原样保留在 `_solve_lp_gurobi` |
-| 21 多进程采集与 Gurobi | 不变；`fluid_backend: scipy` 下各 worker 进程独立求解，无许可证问题 |
+| 19 Gurobi 路径未验证 | **已变更**（V1/V9/V12）：Gurobi 不再支持；流体 LP 与 MILP 一律用 scipy 的 HiGHS（`fluid_backend: scipy`），`auto` = HiGHS → 启发式；Gurobi 模型原样保留在 `_solve_lp_gurobi` 作为未受支持的显式选项，等价性回归的旧语义覆盖层用 `heuristic` |
+| 21 多进程采集与 Gurobi | 已无关：`fluid_backend: scipy` 下各 worker 进程独立求解 HiGHS，无许可证问题 |
 
 等价性回归：V1、V2 仍以 c030dfa 为黄金（旧语义覆盖层）；V3 起以本树冻结提交为黄金（`tests/golden_v2/manifest.json`，
 `python -m tests.equivalence --golden v2`）。

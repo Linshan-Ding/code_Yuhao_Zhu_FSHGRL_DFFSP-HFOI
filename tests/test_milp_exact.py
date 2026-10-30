@@ -149,6 +149,7 @@ def test_brute_force_gates(micro):
 
 def test_backend_resolution():
     assert resolve_backend("highs") == "highs" and resolve_backend("scipy") == "highs"
-    assert resolve_backend("auto") in ("highs", "gurobi")
+    assert resolve_backend("auto") == "highs" and resolve_backend("") == "highs"      # HiGHS is the default
+    assert resolve_backend("gurobi") == "gurobi"                                     # explicit, unsupported
     with pytest.raises(ValueError):
         resolve_backend("cplex")
