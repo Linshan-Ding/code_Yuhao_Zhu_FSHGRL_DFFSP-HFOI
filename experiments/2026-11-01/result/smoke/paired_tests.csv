@@ -1,0 +1,7 @@
+reference,comparator,metric,n_instances,n,wins,ties,losses,mean_delta,r_plus,r_minus,p_value,exact,p_holm,comparator_label
+ours,fifo,fulfillment_rate,2,2,0,0,2,-6.9999999999999964,0.0,3.0,0.5,True,1.0,FIFO
+ours,spt,fulfillment_rate,2,2,0,0,2,-16.500000000000004,0.0,3.0,0.5,True,1.0,SPT
+ours,mor,fulfillment_rate,2,1,0,1,1,-5.499999999999999,0.0,1.0,1.0,True,1.0,MOR
+ours,mwkr,fulfillment_rate,2,2,2,0,0,6.0,3.0,0.0,0.5,True,1.0,MWKR
+ours,random,fulfillment_rate,2,2,2,0,0,6.500000000000002,3.0,0.0,0.5,True,1.0,Random
+ours,rrc,fulfillment_rate,2,2,2,0,0,6.0,3.0,0.0,0.5,True,1.0,RRC

@@ -1,0 +1,8 @@
+tier,method,n_instances,K,eta_mean,eta_std,completed_mean,decision_time_ms,best_rule,best_rule_eta,delta_pp,wins,ties,losses
+benchmark,fifo,2,1,0.43999999999999995,,36.5,0.5626139135803665,spt,0.535,-9.5,1,0,1
+benchmark,mor,2,1,0.425,,37.0,0.5921110099937356,spt,0.535,-11.0,0,0,2
+benchmark,mwkr,2,1,0.31,,27.0,0.5071615528256785,spt,0.535,-22.499999999999996,0,0,2
+benchmark,ours,2,1,0.37,,31.5,14.639832410538673,spt,0.535,-16.499999999999996,0,0,2
+benchmark,random,2,1,0.305,,27.0,0.5541921632807232,spt,0.535,-23.0,0,0,2
+benchmark,rrc,2,1,0.31,,27.0,0.504664543792051,spt,0.535,-22.499999999999996,0,0,2
+benchmark,spt,2,1,0.535,,47.0,0.5588375592448074,spt,0.535,,,,

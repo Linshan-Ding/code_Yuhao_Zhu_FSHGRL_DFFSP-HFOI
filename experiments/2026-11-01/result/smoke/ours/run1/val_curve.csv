@@ -1,0 +1,5 @@
+epoch,instance_id,obj,fulfillment_rate,completed,total_orders,wall_time_s
+0,DDT500_num50,0.88,0.12,6,50,12.416
+0,DDT1200_num100,0.48,0.52,52,100,12.416
+1,DDT500_num50,0.78,0.22,11,50,36.331
+1,DDT1200_num100,0.48,0.52,52,100,36.331

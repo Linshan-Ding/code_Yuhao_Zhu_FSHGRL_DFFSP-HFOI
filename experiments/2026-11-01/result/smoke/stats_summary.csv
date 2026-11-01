@@ -1,0 +1,15 @@
+method,tier,metric,mean,std,n_runs,n_instances
+fifo,benchmark,fulfillment_rate,0.43999999999999995,,1,2
+mor,benchmark,fulfillment_rate,0.425,,1,2
+mwkr,benchmark,fulfillment_rate,0.31,,1,2
+ours,benchmark,fulfillment_rate,0.37,,1,2
+random,benchmark,fulfillment_rate,0.305,,1,2
+rrc,benchmark,fulfillment_rate,0.31,,1,2
+spt,benchmark,fulfillment_rate,0.535,,1,2
+fifo,benchmark,gap,60.52631578947373,,1,2
+mor,benchmark,gap,53.08270676691732,,1,2
+mwkr,benchmark,gap,102.1052631578948,,1,2
+ours,benchmark,gap,82.03007518796996,,1,2
+random,benchmark,gap,100.90225563909779,,1,2
+rrc,benchmark,gap,102.1052631578948,,1,2
+spt,benchmark,gap,2.85714285714286,,1,2
