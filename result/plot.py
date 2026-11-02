@@ -236,10 +236,13 @@ def plot_decision_time(frame: pd.DataFrame, method: str = "ours", column: str = 
 def plot_quality_time_tradeoff(frame: pd.DataFrame, panels: Sequence, out_stem=None, labels: dict | None = None,
                                time_column: str = "decision_time_ms", width_mm: float = 181, height_mm: float = 55,
                                xlabel: str | None = None, log_x: bool = False, unit: str = "s",
-                               label_fontsize: float = 6, offsets: dict | None = None):
+                               label_fontsize: float = 6, offsets: dict | None = None, annotate: bool = True,
+                               legend: str | None = None):
     """Mean fulfillment versus mean decision time, one marker per method; ``panels`` = [(title, methods), ...].
     ``unit`` is "s" or "ms"; ``log_x`` draws a logarithmic time axis (rules at 0.6 ms and policies at 10-15 ms
-    on one panel); rule methods use hollow markers; ``offsets`` moves a method's label by (dx, dy) points."""
+    on one panel); rule methods use hollow markers; ``offsets`` moves a method's label by (dx, dy) points.
+    ``annotate=False`` leaves the method labels out and ``legend`` = "right" (outside the axes) or a matplotlib
+    location draws a legend instead, so that no label crosses the frame."""
     labels = labels or {}
     offsets = offsets or {}
     scale = 1.0 if unit == "ms" else 1.0 / 1000.0
@@ -262,15 +265,22 @@ def plot_quality_time_tradeoff(frame: pd.DataFrame, panels: Sequence, out_stem=N
                 hollow = method in RULE_LIKE
                 axis.scatter([time_value], [rate], s=size, facecolors="none" if hollow else colour,
                              edgecolors=colour, marker=marker, linewidths=0.8, label=labels.get(method, method), zorder=3)
-            dx, dy = offsets.get(method, (3, 3))
-            axis.annotate(labels.get(method, method), (time_value, rate), textcoords="offset points",
-                          xytext=(dx, dy), fontsize=label_fontsize)
+            if annotate:
+                dx, dy = offsets.get(method, (3, 3))
+                axis.annotate(labels.get(method, method), (time_value, rate), textcoords="offset points",
+                              xytext=(dx, dy), fontsize=label_fontsize)
         if log_x:
             axis.set_xscale("log")
+        axis.margins(x=0.12, y=0.12)
         axis.set_xlabel(xlabel)
         axis.set_ylabel("Mean fulfillment rate (%)")
         if title:
             axis.set_title(title, fontsize=8)
+        if legend == "right":
+            axis.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False, fontsize=label_fontsize,
+                        handletextpad=0.4, borderaxespad=0.0, labelspacing=0.45)
+        elif legend:
+            axis.legend(loc=legend, fontsize=label_fontsize)
     fig.tight_layout()
     if out_stem:
         save(fig, out_stem)
@@ -313,11 +323,15 @@ def plot_advantage_heatmap(advantage: pd.DataFrame, methods: Sequence[str], out_
 def plot_validation_panels(val_curve_csv, conv_series: Sequence, out_stem=None,
                            instances: Sequence[str] = ("DDT500_num50", "DDT1200_num100"), checkpoint: int | None = None,
                            smooth_window: int = 9, width_mm: float = 181, height_mm: float = 55,
-                           labels: dict | None = None, instance_labels: dict | None = None):
-    """The paper's Fig. 7 (v2): panels (a), (b) the validation fulfillment of the proposed policy on each validation
-    instance (raw trace from val_curve.csv and its centred moving average; the selected checkpoint marked with an
-    open circle and its value), panel (c) the moving average of the validation fulfillment (1 - ``mean`` of a
-    conv_<method>.csv frame) of the learned methods in ``conv_series`` = [(frame, method_id), ...]."""
+                           labels: dict | None = None, instance_labels: dict | None = None,
+                           y_margin: float | None = 0.06):
+    """The paper's Fig. 7 (v2): one panel per validation instance with the validation fulfillment of the proposed
+    policy (raw trace from val_curve.csv and its centred moving average; the selected checkpoint marked with an
+    open circle and its value) and, when ``conv_series`` = [(frame, method_id), ...] is not empty, a last panel
+    with the moving average of the validation fulfillment (1 - ``mean`` of a conv_<method>.csv frame) of those
+    methods. ``y_margin`` pads the y-axis of every instance panel by this fraction of the panel's own value range
+    (None keeps the fixed range 0-1). The panel letter and the instance label form the panel title and the legend
+    of the instance panels sits below the figure, so no legend covers a curve."""
     labels = labels or {}
     instance_labels = instance_labels or {}
     frame = pd.read_csv(val_curve_csv)
@@ -344,11 +358,15 @@ def plot_validation_panels(val_curve_csv, conv_series: Sequence, out_stem=None,
                               fontsize=7)
         axis.set_xlabel("Iteration")
         axis.set_xlim(float(x.min()), float(x.max()))
-        axis.set_ylim(0.0, 1.0)
-        axis.text(0.02, 0.96, instance_labels.get(instance, instance), transform=axis.transAxes, ha="left", va="top",
-                  fontsize=7)
+        if y_margin is None:
+            axis.set_ylim(0.0, 1.0)
+        else:
+            pad = max(float(y.max() - y.min()), 1e-6) * y_margin
+            axis.set_ylim(float(y.min()) - pad, float(y.max()) + 2.5 * pad)      # room for the checkpoint value
     axes[0].set_ylabel("Fulfillment rate")
-    axes[0].legend(loc="upper center", bbox_to_anchor=(0.56, 0.90))
+    handles, names = axes[0].get_legend_handles_labels()
+    fig.legend(handles, names, loc="lower center", ncol=len(handles), frameon=False, fontsize=7,
+               bbox_to_anchor=(0.5, 0.0), columnspacing=1.6, handletextpad=0.5)
     if conv_series:
         axis = axes[-1]
         for index, (conv, method) in enumerate(conv_series):
@@ -359,9 +377,10 @@ def plot_validation_panels(val_curve_csv, conv_series: Sequence, out_stem=None,
         axis.set_xlabel("Iteration")
         axis.set_ylim(0.0, 1.0)
         axis.legend(loc="upper left")
-    for letter, axis in zip("abc", axes):
-        axis.text(-0.08, 1.03, f"({letter})", transform=axis.transAxes, ha="right", va="bottom", fontsize=8)
-    fig.tight_layout()
+    for letter, axis, instance in zip("abc", axes, list(instances) + [None]):
+        label = instance_labels.get(instance, instance) if instance else ""
+        axis.set_title(f"({letter}) {label}".rstrip(), loc="left", fontsize=8)
+    fig.tight_layout(rect=(0.0, 0.1, 1.0, 1.0))
     if out_stem:
         save(fig, out_stem)
     return fig
@@ -418,7 +437,7 @@ def plot_sensitivity(table: pd.DataFrame, out_stem=None, width_mm: float = 84, h
     ax.set_ylabel("Fulfillment rate")
     low = float(min(table["greedy_eta"].min(), table["sampled_eta"].min()))
     high = float(max(table["greedy_eta"].max(), table["sampled_eta"].max()))
-    ax.set_ylim(low - 0.02, high + 0.07)
+    ax.set_ylim(low - 0.02, high + 0.11)                     # headroom: the legend sits above the greedy line
     twin = ax.twinx()
     twin.plot(x, table["pruned_pct"].astype(float), color=OI["gray"], ls=":", marker="^", label="Pruned pairs")
     twin.set_ylabel("Pruned candidate pairs (%)")

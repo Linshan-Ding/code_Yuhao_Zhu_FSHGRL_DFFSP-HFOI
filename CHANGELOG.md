@@ -85,6 +85,7 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   敏感性）；`experiments/2026-11-01/paper/` 为修订稿比较集的聚合、表与图（`FSHGRL_EXCLUDE_METHODS=spt`，规则为原稿的五条；
   `result/aggregate.py --exclude-methods`、出表与出图脚本共用该过滤）；敏感性表以采样 η 为主列（CSV 保留贪心列）；决策时间与
   质量-时间图限定基准档（`FSHGRL_FIG_TIER`）；`docs/revision-log.md`（R1.1–R1.14、R2.1–R2.5）与 `docs/claim-verdicts.md` 按新结果裁决。
+- V15 图 7、图 10、图 12 的修订（2026-11-02）：`plot_validation_panels` 删去比较方法面板（`fig_train_curve.py` 的 `COMPARATORS` 为空），每个验证面板的纵轴按自身曲线范围缩放（`y_margin`），面板字母与算例标签作面板标题，图例移到图下；`plot_quality_time_tradeoff` 新增 `annotate`/`legend` 参数，图 10 改用轴外图例代替散点旁标签；`plot_sensitivity` 为图例预留上方空间；`tests/test_plots.py` 覆盖两面板图与带图例的权衡图；`docs/reproduce.md` §7 同步。
 - V14 返修提交包的图表与表格（2026-11-02）：`result/plot.py` 固定方法样式与新图函数（三面板验证图含最佳检查点、按方法的 ms 决策时间、单面板对数质量-时间图、带检验记录的配对差值图、含 Mean 列的热力图、阈值敏感性图）；`make_tables.py` 的敏感性表（贪心列 + 剪枝比例）、采样解码附录表、生成器设置表、分组表头、紧凑 MILP 表、科学计数 p 值、CSV 孪生、评测与训练统计表（正文引用的数字）；`paper_assets/scripts/stylecheck.py`/`style_baseline.py`（paper-polish 机检）；
   `experiments/2026-11-01/paper/` 重新生成；`docs/reproduce.md` §7、`docs/revision-log.md` 更新（稿件已按重构计划改写并蓝标）。
 - V12 Gurobi 不再可用（用户确认，2026-10-30）：流体 LP 与 MILP 一律用 scipy 自带的 HiGHS——`configs/env.yaml`、`configs/paper.yaml`

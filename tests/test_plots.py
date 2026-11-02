@@ -95,8 +95,9 @@ def test_aggregate_writes_summary_tables(tmp_path):
 
 
 def test_revision_figures_from_synthetic_frames(tmp_path):
-    """The v2 revision figures: three-panel validation figure, decision time per method, single-panel log-time
-    trade-off, annotated paired gains, heat map with a mean column and the sensitivity figure."""
+    """The v2 revision figures: validation figure with and without the comparator panel, decision time per method,
+    single-panel log-time trade-off with labels or a legend, annotated paired gains, heat map with a mean column and
+    the sensitivity figure."""
     frame = _eval_frame(["ours", "nf", "dqn", "spt"])
     points = point_estimates(frame)
     out = tmp_path / "fig"
@@ -111,15 +112,22 @@ def test_revision_figures_from_synthetic_frames(tmp_path):
                          "n_instances": 2, "n_runs": 1})
     fig = plot_validation_panels(val_curve, [(conv, "ours"), (conv, "dqn")], out / "val", checkpoint=90)
     assert len(fig.axes) == 3
+    fig2 = plot_validation_panels(val_curve, [], out / "val2", checkpoint=90)          # the manuscript's two panels
+    assert len(fig2.axes) == 2 and fig2.axes[0].get_title(loc="left").startswith("(a)")
+    low, high = fig2.axes[0].get_ylim()
+    assert 0.0 < low < 0.2 and 0.29 < high < 0.5                                       # scaled to the panel's own data
     plot_decision_time_methods(points, ["ours", "dqn"], out / "timem")
     plot_quality_time_tradeoff(points, [("", ["ours", "nf", "dqn", "spt"])], out / "tradeoff_log", log_x=True, unit="ms",
                                label_fontsize=7)
+    fig3 = plot_quality_time_tradeoff(points, [("", ["ours", "nf", "dqn", "spt"])], out / "tradeoff_legend", log_x=True,
+                                      unit="ms", annotate=False, legend="right")
+    assert fig3.axes[0].get_legend() is not None and not fig3.axes[0].texts
     advantage = advantage_table(points, "ours")
     plot_paired_gains(advantage, ["nf", "dqn"], out / "gains_annotated", annotations={"nf": "6/0/0\np = 0.03"})
     plot_advantage_heatmap(advantage, ["nf", "dqn", "spt"], out / "heat_mean", mean_column=True, fontsize=7)
     table = pd.DataFrame({"threshold": ["off", "1e-5", "0.2"], "greedy_eta": [0.78, 0.78, 0.78],
                           "sampled_eta": [0.73, 0.74, 0.75], "pruned_pct": [0.0, 0.1, 0.3]})
     plot_sensitivity(table, out / "sens")
-    for name in ("val", "timem", "tradeoff_log", "gains_annotated", "heat_mean", "sens"):
+    for name in ("val", "val2", "timem", "tradeoff_log", "tradeoff_legend", "gains_annotated", "heat_mean", "sens"):
         assert (out / f"{name}.pdf").exists() and (out / f"{name}.png").exists()
     assert style_of("ours") == METHOD_STYLE["ours"] and style_of("unknown", 1) != METHOD_STYLE["ours"]

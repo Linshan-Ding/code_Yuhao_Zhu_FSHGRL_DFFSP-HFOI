@@ -1,8 +1,10 @@
-"""Fig. 7 of the revised manuscript (``train_curve``): panels (a) and (b) show the validation fulfilment of the
-FSHGRL policy on its two validation instances (result/ours/run1/val_curve.csv: one greedy episode per validation
-instance every val_every iterations; raw trace, centred moving average and the validation-selected checkpoint of
-train_meta.yaml), panel (c) the moving average of the validation fulfilment of the learned methods in COMPARATORS
-(result/conv_<method>.csv written by result/aggregate.py). Zero-argument: edit INSTANCES / COMPARATORS / RUN.
+"""Fig. 7 of the revised manuscript (``train_curve``): one panel per validation instance with the validation
+fulfilment of the FSHGRL policy (result/ours/run1/val_curve.csv: one greedy episode per validation instance every
+val_every iterations; raw trace, centred moving average and the validation-selected checkpoint of train_meta.yaml),
+each panel scaled to the range of its own curve. COMPARATORS adds a last panel with the smoothed validation
+fulfilment of the listed learned methods (result/conv_<method>.csv written by result/aggregate.py); the manuscript
+compares the learned methods on the test configurations instead, so it is empty. Zero-argument: edit INSTANCES /
+COMPARATORS / RUN.
 """
 import re
 
@@ -14,7 +16,7 @@ from result.plot import plot_validation_panels
 from result.stats import METHOD_LABELS
 
 INSTANCES = ["DDT500_num50", "DDT1200_num100"]
-COMPARATORS = ["ours", "hsddqn", "hgnn_ppo"]      # the learned comparators of Table 10; the ablations are compared in Table 7
+COMPARATORS: list[str] = []                       # e.g. ["ours", "hsddqn", "hgnn_ppo"] for a third panel
 RUN = "run1"
 
 
@@ -41,7 +43,8 @@ def main() -> None:
     series = [(pd.read_csv(RESULT / f"conv_{m}.csv"), m) for m in COMPARATORS if (RESULT / f"conv_{m}.csv").exists()]
     files = plot_validation_panels(val_curve, series, OUT_DIR / "train_curve", instances=INSTANCES,
                                    checkpoint=_checkpoint(frame), smooth_window=9, labels=METHOD_LABELS,
-                                   instance_labels={i: _instance_label(i) for i in INSTANCES})
+                                   instance_labels={i: _instance_label(i) for i in INSTANCES},
+                                   width_mm=181, height_mm=58)
     print(f"[FIG] {files}")
 
 
