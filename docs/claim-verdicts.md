@@ -9,8 +9,8 @@
 | 决策时间（表 7/10 的 time 列、图 9） | `experiments/2026-11-01/paper/result/generalization.csv` | 已测：FSHGRL 13.5 ms/决策（含 LP），DRL 对比 10.3–10.7 ms，规则 0.6 ms（CPU 单线程） |
 | 训练曲线（图 7，DDT500_num50 与 DDT1200_num100） | `experiments/2026-11-01/result/ours/run1/val_curve.csv`、`paper/figures/train_curve_*.pdf` | 已生成；最佳验证轮 980 的两值 0.34 / 0.76 与表 7、8 一致 |
 | 收敛曲线 | `experiments/2026-11-01/paper/result/conv_<method>.csv`、`figures/convergence.pdf` | 已生成（验证目标值均值，8 个方法）；NM 的验证曲线不比 FSHGRL 慢，正文不作收敛速度比较 |
-| 到达模式鲁棒性（新 5.x） | `experiments/2026-11-01/paper/tables/generalization_arrival.tex` | **部分成立**：6 个算例均值 0.508 为最高（最优规则 MWKR 0.442，+6.7 pp，W/T/L 5/0/1）；指数到达（0.32）低于 NF 0.38 与 MWKR 0.37，突发到达（0.43）低于 NF 0.46 |
-| 剪枝阈值敏感性（新 5.x，意见 5） | `experiments/2026-11-01/paper/tables/sensitivity.tex` | 已测：采样 η 0.731（off）→ 0.749（0.2）；掩码平均去掉 0.3%（small）/ 1.4%（基准）的合法对，贪心解码不变 |
+| 到达模式鲁棒性（新 5.x） | `experiments/2026-11-01/paper/tables/generalization_arrival.tex` | **部分成立**：6 个算例均值 0.508 为最高（最优规则 RRC 0.446，+6.2 pp（MWKR 0.442），W/T/L 5/0/1）；指数到达（0.32）低于 NF 0.38 与 MWKR 0.37，突发到达（0.43）低于 NF 0.46 |
+| 剪枝阈值敏感性（新 5.x，意见 5） | `experiments/2026-11-01/paper/tables/sensitivity.tex` | 已测：采样 η 0.731（off）→ 0.749（0.2）；掩码平均去掉 0.2%（small）/ 0.7%（基准）的合法对，贪心解码不变 |
 | 工业案例（表 13） | 原稿结果（不重做） | 不重做：现场使用文中的派工规则，表 13 的最优规则结果即工业案例实际运行结果；表注说明该表沿用原稿评估口径（逐算例训练），其余表格为 v2 泛化型结果（known-issues 14） |
 | MILP 模型正确性（3.2 节、附录） | `experiments/2026-11-01/paper/tables/milp_small.tex` | **成立**：12 个算例 MILP-A = MILP-B 全部最优（HiGHS ≤ 4.1 s），回放一致；最优值均值 0.886，FSHGRL 0.784，规则最优 0.801 |
 | 表 7 中 S·η 为整数（意见 14） | `experiments/2026-11-01/paper/result/integer_check.csv` | **成立**：726 组全部通过 |
