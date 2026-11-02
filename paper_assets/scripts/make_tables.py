@@ -535,6 +535,90 @@ def generator_settings() -> None:
     _write_csv("generator_settings", pd.DataFrame(rows, columns=["parameter", "value"]))
 
 
+def evaluation_statistics(method: str = "ours", tier: str = PAIRED_TIER) -> None:
+    """``evaluation_statistics.tex/.csv``: quantities of the greedy benchmark evaluation of ``method`` quoted in the
+    manuscript text (candidate pairs before / after the mask, pruned share, fallback rate, decisions per episode,
+    time per decision and the shares of the LP, the policy forward pass and the observation construction)."""
+    path = RESULT / "eval_results.csv"
+    if not path.exists():
+        print(f"[SKIP] {path} missing")
+        return
+    frame = load_eval_results(path)
+    frame = frame[frame["method"] == method]
+    if "tier" in frame.columns and (frame["tier"] == tier).any():
+        frame = frame[frame["tier"] == tier]
+    if "decode" in frame.columns and (frame["decode"] == "greedy").any():
+        frame = frame[frame["decode"] == "greedy"]
+    if frame.empty:
+        print(f"[SKIP] no greedy {tier} rows of {method}")
+        return
+    num = {c: pd.to_numeric(frame[c], errors="coerce") for c in frame.columns if c in (
+        "candidate_pairs_mean", "masked_pairs_mean", "mask_fallback_rate", "decision_count", "infer_time_ms",
+        "fluid_ms", "policy_ms", "obs_ms", "sim_ms")}
+    required = ("candidate_pairs_mean", "masked_pairs_mean", "mask_fallback_rate", "decision_count", "infer_time_ms")
+    if any(c not in num for c in required):
+        print("[SKIP] evaluation statistics need the v2 evaluation columns (candidate pairs, decisions, timing)")
+        return
+    before, after = num["candidate_pairs_mean"].mean(), num["masked_pairs_mean"].mean()
+    per_decision = num["infer_time_ms"] / num["decision_count"].where(num["decision_count"] > 0)
+    rows = [("Instances (greedy episodes)", int(len(frame))),
+            ("Candidate pairs per decision before the mask", round(float(before), 3)),
+            ("Candidate pairs per decision after the mask", round(float(after), 3)),
+            ("Pruned pairs (\\%)", round(float((before - after) / before * 100.0), 2) if before else None),
+            ("Fallback rate", round(float(num["mask_fallback_rate"].mean()), 4)),
+            ("Decisions per episode (min / mean / max)",
+             f"{int(num['decision_count'].min())} / {int(round(num['decision_count'].mean()))} / {int(num['decision_count'].max())}"),
+            ("Time per decision (ms, mean / min / max)",
+             f"{per_decision.mean():.1f} / {per_decision.min():.1f} / {per_decision.max():.1f}")]
+    total = num["infer_time_ms"].sum()
+    for label, column in (("LP share of the decision time (\\%)", "fluid_ms"), ("Policy share (\\%)", "policy_ms"),
+                          ("Observation share (\\%)", "obs_ms")):
+        if column in num and total > 0:
+            rows.append((label, round(float(num[column].sum() / total * 100.0), 1)))
+    _write("evaluation_statistics", ["Quantity", "Value"], [[k, v] for k, v in rows], align="lr")
+    _write_csv("evaluation_statistics", pd.DataFrame(rows, columns=["quantity", "value"]))
+
+
+def training_statistics(methods=("ours", "nfe", "nm", "nf", "ng", "na", "hsddqn", "hgnn_ppo")) -> None:
+    """``training_statistics.tex/.csv``: per trained method the wall-clock hours, the transitions per update
+    (mean / min / max), the mean and maximum pruned share during training and the selected checkpoint
+    (result/<method>/run1/log.csv and train_meta.yaml)."""
+    rows = []
+    for method in methods:
+        run = RESULT / method / "run1"
+        log_path = run / "log.csv"
+        if not log_path.exists():
+            continue
+        log = pd.read_csv(log_path)
+        steps = pd.to_numeric(log["env_steps"], errors="coerce")
+        per_iter = steps.diff().fillna(steps.iloc[0])
+        before = pd.to_numeric(log.get("candidate_pairs_mean"), errors="coerce")
+        after = pd.to_numeric(log.get("masked_pairs_mean"), errors="coerce")
+        pruned = ((before - after) / before.where(before > 0) * 100.0)
+        meta = {}
+        meta_path = run / "train_meta.yaml"
+        if meta_path.exists():
+            meta = yaml.safe_load(meta_path.read_text(encoding="utf-8")) or {}
+        hours = float(pd.to_numeric(log["wall_time_s"], errors="coerce").iloc[-1]) / 3600.0
+        rows.append({"method": method, "label": METHOD_LABELS.get(method, method), "iterations": int(len(log)),
+                     "wall_clock_h": round(hours, 1), "transitions_mean": int(round(per_iter.mean())),
+                     "transitions_min": int(per_iter.min()), "transitions_max": int(per_iter.max()),
+                     "pruned_pct_mean": round(float(pruned.mean()), 2) if pruned.notna().any() else None,
+                     "pruned_pct_max": round(float(pruned.max()), 2) if pruned.notna().any() else None,
+                     "best_val_iteration": meta.get("best_val_iteration")})
+    if not rows:
+        print("[SKIP] no training logs")
+        return
+    header = ["Method", "Iterations", "Wall-clock (h)", "Transitions per update (mean / min / max)",
+              "Pruned pairs in training (\\%, mean / max)", "Selected iteration"]
+    body = [[r["label"], r["iterations"], _fmt(r["wall_clock_h"], 1),
+             f"{r['transitions_mean']} / {r['transitions_min']} / {r['transitions_max']}",
+             f"{_fmt(r['pruned_pct_mean'], 2)} / {_fmt(r['pruned_pct_max'], 2)}",
+             r["best_val_iteration"] if r["best_val_iteration"] is not None else "--"] for r in rows]
+    _write("training_statistics", header, body, align="lrrrrr")
+    _write_csv("training_statistics", pd.DataFrame(rows))
+
+
 def main() -> None:
     ablation()
     comparison("comparison_pdr", ["ours"] + list(RULE_METHODS))
@@ -547,6 +631,8 @@ def main() -> None:
     sensitivity()
     sampled_decoding()
     generator_settings()
+    evaluation_statistics()
+    training_statistics()
 
 
 if __name__ == "__main__":
