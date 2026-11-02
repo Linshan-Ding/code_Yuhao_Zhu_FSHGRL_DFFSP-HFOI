@@ -1,0 +1,11 @@
+quantity,value
+Instances (greedy episodes),15
+Candidate pairs per decision before the mask,3.565
+Candidate pairs per decision after the mask,3.539
+Pruned pairs (\%),0.73
+Fallback rate,0.0
+Decisions per episode (min / mean / max),147 / 337 / 589
+"Time per decision (ms, mean / min / max)",13.5 / 12.9 / 15.6
+LP share of the decision time (\%),9.4
+Policy share (\%),44.3
+Observation share (\%),50.3

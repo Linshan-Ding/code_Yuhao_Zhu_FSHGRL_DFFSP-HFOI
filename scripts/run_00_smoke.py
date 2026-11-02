@@ -15,7 +15,8 @@ RUN = "smoke/ours/run1"                        # generalisation layout result/<m
 SMOKE_DIR = ROOT / "result" / "smoke"
 VAL_IDS = [name.replace(".txt", "") for name in (read_yaml(ROOT / "configs" / "smoke.yaml")["instance"]["val_instances"])]
 FIGURE_SCRIPTS = ["paper_assets/figures/src/fig_train_curve.py", "paper_assets/figures/src/fig_convergence.py",
-                  "paper_assets/figures/src/fig_ablation_paired_gains.py", "paper_assets/figures/src/fig_decision_time.py"]
+                  "paper_assets/figures/src/fig_ablation_paired_gains.py", "paper_assets/figures/src/fig_decision_time.py",
+                  "paper_assets/figures/src/fig_sensitivity.py"]
 
 t0 = time.time()
 step("smoke: remove the previous smoke outputs")

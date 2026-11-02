@@ -85,6 +85,8 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   敏感性）；`experiments/2026-11-01/paper/` 为修订稿比较集的聚合、表与图（`FSHGRL_EXCLUDE_METHODS=spt`，规则为原稿的五条；
   `result/aggregate.py --exclude-methods`、出表与出图脚本共用该过滤）；敏感性表以采样 η 为主列（CSV 保留贪心列）；决策时间与
   质量-时间图限定基准档（`FSHGRL_FIG_TIER`）；`docs/revision-log.md`（R1.1–R1.14、R2.1–R2.5）与 `docs/claim-verdicts.md` 按新结果裁决。
+- V14 返修提交包的图表与表格（2026-11-02）：`result/plot.py` 固定方法样式与新图函数（三面板验证图含最佳检查点、按方法的 ms 决策时间、单面板对数质量-时间图、带检验记录的配对差值图、含 Mean 列的热力图、阈值敏感性图）；`make_tables.py` 的敏感性表（贪心列 + 剪枝比例）、采样解码附录表、生成器设置表、分组表头、紧凑 MILP 表、科学计数 p 值、CSV 孪生、评测与训练统计表（正文引用的数字）；`paper_assets/scripts/stylecheck.py`/`style_baseline.py`（paper-polish 机检）；
+  `experiments/2026-11-01/paper/` 重新生成；`docs/reproduce.md` §7、`docs/revision-log.md` 更新（稿件已按重构计划改写并蓝标）。
 - V12 Gurobi 不再可用（用户确认，2026-10-30）：流体 LP 与 MILP 一律用 scipy 自带的 HiGHS——`configs/env.yaml`、`configs/paper.yaml`
   `fluid_backend: scipy`（`auto` 改为 HiGHS → 启发式，`gurobi` 仅为未受支持的显式选项），`baselines/milp_exact.py` 默认后端 `highs`；
   等价性回归的旧语义覆盖层改用 `heuristic`；超参表的求解器行改为 "HiGHS (scipy.optimize.linprog) / 时限"；文档与 README 同步。

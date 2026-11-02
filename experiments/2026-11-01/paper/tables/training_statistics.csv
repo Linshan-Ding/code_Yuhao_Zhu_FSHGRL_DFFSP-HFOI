@@ -1,0 +1,9 @@
+method,label,iterations,wall_clock_h,transitions_mean,transitions_min,transitions_max,pruned_pct_mean,pruned_pct_max,best_val_iteration
+ours,FSHGRL,1000,14.9,2316,875,4073,0.62,2.02,980
+nfe,FSHGRL-NFe,1000,14.0,2183,838,3873,0.57,2.33,870
+nm,FSHGRL-NM,1000,14.5,2239,858,4074,0.0,0.0,390
+nf,FSHGRL-NF,1000,11.3,2124,697,3825,0.0,0.0,210
+ng,FSHGRL-NG,1000,19.4,2461,756,4901,0.8,2.13,690
+na,FSHGRL-NA,1000,14.3,2233,880,3930,0.6,2.6,380
+hsddqn,HSDDQN,1000,16.2,2176,850,3883,0.0,0.0,710
+hgnn_ppo,HGNN-PPO,1000,15.3,2200,787,4108,0.0,0.0,520

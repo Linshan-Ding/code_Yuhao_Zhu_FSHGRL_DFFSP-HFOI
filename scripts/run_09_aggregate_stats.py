@@ -12,7 +12,8 @@ import time
 from _bootstrap import ROOT, done, run_py, step
 
 FIGURE_SCRIPTS = ["paper_assets/figures/src/fig_train_curve.py", "paper_assets/figures/src/fig_convergence.py",
-                  "paper_assets/figures/src/fig_ablation_paired_gains.py", "paper_assets/figures/src/fig_decision_time.py"]
+                  "paper_assets/figures/src/fig_ablation_paired_gains.py", "paper_assets/figures/src/fig_decision_time.py",
+                  "paper_assets/figures/src/fig_sensitivity.py"]
 
 t0 = time.time()
 step("aggregate: summaries and paired tests")

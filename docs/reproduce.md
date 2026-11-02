@@ -107,7 +107,7 @@ python scripts/run_10_sensitivity.py
 | `paper_assets/tables/instance_statistics.tex` | 基准算例统计（由 params.yaml 生成） | 新表（意见 2） |
 | `paper_assets/tables/milp_small.tex` | MILP-A/B 最优值、状态、求解时间、回放核对、最优规则、FSHGRL η 与差距 | 附录（意见 3） |
 | `paper_assets/tables/sensitivity.tex` | 各阈值的 η、与 η* 的差距、候选对数、回退率、每决策时间 | 新 5.x（意见 5） |
-| `paper_assets/figures/generated/` | 训练曲线（两个验证算例的 `val_curve.csv`，图 7）、收敛、配对差值、决策时间、热力图 | 图 7–10 |
+| `paper_assets/figures/generated/` | `train_curve`（图 7：两个验证算例的 `val_curve.csv` + 最佳检查点，面板 (c) 为 FSHGRL/HSDDQN/HGNN-PPO 的平滑验证曲线）、`convergence`（仓库产物，稿件不用）、`ablation_paired_gains`（含 W/T/L 与 Holm p）、`baseline_advantage_heatmap`（含 Mean 列）、`decision_time_configurations`（ms，三方法）、`quality_time_tradeoff`（单面板、对数 ms）、`sensitivity_threshold`（新，§5.8） | 图 7–12 |
 
 一键顺序：`python scripts/run_all.py`（数据 → 训练 ‖ 规则 ‖ MILP → 评测 ‖ 敏感性 → 聚合）。
 
