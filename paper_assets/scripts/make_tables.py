@@ -17,9 +17,14 @@ paper_assets/tables/ (FSHGRL_TABLE_DIR) from result/ (FSHGRL_RESULT_DIR):
                           same instances (eval_results.csv, tier small), its gap to the optimum and the best rule
                           of result/rules.csv;
 - sensitivity.tex         the mask-threshold sensitivity of the trained policy (result/sensitivity.csv written by
-                          scripts/run_10_sensitivity.py): per threshold the mean sampled eta (10 episodes) on the
-                          small tier, its gap to the MILP optimum, candidate pairs before / after the mask, the
-                          fallback rate and the time per decision (the CSV also keeps the greedy eta).
+                          scripts/run_10_sensitivity.py): per threshold the greedy eta and the mean sampled eta
+                          (10 episodes) on the small tier, the share of pruned candidate pairs, candidate pairs
+                          before / after the mask, the fallback rate and the time per decision (the CSV also keeps
+                          the gap to the MILP optimum);
+- sampled_decoding.tex    Appendix B: the sampled-decoding fulfilment (mean of 10 episodes) of every learned policy
+                          per benchmark configuration (eval_results.csv, decode = sample);
+- generator_settings.tex  Table 5(a): the generator settings of the training pool (configs/instance.yaml);
+- milp_small_compact.tex  the nine-column layout of the MILP check used in the manuscript appendix.
 Every v2 table is also written as CSV next to the .tex file (same name) for the response letter.
 The environment variable FSHGRL_EXCLUDE_METHODS (comma-separated method ids) leaves methods out of every table
 (the manuscript compares the five rules of the original submission; the released CSVs keep every method).
@@ -62,6 +67,40 @@ def _tex(text) -> str:
     return str(text).replace("_", r"\_").replace("%", r"\%").replace("&", r"\&")
 
 
+def _sci(value) -> str:
+    """``6.104e-05`` -> ``$6.104\\times10^{-5}$`` (p values of the Wilcoxon table)."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "--"
+    if number == 0.0:
+        return "0"
+    mantissa, exponent = f"{number:.3e}".split("e")
+    return f"${mantissa}\\times10^{{{int(exponent)}}}$"
+
+
+def _instance_label(instance_id: str, tier: str | None = None) -> str:
+    """Row labels of the zero-shot tables: arrival instances ``ARR3000_uniform_rho0.8_DDT900_num100`` ->
+    ``Uniform, $\\rho = 0.8$``; small instances ``SML5000_DDT500_num6`` -> ``SML5000 (500, 6)``; otherwise the
+    escaped id."""
+    arrival = re.search(r"_(uniform|exponential|bursty)_rho([0-9.]+)_DDT(\d+)_num(\d+)$", str(instance_id))
+    if arrival:
+        return f"{arrival.group(1).capitalize()}, $\\rho = {arrival.group(2)}$"
+    small = re.match(r"^([A-Za-z]+\d+)_DDT(\d+)_num(\d+)$", str(instance_id))
+    if small:
+        return f"{small.group(1)} ({small.group(2)}, {small.group(3)})"
+    return _tex(instance_id)
+
+
+def _tier_header(instance_ids) -> str:
+    """``Instance ($S = 100$, DDT $= 900$)`` when every id of the tier shares S and DDT, else ``Instance``."""
+    pairs = {(m.group(1), m.group(2)) for m in (re.search(r"DDT(\d+)_num(\d+)$", str(i)) for i in instance_ids) if m}
+    if len(pairs) == 1:
+        ddt, scale = next(iter(pairs))
+        return f"Instance ($S = {scale}$, DDT $= {ddt}$)"
+    return "Instance"
+
+
 def _write(name: str, header: list, rows: list, align: str | None = None) -> Path:
     TABLES.mkdir(parents=True, exist_ok=True)
     path = TABLES / f"{name}.tex"
@@ -101,6 +140,7 @@ def ablation() -> None:
     rows = [[f"({int(r['ddt'])}, {int(r['scale'])})"] + [_fmt(r[m]) for m in methods] for _, r in table.iterrows()]
     rows.append(["Mean"] + [_fmt(table[m].mean()) for m in methods])
     _write("ablation", header, rows)
+    _write_csv("ablation", table[[c for c in ["instance_id", "ddt", "scale"] if c in table.columns] + methods])
 
 
 def comparison(name: str, methods: list, tier: str = PAIRED_TIER) -> None:
@@ -116,15 +156,41 @@ def comparison(name: str, methods: list, tier: str = PAIRED_TIER) -> None:
     pivot_rate = frame.pivot_table(index=["ddt", "scale"], columns="method", values="fulfillment_rate", aggfunc="mean")
     pivot_time = frame.pivot_table(index=["ddt", "scale"], columns="method", values="decision_time_ms", aggfunc="mean")
     header = ["Configuration (DDT, S)"] + [f"{METHOD_LABELS[m]} $\\eta$" for m in present] + \
-             [f"{METHOD_LABELS[m]} time per decision (s)" for m in present]
-    rows = []
+             [f"{METHOD_LABELS[m]} time per decision (ms)" for m in present]
+    rows, flat = [], []
     for (ddt, scale), row in pivot_rate.iterrows():
         times = pivot_time.loc[(ddt, scale)] if (ddt, scale) in pivot_time.index else pd.Series(dtype=float)
         rows.append([f"({int(ddt)}, {int(scale)})"] + [_fmt(row.get(m)) for m in present]
-                    + [_fmt(times.get(m) / 1000.0 if pd.notna(times.get(m, float("nan"))) else None, 3) for m in present])
+                    + [_fmt(times.get(m), 1) for m in present])
+        record = {"ddt": int(ddt), "scale": int(scale)}
+        record.update({f"{m}_eta": row.get(m) for m in present})
+        record.update({f"{m}_time_ms": times.get(m) for m in present})
+        flat.append(record)
     rows.append(["Mean"] + [_fmt(pivot_rate[m].mean()) for m in present]
-                + [_fmt(pivot_time[m].mean() / 1000.0 if m in pivot_time.columns else None, 3) for m in present])
+                + [_fmt(pivot_time[m].mean() if m in pivot_time.columns else None, 1) for m in present])
     _write(name, header, rows)
+    _write_csv(name, pd.DataFrame(flat))
+    _write_grouped(name, present, rows)
+
+
+def _write_grouped(name: str, present: list, rows: list) -> Path:
+    """``<name>_grouped.tex``: the same rows under a two-level header (fulfillment columns, then time columns),
+    the layout used inside the manuscript."""
+    TABLES.mkdir(parents=True, exist_ok=True)
+    path = TABLES / f"{name}_grouped.tex"
+    k = len(present)
+    spec = "l" + "r" * (2 * k)
+    top = (" & \\multicolumn{" + str(k) + "}{c}{Fulfillment rate $\\eta$} & \\multicolumn{" + str(k)
+           + "}{c}{Time per decision (ms)} \\\\")
+    rules = f"\\cmidrule(lr){{2-{k + 1}}}\\cmidrule(lr){{{k + 2}-{2 * k + 1}}}"
+    second = "Configuration (DDT, S) & " + " & ".join(METHOD_LABELS[m] for m in present) + " & " + \
+        " & ".join(METHOD_LABELS[m] for m in present) + " \\\\"
+    lines = [f"\\begin{{tabular}}{{{spec}}}", "\\toprule", top, rules, second, "\\midrule"]
+    lines += [" & ".join(str(cell) for cell in row) + " \\\\" for row in rows]
+    lines += ["\\bottomrule", "\\end{tabular}"]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"[TABLE] {path}")
+    return path
 
 
 def wilcoxon() -> None:
@@ -136,8 +202,9 @@ def wilcoxon() -> None:
     header = ["Comparator", "$n$", "W/T/L", "Mean $\\Delta$ (pp)", "$R^+$", "$R^-$", "$p$", "$p_{\\mathrm{Holm}}$"]
     rows = [[r["comparator_label"], int(r["n"]), f"{int(r['wins'])}/{int(r['ties'])}/{int(r['losses'])}",
              _fmt(r["mean_delta"], 2), _fmt(r["r_plus"], 1), _fmt(r["r_minus"], 1),
-             f"{float(r['p_value']):.3e}", f"{float(r['p_holm']):.3e}"] for _, r in table.iterrows()]
+             _sci(r["p_value"]), _sci(r["p_holm"])] for _, r in table.iterrows()]
     _write("wilcoxon", header, rows)
+    _write_csv("wilcoxon", table)
 
 
 # -- v2: zero-shot tiers ---------------------------------------------------------------------------------------
@@ -155,8 +222,8 @@ def generalization_tables(exclude: tuple = (PAIRED_TIER,)) -> None:
         methods += sorted(set(tier_frame["method"]) - set(methods))
         pivot = tier_frame.pivot_table(index="instance_id", columns="method", values="fulfillment_rate", aggfunc="mean")
         pivot = pivot.reindex(columns=methods)
-        header = ["Instance"] + [method_label(m) for m in methods]
-        rows = [[_tex(instance)] + [_fmt(row.get(m)) for m in methods] for instance, row in pivot.iterrows()]
+        header = [_tier_header(pivot.index)] + [method_label(m) for m in methods]
+        rows = [[_instance_label(instance, tier)] + [_fmt(row.get(m)) for m in methods] for instance, row in pivot.iterrows()]
         rows.append(["Mean"] + [_fmt(pivot[m].mean()) for m in methods])
         _write(f"generalization_{tier}", header, rows)
         _write_csv(f"generalization_{tier}", pivot.reset_index())
@@ -338,18 +405,30 @@ def milp_small() -> None:
                      "best_rule_eta": rule_eta, "ours_eta": ours_eta, "gap_pp": gap_pp})
     _write("milp_small", header, rows, align="llrrrrrllrrrrr")
     _write_csv("milp_small", pd.DataFrame(flat))
+    all_optimal = all("optimal" in str(f["status"]) and "/" in str(f["status"]) and
+                      all(part.strip() == "optimal" for part in str(f["status"]).split("/")) for f in flat)
+    compact_header = ["Instance (DDT, $S$)", "$S$", "Binaries", "$\\eta^*_{A}$", "$\\eta^*_{B}$"] + \
+        ([] if all_optimal else ["Status (A / B)"]) + ["Time (s, A / B)", "Replay", "Best rule $\\eta$", "FSHGRL $\\eta$"]
+    compact_rows = []
+    for f in flat:
+        compact_rows.append([_instance_label(f["instance"]), int(f["S"]), int(f["n_binary"]), _fmt(f["eta_A"]), _fmt(f["eta_B"])]
+                            + ([] if all_optimal else [f["status"]])
+                            + [f["solve_s"], f["replay_ok"], _fmt(f["best_rule_eta"]), _fmt(f["ours_eta"])])
+    _write("milp_small_compact", compact_header, compact_rows,
+           align="lrrrr" + ("" if all_optimal else "l") + "rlrr")
 
 
 THRESHOLD_ORDER = ["off", "1e-5", "0.05", "0.1", "0.2"]
 
 
-def sensitivity() -> None:
-    """Mask-threshold sensitivity table from result/sensitivity.csv (scripts/run_10_sensitivity.py) with the MILP
-    optimum of result/milp/milp_results.csv (variant B, else A) as reference."""
+def sensitivity_frame() -> pd.DataFrame | None:
+    """Per-threshold rows of the mask sensitivity (result/sensitivity.csv of scripts/run_10_sensitivity.py): greedy
+    and sampled fulfilment, gap of the sampled fulfilment to the MILP optimum (result/milp/milp_results.csv, variant
+    B else A), candidate pairs before / after the mask and the pruned share, fallback rate, time per decision."""
     path = RESULT / "sensitivity.csv"
     if not path.exists():
         print(f"[SKIP] {path} missing")
-        return
+        return None
     frame = load_eval_results(path)
     frame["threshold"] = frame["threshold"].astype(str)
     optimum = {}
@@ -364,9 +443,7 @@ def sensitivity() -> None:
     counts = pd.to_numeric(frame.get("decision_count"), errors="coerce") if "decision_count" in frame.columns else None
     if counts is not None:
         frame["decision_time_ms"] = pd.to_numeric(frame["infer_time_ms"], errors="coerce") / counts.where(counts > 0)
-    header = ["$\\varepsilon_f$", "Sampled $\\eta$ (10 episodes)", "Gap to $\\eta^*$ (pp)",
-              "Candidate pairs before / after", "Fallback rate", "Time per decision (ms)"]
-    rows, flat = [], []
+    flat = []
     for value in thresholds:
         part = frame[frame["threshold"] == value]
         greedy = part[part["decode"] == "greedy"] if "decode" in part.columns else part
@@ -379,14 +456,83 @@ def sensitivity() -> None:
         after = pd.to_numeric(greedy.get("masked_pairs_mean"), errors="coerce").mean() if "masked_pairs_mean" in greedy else None
         fallback = pd.to_numeric(greedy.get("mask_fallback_rate"), errors="coerce").mean() if "mask_fallback_rate" in greedy else None
         time_ms = greedy["decision_time_ms"].mean() if "decision_time_ms" in greedy.columns else None
-        label = "off" if value == "off" else value
-        rows.append([label, _fmt(per_instance_sampled.mean()), _fmt(gap, 2), f"{_fmt(before, 2)} / {_fmt(after, 2)}",
-                     _fmt(fallback, 3), _fmt(time_ms, 2)])
+        pruned = (before - after) / before * 100.0 if before and after is not None and before > 0 else None
         flat.append({"threshold": value, "greedy_eta": per_instance.mean(), "sampled_eta": per_instance_sampled.mean(),
-                     "gap_pp": gap, "candidate_pairs_mean": before, "masked_pairs_mean": after, "mask_fallback_rate": fallback,
-                     "decision_time_ms": time_ms, "n_instances": int(per_instance.size)})
-    _write("sensitivity", header, rows, align="lrrrrr")
-    _write_csv("sensitivity", pd.DataFrame(flat))
+                     "gap_pp": gap, "candidate_pairs_mean": before, "masked_pairs_mean": after, "pruned_pct": pruned,
+                     "mask_fallback_rate": fallback, "decision_time_ms": time_ms, "n_instances": int(per_instance.size)})
+    return pd.DataFrame(flat)
+
+
+def sensitivity() -> None:
+    """Mask-threshold sensitivity table: threshold, greedy eta, sampled eta, pruned share, candidate pairs,
+    fallback rate and time per decision (the CSV twin also keeps the gap to the MILP optimum)."""
+    table = sensitivity_frame()
+    if table is None:
+        return
+    header = ["$\\varepsilon_f$", "Greedy $\\eta$", "Sampled $\\eta$ (10 episodes)", "Pruned pairs (\\%)",
+              "Candidate pairs before / after", "Fallback rate", "Time per decision (ms)"]
+    rows = []
+    for _, r in table.iterrows():
+        rows.append([r["threshold"], _fmt(r["greedy_eta"]), _fmt(r["sampled_eta"]), _fmt(r["pruned_pct"], 2),
+                     f"{_fmt(r['candidate_pairs_mean'], 2)} / {_fmt(r['masked_pairs_mean'], 2)}",
+                     _fmt(r["mask_fallback_rate"], 3), _fmt(r["decision_time_ms"], 2)])
+    _write("sensitivity", header, rows, align="lrrrrrr")
+    _write_csv("sensitivity", table)
+
+
+def sampled_decoding(tier: str = PAIRED_TIER) -> None:
+    """Appendix B: mean fulfilment of the ten sampled episodes of every learned policy per benchmark
+    configuration (eval_results.csv rows with decode = sample), with the mean over configurations."""
+    path = RESULT / "eval_results.csv"
+    if not path.exists():
+        print(f"[SKIP] {path} missing")
+        return
+    frame = load_eval_results(path)
+    if "decode" not in frame.columns:
+        print("[SKIP] eval_results.csv has no decode column")
+        return
+    frame = frame[frame["decode"] == "sample"]
+    if "tier" in frame.columns and (frame["tier"] == tier).any():
+        frame = frame[frame["tier"] == tier]
+    order = ["ours"] + list(ABLATION_METHODS) + list(DRL_METHODS)
+    present = [m for m in order if (frame["method"] == m).any()]
+    if not present:
+        print("[SKIP] no sampled-decoding rows")
+        return
+    pivot = frame.pivot_table(index=["ddt", "scale"], columns="method", values="fulfillment_rate", aggfunc="mean")
+    header = ["Configuration (DDT, S)"] + [METHOD_LABELS[m] for m in present]
+    rows = [[f"({int(ddt)}, {int(scale)})"] + [_fmt(row.get(m)) for m in present] for (ddt, scale), row in pivot.iterrows()]
+    rows.append(["Mean"] + [_fmt(pivot[m].mean()) for m in present])
+    _write("sampled_decoding", header, rows)
+    _write_csv("sampled_decoding", pivot.reindex(columns=present).reset_index())
+
+
+def generator_settings() -> None:
+    """Table 5(a): the generator settings of the training pool, read from configs/instance.yaml."""
+    cfg = _load_config()
+    inst = cfg.get("instance", {})
+    gen = inst.get("generator", {}) or {}
+    pool = ((inst.get("pools") or {}).get("train") or {})
+    p_range = gen.get("process_time_range", [25, 450])
+    gap = gen.get("inter_arrival_range", [1, 40])
+    ddt = gen.get("ddt_range", [500, 1600])
+    slack = gen.get("slack_rel_range", [0.6, 1.55])
+    orders = gen.get("n_orders_range", [50, 150])
+    n_pool, seed = pool.get("n"), pool.get("seed")
+    pool_text = (f"{n_pool} instances (seeds {seed} to {int(seed) + int(n_pool) - 1}), each used once"
+                 if n_pool is not None and seed is not None else "--")
+    rows = [
+        ("Product types / stages / machines per stage",
+         f"{gen.get('n_products', 5)} / {gen.get('n_stages', 5)} / {gen.get('machines_per_stage', 5)}"),
+        ("Processing time $p_{rjm}$ (s)", f"integer uniform in [{p_range[0]}, {p_range[1]}] per (product type, machine)"),
+        ("Inter-arrival time $\\Delta t$ (s)", f"integer uniform in [{gap[0]}, {gap[1]}] (mean {(gap[0] + gap[1]) / 2:g})"),
+        ("Orders per instance $S$", f"integer uniform in [{orders[0]}, {orders[1]}]"),
+        ("Due-date tightness DDT", f"integer uniform in [{ddt[0]}, {ddt[1]}], one value per instance"),
+        ("Slack $d_s - a_s$", f"integer uniform in [{slack[0]} DDT, {slack[1]} DDT]"),
+        ("Training pool", pool_text),
+    ]
+    _write("generator_settings", ["Parameter", "Value"], [[k, v] for k, v in rows], align="ll")
+    _write_csv("generator_settings", pd.DataFrame(rows, columns=["parameter", "value"]))
 
 
 def main() -> None:
@@ -399,6 +545,8 @@ def main() -> None:
     instance_statistics("benchmark")
     milp_small()
     sensitivity()
+    sampled_decoding()
+    generator_settings()
 
 
 if __name__ == "__main__":

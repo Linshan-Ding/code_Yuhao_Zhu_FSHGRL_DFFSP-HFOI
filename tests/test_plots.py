@@ -12,8 +12,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from result.aggregate import aggregate, point_estimates  # noqa: E402
-from result.plot import (aggregate_curves, plot_advantage_heatmap, plot_convergence, plot_decision_time,  # noqa: E402
-                         plot_method_boxplot, plot_paired_gains, plot_quality_time_tradeoff, plot_training_trace)
+from result.plot import (METHOD_STYLE, aggregate_curves, plot_advantage_heatmap, plot_convergence,  # noqa: E402
+                         plot_decision_time, plot_decision_time_methods, plot_method_boxplot, plot_paired_gains,
+                         plot_quality_time_tradeoff, plot_sensitivity, plot_training_trace, plot_validation_panels,
+                         style_of)
 from result.stats import advantage_table  # noqa: E402
 
 
@@ -90,3 +92,34 @@ def test_aggregate_writes_summary_tables(tmp_path):
     assert set(summary["metric"]) == {"fulfillment_rate", "gap"}
     paired = pd.read_csv(written["paired_tests"])
     assert list(paired["comparator"]) == ["nf", "dqn", "spt"] and paired["p_holm"].between(0, 1).all()
+
+
+def test_revision_figures_from_synthetic_frames(tmp_path):
+    """The v2 revision figures: three-panel validation figure, decision time per method, single-panel log-time
+    trade-off, annotated paired gains, heat map with a mean column and the sensitivity figure."""
+    frame = _eval_frame(["ours", "nf", "dqn", "spt"])
+    points = point_estimates(frame)
+    out = tmp_path / "fig"
+    rows = []
+    for epoch in range(0, 100, 10):
+        for instance, base in (("DDT500_num50", 0.2), ("DDT1200_num100", 0.6)):
+            rows.append({"epoch": epoch, "instance_id": instance, "obj": 1 - base - 0.001 * epoch,
+                         "fulfillment_rate": base + 0.001 * epoch, "completed": 10, "total_orders": 50, "wall_time_s": 1.0})
+    val_curve = tmp_path / "val_curve.csv"
+    pd.DataFrame(rows).to_csv(val_curve, index=False)
+    conv = pd.DataFrame({"epoch": range(0, 100, 10), "mean": np.linspace(0.8, 0.5, 10), "std": np.nan,
+                         "n_instances": 2, "n_runs": 1})
+    fig = plot_validation_panels(val_curve, [(conv, "ours"), (conv, "dqn")], out / "val", checkpoint=90)
+    assert len(fig.axes) == 3
+    plot_decision_time_methods(points, ["ours", "dqn"], out / "timem")
+    plot_quality_time_tradeoff(points, [("", ["ours", "nf", "dqn", "spt"])], out / "tradeoff_log", log_x=True, unit="ms",
+                               label_fontsize=7)
+    advantage = advantage_table(points, "ours")
+    plot_paired_gains(advantage, ["nf", "dqn"], out / "gains_annotated", annotations={"nf": "6/0/0\np = 0.03"})
+    plot_advantage_heatmap(advantage, ["nf", "dqn", "spt"], out / "heat_mean", mean_column=True, fontsize=7)
+    table = pd.DataFrame({"threshold": ["off", "1e-5", "0.2"], "greedy_eta": [0.78, 0.78, 0.78],
+                          "sampled_eta": [0.73, 0.74, 0.75], "pruned_pct": [0.0, 0.1, 0.3]})
+    plot_sensitivity(table, out / "sens")
+    for name in ("val", "timem", "tradeoff_log", "gains_annotated", "heat_mean", "sens"):
+        assert (out / f"{name}.pdf").exists() and (out / f"{name}.png").exists()
+    assert style_of("ours") == METHOD_STYLE["ours"] and style_of("unknown", 1) != METHOD_STYLE["ours"]

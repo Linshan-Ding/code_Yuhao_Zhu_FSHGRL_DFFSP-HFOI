@@ -87,8 +87,11 @@ def test_sensitivity_table_and_policy_column_of_the_milp_table(tmp_path, monkeyp
     assert table["sampled_eta"].iloc[0] == pytest.approx((3 / 6 + 5 / 8) / 2)          # the table's main column
     assert table["gap_pp"].iloc[0] == pytest.approx(((1 - 3 / 6) + (1 - 5 / 8)) / 2 * 100)
     assert table["masked_pairs_mean"].tolist() == [4.0, 2.5] and table["decision_time_ms"].iloc[0] == pytest.approx((100 / 30 + 100 / 40) / 2)
+    assert table["pruned_pct"].tolist() == pytest.approx([0.0, 37.5])                 # (4.0 - 2.5) / 4.0
     tex = (tables / "sensitivity.tex").read_text(encoding="utf-8")
     assert tex.count("\\\\") == 1 + 2 and "4.00 / 2.50" in tex
+    assert "Greedy $\\eta$" in tex and "Sampled $\\eta$ (10 episodes)" in tex and "Gap" not in tex
+    assert "37.50" in tex
     milp = pd.read_csv(tables / "milp_small.csv")
     assert milp["ours_eta"].tolist() == pytest.approx([4 / 6, 6 / 8]) and milp["gap_pp"].tolist() == pytest.approx([100 / 3, 25.0])
 

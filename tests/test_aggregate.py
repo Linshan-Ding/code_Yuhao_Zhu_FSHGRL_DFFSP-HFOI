@@ -139,14 +139,25 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
     ]).to_csv(result / "milp" / "milp_results.csv", index=False)
     mt.main()
     names = {p.name for p in tables.iterdir()}
-    assert {"ablation.tex", "comparison_pdr.tex", "comparison_drl.tex", "wilcoxon.tex", "generalization_arrival.tex",
-            "generalization_arrival.csv", "hyperparameters.tex", "hyperparameters.csv", "instance_statistics.tex",
-            "instance_statistics.csv", "milp_small.tex", "milp_small.csv"} <= names
+    assert {"ablation.tex", "ablation.csv", "comparison_pdr.tex", "comparison_pdr.csv", "comparison_drl.tex",
+            "wilcoxon.tex", "wilcoxon.csv", "generalization_arrival.tex", "generalization_arrival.csv",
+            "hyperparameters.tex", "hyperparameters.csv", "instance_statistics.tex", "instance_statistics.csv",
+            "milp_small.tex", "milp_small.csv", "milp_small_compact.tex", "sampled_decoding.tex", "sampled_decoding.csv",
+            "generator_settings.tex", "generator_settings.csv"} <= names
     assert "generalization_benchmark.tex" not in names                                # the paired tier has its own tables
     arrival = (tables / "generalization_arrival.tex").read_text(encoding="utf-8")
-    assert "FSHGRL & FSHGRL-NF & HSDDQN & FIFO & SPT" in arrival and arrival.count("ARR300") == 2
+    assert "FSHGRL & FSHGRL-NF & HSDDQN & FIFO & SPT" in arrival and arrival.count("\\\\") == 1 + 2 + 1
     comparison = (tables / "comparison_pdr.tex").read_text(encoding="utf-8")
     assert comparison.count("\\\\") == 1 + 3 + 1                                           # header + 3 configurations + mean
+    assert "time per decision (ms)" in comparison
+    sampled = pd.read_csv(tables / "sampled_decoding.csv")
+    assert set(sampled.columns) >= {"ddt", "scale", "ours", "nf"} and len(sampled) == 3
+    generator = (tables / "generator_settings.tex").read_text(encoding="utf-8")
+    assert "[25, 450]" in generator and "[1, 40]" in generator and "1000 instances" in generator
+    wilcoxon = (tables / "wilcoxon.tex").read_text(encoding="utf-8")
+    assert "\\times10^{" in wilcoxon
+    compact = (tables / "milp_small_compact.tex").read_text(encoding="utf-8")
+    assert "Status" not in compact and compact.count("\\\\") == 1 + 1
     milp = pd.read_csv(tables / "milp_small.csv")
     assert milp.loc[0, "eta_A"] == 0.75 and milp.loc[0, "replay_ok"] == "yes" and milp.loc[0, "brute_force_ok"] == "yes"
     assert milp.loc[0, "best_rule_eta"] == pytest.approx(0.7)

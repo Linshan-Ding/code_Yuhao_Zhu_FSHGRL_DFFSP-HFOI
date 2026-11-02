@@ -1,0 +1,13 @@
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Product types / stages / machines per stage & 5 / 5 / 5 \\
+Processing time $p_{rjm}$ (s) & integer uniform in [25, 450] per (product type, machine) \\
+Inter-arrival time $\Delta t$ (s) & integer uniform in [1, 40] (mean 20.5) \\
+Orders per instance $S$ & integer uniform in [50, 150] \\
+Due-date tightness DDT & integer uniform in [500, 1600], one value per instance \\
+Slack $d_s - a_s$ & integer uniform in [0.6 DDT, 1.55 DDT] \\
+Training pool & 1000 instances (seeds 1000 to 1999), each used once \\
+\bottomrule
+\end{tabular}

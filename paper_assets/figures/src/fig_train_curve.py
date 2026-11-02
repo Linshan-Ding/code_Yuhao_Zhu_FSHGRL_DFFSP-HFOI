@@ -1,34 +1,48 @@
-"""Training traces of the two validation instances (paper figure ``train_curve``).
-
-Generalisation paradigm (v2): reads result/ours/run1/val_curve.csv (one greedy episode per validation instance
-every val_every iterations, the paper's two training-curve instances) and draws, per instance, the raw trace plus
-its moving average. Per-instance paradigm (legacy): result/ours/<instance>/run1/curve.csv. Zero-argument: edit
-INSTANCES / RUN.
+"""Fig. 7 of the revised manuscript (``train_curve``): panels (a) and (b) show the validation fulfilment of the
+FSHGRL policy on its two validation instances (result/ours/run1/val_curve.csv: one greedy episode per validation
+instance every val_every iterations; raw trace, centred moving average and the validation-selected checkpoint of
+train_meta.yaml), panel (c) the moving average of the validation fulfilment of the learned methods in COMPARATORS
+(result/conv_<method>.csv written by result/aggregate.py). Zero-argument: edit INSTANCES / COMPARATORS / RUN.
 """
+import re
+
 import pandas as pd
+import yaml
 from _common import OUT_DIR, RESULT, require
 
-from result.plot import plot_training_trace
+from result.plot import plot_validation_panels
+from result.stats import METHOD_LABELS
 
 INSTANCES = ["DDT500_num50", "DDT1200_num100"]
+COMPARATORS = ["ours", "hsddqn", "hgnn_ppo"]      # the learned comparators of Table 10; the ablations are compared in Table 7
 RUN = "run1"
+
+
+def _instance_label(instance_id: str) -> str:
+    match = re.search(r"DDT(\d+)_num(\d+)", instance_id)
+    return f"(DDT, S) = ({match.group(1)}, {match.group(2)})" if match else instance_id
+
+
+def _checkpoint(val_curve: pd.DataFrame) -> int | None:
+    meta = RESULT / "ours" / RUN / "train_meta.yaml"
+    if meta.exists():
+        value = (yaml.safe_load(meta.read_text(encoding="utf-8")) or {}).get("best_val_iteration")
+        if value is not None:
+            return int(value)
+    means = val_curve.groupby("epoch")["fulfillment_rate"].mean()
+    return int(means.idxmax()) if not means.empty else None
 
 
 def main() -> None:
     val_curve = RESULT / "ours" / RUN / "val_curve.csv"
-    available = set(pd.read_csv(val_curve)["instance_id"]) if val_curve.exists() else set()
-    for instance in INSTANCES:
-        if instance in available:
-            files = plot_training_trace(val_curve, OUT_DIR / f"train_curve_{instance}", column="fulfillment_rate",
-                                        x_column="epoch", instance_id=instance, smooth_window=9,
-                                        title=instance.replace("_", ", "))
-        else:
-            curve = RESULT / "ours" / instance / RUN / "curve.csv"
-            if not require(curve):
-                continue
-            files = plot_training_trace(curve, OUT_DIR / f"train_curve_{instance}", column="obj", x_column="epoch",
-                                        title=instance.replace("_", ", "))
-        print(f"[FIG] {files}")
+    if not require(val_curve):
+        return
+    frame = pd.read_csv(val_curve)
+    series = [(pd.read_csv(RESULT / f"conv_{m}.csv"), m) for m in COMPARATORS if (RESULT / f"conv_{m}.csv").exists()]
+    files = plot_validation_panels(val_curve, series, OUT_DIR / "train_curve", instances=INSTANCES,
+                                   checkpoint=_checkpoint(frame), smooth_window=9, labels=METHOD_LABELS,
+                                   instance_labels={i: _instance_label(i) for i in INSTANCES})
+    print(f"[FIG] {files}")
 
 
 if __name__ == "__main__":
