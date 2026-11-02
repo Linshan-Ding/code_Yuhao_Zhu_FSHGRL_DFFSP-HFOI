@@ -17,10 +17,12 @@ paper_assets/tables/ (FSHGRL_TABLE_DIR) from result/ (FSHGRL_RESULT_DIR):
                           same instances (eval_results.csv, tier small), its gap to the optimum and the best rule
                           of result/rules.csv;
 - sensitivity.tex         the mask-threshold sensitivity of the trained policy (result/sensitivity.csv written by
-                          scripts/run_10_sensitivity.py): per threshold the mean greedy / sampled eta on the small
-                          tier, the gap to the MILP optimum, candidate pairs before / after the mask, the fallback
-                          rate and the time per decision.
+                          scripts/run_10_sensitivity.py): per threshold the mean sampled eta (10 episodes) on the
+                          small tier, its gap to the MILP optimum, candidate pairs before / after the mask, the
+                          fallback rate and the time per decision (the CSV also keeps the greedy eta).
 Every v2 table is also written as CSV next to the .tex file (same name) for the response letter.
+The environment variable FSHGRL_EXCLUDE_METHODS (comma-separated method ids) leaves methods out of every table
+(the manuscript compares the five rules of the original submission; the released CSVs keep every method).
 """
 from __future__ import annotations
 
@@ -307,7 +309,7 @@ def milp_small() -> None:
     rules_path = RESULT / "rules.csv"
     best_rule = {}
     if rules_path.exists():
-        rules = pd.read_csv(rules_path)
+        rules = load_eval_results(rules_path)                       # honours FSHGRL_EXCLUDE_METHODS
         rules = rules[rules["method"].isin(DETERMINISTIC_RULE_METHODS)]
         if not rules.empty:
             best_rule = rules.groupby("instance_id")["fulfillment_rate"].max().to_dict()
@@ -362,7 +364,7 @@ def sensitivity() -> None:
     counts = pd.to_numeric(frame.get("decision_count"), errors="coerce") if "decision_count" in frame.columns else None
     if counts is not None:
         frame["decision_time_ms"] = pd.to_numeric(frame["infer_time_ms"], errors="coerce") / counts.where(counts > 0)
-    header = ["$\\varepsilon_f$", "Greedy $\\eta$", "Sampled $\\eta$", "Gap to $\\eta^*$ (pp)",
+    header = ["$\\varepsilon_f$", "Sampled $\\eta$ (10 episodes)", "Gap to $\\eta^*$ (pp)",
               "Candidate pairs before / after", "Fallback rate", "Time per decision (ms)"]
     rows, flat = [], []
     for value in thresholds:
@@ -370,19 +372,20 @@ def sensitivity() -> None:
         greedy = part[part["decode"] == "greedy"] if "decode" in part.columns else part
         sampled = part[part["decode"] == "sample"] if "decode" in part.columns else part.iloc[0:0]
         per_instance = greedy.groupby("instance_id")["fulfillment_rate"].mean()
-        gaps = [(optimum[i] - eta) * 100.0 for i, eta in per_instance.items() if i in optimum]
+        per_instance_sampled = (sampled if not sampled.empty else greedy).groupby("instance_id")["fulfillment_rate"].mean()
+        gaps = [(optimum[i] - eta) * 100.0 for i, eta in per_instance_sampled.items() if i in optimum]
         gap = sum(gaps) / len(gaps) if gaps else None
         before = pd.to_numeric(greedy.get("candidate_pairs_mean"), errors="coerce").mean() if "candidate_pairs_mean" in greedy else None
         after = pd.to_numeric(greedy.get("masked_pairs_mean"), errors="coerce").mean() if "masked_pairs_mean" in greedy else None
         fallback = pd.to_numeric(greedy.get("mask_fallback_rate"), errors="coerce").mean() if "mask_fallback_rate" in greedy else None
         time_ms = greedy["decision_time_ms"].mean() if "decision_time_ms" in greedy.columns else None
         label = "off" if value == "off" else value
-        rows.append([label, _fmt(per_instance.mean()), _fmt(sampled["fulfillment_rate"].mean()) if not sampled.empty else "--",
-                     _fmt(gap, 2), f"{_fmt(before, 2)} / {_fmt(after, 2)}", _fmt(fallback, 3), _fmt(time_ms, 2)])
-        flat.append({"threshold": value, "greedy_eta": per_instance.mean(), "sampled_eta": sampled["fulfillment_rate"].mean() if not sampled.empty else None,
+        rows.append([label, _fmt(per_instance_sampled.mean()), _fmt(gap, 2), f"{_fmt(before, 2)} / {_fmt(after, 2)}",
+                     _fmt(fallback, 3), _fmt(time_ms, 2)])
+        flat.append({"threshold": value, "greedy_eta": per_instance.mean(), "sampled_eta": per_instance_sampled.mean(),
                      "gap_pp": gap, "candidate_pairs_mean": before, "masked_pairs_mean": after, "mask_fallback_rate": fallback,
                      "decision_time_ms": time_ms, "n_instances": int(per_instance.size)})
-    _write("sensitivity", header, rows, align="lrrrrrr")
+    _write("sensitivity", header, rows, align="lrrrrr")
     _write_csv("sensitivity", pd.DataFrame(flat))
 
 

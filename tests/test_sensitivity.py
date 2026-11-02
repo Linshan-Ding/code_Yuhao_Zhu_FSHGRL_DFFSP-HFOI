@@ -84,7 +84,8 @@ def test_sensitivity_table_and_policy_column_of_the_milp_table(tmp_path, monkeyp
     table = pd.read_csv(tables / "sensitivity.csv")
     assert list(table["threshold"].astype(str)) == ["off", "1e-5"] and (table["n_instances"] == 2).all()
     assert table["greedy_eta"].iloc[0] == pytest.approx((4 / 6 + 6 / 8) / 2)
-    assert table["gap_pp"].iloc[0] == pytest.approx(((1 - 4 / 6) + (1 - 6 / 8)) / 2 * 100)
+    assert table["sampled_eta"].iloc[0] == pytest.approx((3 / 6 + 5 / 8) / 2)          # the table's main column
+    assert table["gap_pp"].iloc[0] == pytest.approx(((1 - 3 / 6) + (1 - 5 / 8)) / 2 * 100)
     assert table["masked_pairs_mean"].tolist() == [4.0, 2.5] and table["decision_time_ms"].iloc[0] == pytest.approx((100 / 30 + 100 / 40) / 2)
     tex = (tables / "sensitivity.tex").read_text(encoding="utf-8")
     assert tex.count("\\\\") == 1 + 2 and "4.00 / 2.50" in tex

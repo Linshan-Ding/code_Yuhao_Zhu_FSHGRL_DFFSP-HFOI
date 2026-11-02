@@ -15,6 +15,8 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
 - 对比方法与基线的改编范围、精确求解检查、阈值敏感性：`docs/baselines.md`
 - 已知缺陷与 v2 处理状态：`docs/known-issues.md`；论文结论与数据文件的对应：`docs/claim-verdicts.md`
 - 与原仓库的文件对应：`docs/migration-map.md`；预实验门控（本版关闭）：`docs/pilot-log.md`
+- 修订版实验的完整评估档案：`experiments/2026-11-01/`（`result/` 全部方法；`paper/` 为修订稿比较集的聚合、表与图，
+  生成命令见其 README）；审稿意见的处置记录：`docs/revision-log.md`
 
 ## 1. 问题与假设
 
