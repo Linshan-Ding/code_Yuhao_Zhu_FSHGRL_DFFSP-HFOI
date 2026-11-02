@@ -81,6 +81,10 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   全部最优、回放一致 160/160、穷举一致 40/40（其余因结构规模跳过）、MILP-A 与 MILP-B 最优值相等。
   标签 `v2.0-revision` 指向本分支的末端提交，由作者本地创建并推送（`git tag -a v2.0-revision -m "revision code freeze"`，
   `git push origin v2.0-revision`；本会话的凭据只允许推送 `claude/*` 分支，推送标签被拒绝 403）。
+- V13 结果档案与论文比较集（2026-11-02）：`experiments/2026-11-01/` 为作者上传的完整评估档案（8 个策略各 1 次训练、6 条规则、MILP、
+  敏感性）；`experiments/2026-11-01/paper/` 为修订稿比较集的聚合、表与图（`FSHGRL_EXCLUDE_METHODS=spt`，规则为原稿的五条；
+  `result/aggregate.py --exclude-methods`、出表与出图脚本共用该过滤）；敏感性表以采样 η 为主列（CSV 保留贪心列）；决策时间与
+  质量-时间图限定基准档（`FSHGRL_FIG_TIER`）；`docs/revision-log.md`（R1.1–R1.14、R2.1–R2.5）与 `docs/claim-verdicts.md` 按新结果裁决。
 - V12 Gurobi 不再可用（用户确认，2026-10-30）：流体 LP 与 MILP 一律用 scipy 自带的 HiGHS——`configs/env.yaml`、`configs/paper.yaml`
   `fluid_backend: scipy`（`auto` 改为 HiGHS → 启发式，`gurobi` 仅为未受支持的显式选项），`baselines/milp_exact.py` 默认后端 `highs`；
   等价性回归的旧语义覆盖层改用 `heuristic`；超参表的求解器行改为 "HiGHS (scipy.optimize.linprog) / 时限"；文档与 README 同步。

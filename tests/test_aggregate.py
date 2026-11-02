@@ -56,6 +56,24 @@ def test_integer_check_passes_on_consistent_rows_and_flags_a_tampered_mean():
     assert integer_check(pd.DataFrame({"instance_id": ["a"], "method": ["m"]})).empty   # columns missing -> empty
 
 
+def test_excluded_methods_leave_every_product(tmp_path, monkeypatch):
+    frame = _frame()
+    eval_path = tmp_path / "eval_results.csv"
+    frame.to_csv(eval_path, index=False)
+    monkeypatch.setenv("FSHGRL_EXCLUDE_METHODS", "spt, HSDDQN")
+    from result.aggregate import excluded_methods, load_eval_results
+
+    assert excluded_methods() == {"spt", "hsddqn"}
+    loaded = load_eval_results(eval_path)
+    assert set(loaded["method"]) == {"ours", "nf", "fifo"}
+    written = aggregate(eval_path, tmp_path / "out", "ours")
+    paired = pd.read_csv(written["paired_tests"])
+    assert set(paired["comparator"]) == {"nf", "fifo"}
+    generalization = pd.read_csv(written["generalization"])
+    assert "spt" not in set(generalization["method"]) and set(generalization["best_rule"]) == {"fifo"}
+    assert set(load_eval_results(eval_path, exclude=[])["method"]) == set(COMPLETED)   # explicit override
+
+
 def test_point_estimates_carry_completed_and_total_orders():
     points = point_estimates(_frame())
     assert {"completed", "total_orders", "decision_time_ms"} <= set(points.columns)

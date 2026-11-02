@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import os
 import sys
 from pathlib import Path
 
@@ -40,11 +41,23 @@ from result.stats import (ABLATION_METHODS, DETERMINISTIC_RULE_METHODS, DRL_METH
 INTEGER_TOL = 1e-9
 
 
-def load_eval_results(path: Path) -> pd.DataFrame:
+EXCLUDE_ENV = "FSHGRL_EXCLUDE_METHODS"       # comma-separated method ids left out of every table, test and figure
+
+
+def excluded_methods() -> set:
+    """Method ids named in the FSHGRL_EXCLUDE_METHODS environment variable (the manuscript's comparison set
+    is the released set minus these; the excluded rows stay in the CSVs of the repository)."""
+    return {m.strip().lower() for m in os.environ.get(EXCLUDE_ENV, "").split(",") if m.strip()}
+
+
+def load_eval_results(path: Path, exclude=None) -> pd.DataFrame:
     frame = pd.read_csv(path)
     for column in ("fulfillment_rate", "gap", "obj_model", "infer_time_ms", "ddt", "scale"):
         if column in frame.columns:
             frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    dropped = set(exclude) if exclude is not None else excluded_methods()
+    if dropped and "method" in frame.columns:
+        frame = frame[~frame["method"].astype(str).str.lower().isin(dropped)].reset_index(drop=True)
     return frame
 
 
@@ -205,7 +218,11 @@ def main() -> None:
     parser.add_argument("--reference", default="ours")
     parser.add_argument("--paired-tier", default="benchmark",
                         help="tier of the paired tests, ablation and advantage tables (all tiers when absent)")
+    parser.add_argument("--exclude-methods", nargs="*", default=None,
+                        help=f"method ids left out of every product (also read from {EXCLUDE_ENV})")
     args = parser.parse_args()
+    if args.exclude_methods:
+        os.environ[EXCLUDE_ENV] = ",".join(str(m) for m in args.exclude_methods)
     eval_path = Path(args.eval)
     eval_path = eval_path if eval_path.is_absolute() else ROOT / eval_path
     out_dir = Path(args.out_dir)
