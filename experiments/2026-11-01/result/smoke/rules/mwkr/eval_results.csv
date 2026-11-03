@@ -1,3 +1,0 @@
-instance_id,method,run_id,tier,scale,obj_model,obj_ref,gap,feasible,infer_time_ms,decode,episode,eval_batch,fulfillment_rate,completed,discarded,total_orders,decision_count,policy_ms,obs_ms,fluid_ms,sim_ms,fluid_backend,candidate_pairs_mean,masked_pairs_mean,mask_fallback_rate,ddt,checkpoint,checkpoint_iteration,epochs,wall_time_s,obj_best
-DDT500_num50,mwkr,run1,benchmark,50,0.84,0.7,20.000000000000004,True,54.71406131982803,rule,0,1,0.16,8,42,50,118,15.451464802026749,0.0,0.0,38.97424414753914,none,0.0,0.0,0.0,500,,,,,
-DDT1200_num100,mwkr,run1,benchmark,100,0.54,0.18999999999999995,184.2105263157896,True,180.61143532395363,rule,0,1,0.46,46,54,100,328,47.36170172691345,0.0,0.0,132.44416937232018,none,0.0,0.0,0.0,1200,,,,,
