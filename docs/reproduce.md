@@ -104,8 +104,8 @@ python scripts/run_10_sensitivity.py
 | `paper_assets/tables/generalization_arrival.tex`、`generalization_small.tex` | 零样本表体（含 CSV） | 新 5.x |
 | `paper_assets/tables/hyperparameters.tex` | 由配置生成的超参表 | 表 6 |
 | `paper_assets/tables/instance_statistics.tex` | 基准算例统计（由 params.yaml 生成） | 新表（意见 2） |
-| `paper_assets/tables/milp_small.tex` | MILP-A/B 最优值、状态、求解时间、回放核对、最优规则、FSHGRL η 与差距 | 附录（意见 3） |
-| `paper_assets/tables/sensitivity.tex` | 各阈值的 η、与 η* 的差距、候选对数、回退率、每决策时间 | 新 5.x（意见 5） |
+| `paper_assets/tables/milp_small.tex`、`milp_small_compact.tex` | 全表：MILP-A/B 最优值、状态、求解时间、回放核对、最优规则、FSHGRL η 与差距；紧凑表（稿件表 A.1）：只含论文模型（变体 A）的最优值、求解时间、回放与 FSHGRL η，不含规则列 | 附录 A（意见 3） |
+| `paper_assets/tables/sensitivity.tex` | 各阈值的贪心/采样 η、剪枝比例、候选对数、每决策时间（CSV 另含与 η* 的差距与回退率） | §5.8（意见 5） |
 | `paper_assets/figures/generated/` | `train_curve`（图 7：两个验证算例的 `val_curve.csv` + 最佳检查点，各面板纵轴按自身曲线范围缩放，图例在图下）、`convergence`（仓库产物，稿件不用）、`ablation_paired_gains`（含 W/T/L 与 Holm p）、`baseline_advantage_heatmap`（含 Mean 列）、`decision_time_configurations`（ms，三方法）、`quality_time_tradeoff`（单面板、对数 ms、右侧图例）、`sensitivity_threshold`（新，§5.8） | 图 7–12 |
 
 一键顺序：`python scripts/run_all.py`（数据 → 训练 ‖ 规则 ‖ MILP → 评测 ‖ 敏感性 → 聚合）。

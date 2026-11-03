@@ -405,7 +405,7 @@ def milp_small() -> None:
                              values=["eta_opt", "status", "solve_s", "replay_ok", "brute_force_ok"], aggfunc="first")
     header = ["Tier", "Instance", "$S$", "$|\\mathcal{K}|$", "Binaries", "$\\eta^*_{A}$", "$\\eta^*_{B}$", "Status (A / B)",
               "Solve time (s, A / B)", "Replay", "Brute force", "Best rule $\\eta$", "FSHGRL $\\eta$", "Gap (pp)"]
-    rows, flat = [], []
+    rows, flat, paper = [], [], []
     for (tier, instance, s, n_ops, n_binary), r in pivot.iterrows():
         eta_a, eta_b = r.get(("eta_opt", "A")), r.get(("eta_opt", "B"))
         status = f"{r.get(('status', 'A'), '--')} / {r.get(('status', 'B'), '--')}"
@@ -423,19 +423,21 @@ def milp_small() -> None:
         flat.append({"tier": tier, "instance": instance, "S": s, "n_ops": n_ops, "n_binary": n_binary, "eta_A": eta_a,
                      "eta_B": eta_b, "status": status, "solve_s": solve, "replay_ok": replay, "brute_force_ok": brute,
                      "best_rule_eta": rule_eta, "ours_eta": ours_eta, "gap_pp": gap_pp})
+        paper.append({"instance": instance, "S": s, "n_binary": n_binary, "eta": eta_a, "status": str(r.get(("status", "A"), "--")),
+                      "solve_s": r.get(("solve_s", "A")), "replay": "yes" if bool(r.get(("replay_ok", "A"), False)) else "no",
+                      "ours_eta": ours_eta})
     _write("milp_small", header, rows, align="llrrrrrllrrrrr")
     _write_csv("milp_small", pd.DataFrame(flat))
-    all_optimal = all("optimal" in str(f["status"]) and "/" in str(f["status"]) and
-                      all(part.strip() == "optimal" for part in str(f["status"]).split("/")) for f in flat)
-    compact_header = ["Instance (DDT, $S$)", "$S$", "Binaries", "$\\eta^*_{A}$", "$\\eta^*_{B}$"] + \
-        ([] if all_optimal else ["Status (A / B)"]) + ["Time (s, A / B)", "Replay", "Best rule $\\eta$", "FSHGRL $\\eta$"]
+    # the manuscript's Table A.1: the model of the paper only (variant A), without the rule column
+    all_optimal = all(f["status"] == "optimal" for f in paper)
+    compact_header = ["Instance (DDT, $S$)", "$S$", "Binaries", "$\\eta^*$"] + ([] if all_optimal else ["Status"]) + \
+        ["Time (s)", "Replay", "FSHGRL $\\eta$"]
     compact_rows = []
-    for f in flat:
-        compact_rows.append([_instance_label(f["instance"]), int(f["S"]), int(f["n_binary"]), _fmt(f["eta_A"]), _fmt(f["eta_B"])]
+    for f in paper:
+        compact_rows.append([_instance_label(f["instance"]), int(f["S"]), int(f["n_binary"]), _fmt(f["eta"])]
                             + ([] if all_optimal else [f["status"]])
-                            + [f["solve_s"], f["replay_ok"], _fmt(f["best_rule_eta"]), _fmt(f["ours_eta"])])
-    _write("milp_small_compact", compact_header, compact_rows,
-           align="lrrrr" + ("" if all_optimal else "l") + "rlrr")
+                            + [_fmt(f["solve_s"], 1), f["replay"], _fmt(f["ours_eta"])])
+    _write("milp_small_compact", compact_header, compact_rows, align="lrrr" + ("" if all_optimal else "l") + "rlr")
 
 
 THRESHOLD_ORDER = ["off", "1e-5", "0.05", "0.1", "0.2"]
@@ -484,19 +486,19 @@ def sensitivity_frame() -> pd.DataFrame | None:
 
 
 def sensitivity() -> None:
-    """Mask-threshold sensitivity table: threshold, greedy eta, sampled eta, pruned share, candidate pairs,
-    fallback rate and time per decision (the CSV twin also keeps the gap to the MILP optimum)."""
+    """Mask-threshold sensitivity table: threshold, greedy eta, sampled eta, pruned share, candidate pairs and
+    time per decision (the CSV twin also keeps the gap to the MILP optimum and the fallback rate)."""
     table = sensitivity_frame()
     if table is None:
         return
     header = ["$\\varepsilon_f$", "Greedy $\\eta$", "Sampled $\\eta$ (10 episodes)", "Pruned pairs (\\%)",
-              "Candidate pairs before / after", "Fallback rate", "Time per decision (ms)"]
+              "Candidate pairs before / after", "Time per decision (ms)"]
     rows = []
     for _, r in table.iterrows():
         rows.append([r["threshold"], _fmt(r["greedy_eta"]), _fmt(r["sampled_eta"]), _fmt(r["pruned_pct"], 2),
                      f"{_fmt(r['candidate_pairs_mean'], 2)} / {_fmt(r['masked_pairs_mean'], 2)}",
-                     _fmt(r["mask_fallback_rate"], 3), _fmt(r["decision_time_ms"], 2)])
-    _write("sensitivity", header, rows, align="lrrrrrr")
+                     _fmt(r["decision_time_ms"], 2)])
+    _write("sensitivity", header, rows, align="lrrrrr")
     _write_csv("sensitivity", table)
 
 

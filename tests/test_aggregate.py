@@ -158,6 +158,7 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
     assert "\\times10^{" in wilcoxon
     compact = (tables / "milp_small_compact.tex").read_text(encoding="utf-8")
     assert "Status" not in compact and compact.count("\\\\") == 1 + 1
+    assert "Best rule" not in compact and "_{B}" not in compact and "A / B" not in compact and "$\\eta^*$" in compact
     milp = pd.read_csv(tables / "milp_small.csv")
     assert milp.loc[0, "eta_A"] == 0.75 and milp.loc[0, "replay_ok"] == "yes" and milp.loc[0, "brute_force_ok"] == "yes"
     assert milp.loc[0, "best_rule_eta"] == pytest.approx(0.7)

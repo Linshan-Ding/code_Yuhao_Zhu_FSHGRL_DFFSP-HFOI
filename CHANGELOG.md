@@ -85,6 +85,7 @@ V3 起数值变化（缺陷修复），等价性回归改以 v2 自身的黄金�
   敏感性）；`experiments/2026-11-01/paper/` 为修订稿比较集的聚合、表与图（`FSHGRL_EXCLUDE_METHODS=spt`，规则为原稿的五条；
   `result/aggregate.py --exclude-methods`、出表与出图脚本共用该过滤）；敏感性表以采样 η 为主列（CSV 保留贪心列）；决策时间与
   质量-时间图限定基准档（`FSHGRL_FIG_TIER`）；`docs/revision-log.md`（R1.1–R1.14、R2.1–R2.5）与 `docs/claim-verdicts.md` 按新结果裁决。
+- V17 稿件表 A.1 与表 13 的列（2026-11-03）：`make_tables.milp_small` 的紧凑表只含论文模型（变体 A）的最优值、求解时间、回放与 FSHGRL η，不再有变体 B 与最优规则列（全表与 CSV 不变）；`sensitivity()` 的 tex 不再有回退率列（CSV 保留）；测试与 `docs/reproduce.md` §7 同步。
 - V16 表 6 的展示值与版本口径（2026-11-03）：`make_tables.hyperparameter_rows` 把配置原值写成正文表述（阈值 `$10^{-5}$`、"at every decision epoch"、CPU / GPU、layer normalization、"Other unseen instance sets"），`tests/test_aggregate.py` 同步；稿件以仓库网址引用代码、不打标签，`docs/reproduce.md`、README、`docs/revision-log.md` 相应修改。
 - V15 图 7、图 10、图 12 的修订（2026-11-02）：`plot_validation_panels` 删去比较方法面板（`fig_train_curve.py` 的 `COMPARATORS` 为空），每个验证面板的纵轴按自身曲线范围缩放（`y_margin`），面板字母与算例标签作面板标题，图例移到图下；`plot_quality_time_tradeoff` 新增 `annotate`/`legend` 参数，图 10 改用轴外图例代替散点旁标签；`plot_sensitivity` 为图例预留上方空间；`tests/test_plots.py` 覆盖两面板图与带图例的权衡图；`docs/reproduce.md` §7 同步。
 - V14 返修提交包的图表与表格（2026-11-02）：`result/plot.py` 固定方法样式与新图函数（三面板验证图含最佳检查点、按方法的 ms 决策时间、单面板对数质量-时间图、带检验记录的配对差值图、含 Mean 列的热力图、阈值敏感性图）；`make_tables.py` 的敏感性表（贪心列 + 剪枝比例）、采样解码附录表、生成器设置表、分组表头、紧凑 MILP 表、科学计数 p 值、CSV 孪生、评测与训练统计表（正文引用的数字）；`paper_assets/scripts/stylecheck.py`/`style_baseline.py`（paper-polish 机检）；
