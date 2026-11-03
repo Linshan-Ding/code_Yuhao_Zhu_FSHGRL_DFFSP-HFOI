@@ -27,7 +27,7 @@ from result.logger import RunLogger  # noqa: E402
 from result.metrics import load_reference  # noqa: E402
 from train import evaluate_fixed_set  # noqa: E402
 
-RUN = "result/smoke/ours"      # run directory holding checkpoint_epoch*.pt
+RUN = "result/smoke/ours/run1"      # run directory holding checkpoint_epoch*.pt
 INSTANCES = None               # None = the run's training instances (config_snapshot.yaml); or ["DDT500_num50"]
 SET_NAME = "train"             # suffix of the output file
 DEVICE = "cpu"

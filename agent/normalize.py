@@ -1,4 +1,4 @@
-"""Per-observation feature normalisation (v2; fixes docs/known-issues.md item 9).
+"""Per-observation feature normalisation (fixes docs/known-issues.md item 9).
 
 The original networks normalised the processing-rate matrix over the whole forward batch and the due dates
 over all valid entries of the batch, so the logits of one observation depended on the other observations in

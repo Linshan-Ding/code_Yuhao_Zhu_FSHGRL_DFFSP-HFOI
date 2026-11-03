@@ -22,7 +22,7 @@ from result.plot import plot_training_trace  # noqa: E402
 from tests.test_aggregate import _frame  # noqa: E402
 from train import load_config  # noqa: E402
 
-TRIO = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml", "configs/paper.yaml"]
+TRIO = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]
 OVERLAYS = {"off": (False, None), "1e-5": (True, 1e-5), "0.05": (True, 0.05), "0.1": (True, 0.1), "0.2": (True, 0.2)}
 
 

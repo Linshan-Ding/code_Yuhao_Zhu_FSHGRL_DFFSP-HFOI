@@ -1,4 +1,4 @@
-"""Hierarchical double DQN comparator (HSDDQN, adapted; v2, new code).
+"""Hierarchical double DQN comparator (HSDDQN, adapted).
 
 The comparator of the manuscript's Table 10 named HSDDQN is a hierarchical strategy-optimised double DQN for a
 dynamic re-entrant hybrid flow shop with batch-processing machines. Its code is not public; what is adapted here

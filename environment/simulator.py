@@ -1,4 +1,4 @@
-"""Discrete-event training simulator (moved verbatim from agent/training_simulator.py)."""
+"""Discrete-event training simulator ."""
 from __future__ import annotations
 
 import time
@@ -29,7 +29,7 @@ class TrainingSimulator:
         self.fluid_mode = str(train_paras.get("fluid_mode", "heuristic")).lower()
         self.fluid_time_limit = float(train_paras.get("fluid_time_limit", 20))
         self.fluid_threads = int(train_paras.get("fluid_threads", 0))
-        # v2 (fluid guidance split into its two uses; see docs/experiment-spec.md):
+        # (fluid guidance split into its two uses; see docs/experiment-spec.md):
         #   fluid_features  on | off   the two fluid node features (raw_opes[:, 8:10]); off = zero columns
         #   fluid_mask      bool       candidate (machine, operation-type) pairs restricted to u* > threshold,
         #                              fallback to every eligible pair when nothing is retained (cached_lp only)
@@ -47,7 +47,7 @@ class TrainingSimulator:
         self.fluid_mask_on = (self.fluid_mode == "cached_lp" and bool(train_paras.get("fluid_mask", False)))
         self.fluid_mask_threshold = float(train_paras.get("fluid_mask_threshold", 1e-5))
         #   fluid_recompute decision | event   when the LP is re-solved: at every decision whose state signature
-        #                              is new (v2 default; the state cache still avoids repeated solves) or only
+        #                              is new (default; the state cache still avoids repeated solves) or only
         #                              after an arrival / discard event (legacy; a stale solution between events
         #                              cannot serve the mask because its pair set differs from the eligible set)
         self.fluid_recompute = str(train_paras.get("fluid_recompute", "decision")).lower()
@@ -276,7 +276,7 @@ class TrainingSimulator:
         return (np.zeros(self.spec.task_count, dtype=np.float32),
                 np.zeros(self.spec.task_count, dtype=np.float32), None)
 
-    # -- LP backends (v2) -----------------------------------------------------------------------------------
+    # -- LP backends -----------------------------------------------------------------------------------
     @classmethod
     def _load_scipy_linprog(cls):
         try:
@@ -288,7 +288,7 @@ class TrainingSimulator:
     def resolve_fluid_backend(self) -> str:
         """``scipy`` | ``heuristic`` | ``gurobi``: the solver actually used for ``fluid_mode: cached_lp``.
 
-        ``scipy`` (the solver of record since V12) solves the LP with HiGHS through ``scipy.optimize.linprog``
+        ``scipy`` (the solver of record) solves the LP with HiGHS through ``scipy.optimize.linprog``
         (exact, no licence, so the mask is available on every machine); ``auto`` is HiGHS when scipy is
         importable and otherwise the heuristic fallback (counted in ``fluid_fallback_count``); ``gurobi`` is the
         original Gurobi model, unsupported, falling back to the heuristic when gurobipy is missing; ``heuristic``
@@ -531,7 +531,7 @@ class TrainingSimulator:
                 raw_opes[task_index, 3] = float(np.min(due_remaining))
                 raw_opes[task_index, 4] = float(np.max(due_remaining))
                 raw_opes[task_index, 5] = float(np.std(due_remaining))
-            raw_opes[task_index, 6] = int(np.sum(          # v2: arrived, unfinished orders only (no future orders)
+            raw_opes[task_index, 6] = int(np.sum(          # arrived, unfinished orders only (no future orders)
                 ((self.order_status == self.STATUS_WAITING) | (self.order_status == self.STATUS_PROCESSING))
                 & (self.spec.product_types == product)
                 & (self.order_stage <= stage)
@@ -601,7 +601,7 @@ class TrainingSimulator:
         machine = action1 // task_count
         task_index = action1 % task_count
         valid_pairs = set(self._eligible_pairs(grouped_orders))
-        if (machine, task_index) not in valid_pairs:          # v2: no silent remapping (known issue 12)
+        if (machine, task_index) not in valid_pairs:          # no silent remapping (known issue 12)
             raise ValueError(f"invalid action: (machine {machine}, operation type {task_index}) is not an eligible "
                              f"pair at t={self.current_time:.0f} ({len(valid_pairs)} eligible pair(s))")
 

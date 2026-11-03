@@ -1,4 +1,4 @@
-"""v2 generalisation paradigm: tier index, validation tracker, pilot verdict, evaluation tiers, scripts' job
+"""generalisation paradigm: tier index, validation tracker, pilot verdict, evaluation tiers, scripts' job
 builders and one two-iteration training run on a generated pool with validation."""
 from __future__ import annotations
 
@@ -91,8 +91,8 @@ def test_job_builders_follow_the_paradigm(monkeypatch):
     jobs = _bootstrap.pool_jobs("ours", ["configs/ablation/nf.yaml"], 2, prefix="pilot/", extra_args=["--max-iterations", "5"])
     assert [j.name for j in jobs] == ["pilot/ours/run1", "pilot/ours/run2"]
     assert "--instances" not in jobs[0].cmd and "configs/ablation/nf.yaml" in jobs[0].cmd and "--max-iterations" in jobs[0].cmd
-    assert _bootstrap.paradigm() == "generalization"          # configs/paper.yaml is part of CONFIGS
-    assert "configs/paper.yaml" in _bootstrap.CONFIGS
+    assert _bootstrap.paradigm() == "generalization"          # the base configuration is the paper's
+    assert _bootstrap.CONFIGS == ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]
     assert [j.name for j in _bootstrap.method_jobs("nf", [], ["DDT500_num50"], 1)] == ["nf/run1"]
     monkeypatch.setattr(_bootstrap, "paradigm", lambda: "per_instance")
     assert [j.name for j in _bootstrap.method_jobs("nf", [], ["DDT500_num50"], 1)] == ["nf/DDT500_num50/run1"]

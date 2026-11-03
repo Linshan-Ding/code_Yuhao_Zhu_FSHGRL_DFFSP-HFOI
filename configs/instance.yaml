@@ -1,24 +1,25 @@
-# Instance set, paradigm and generator settings.
+# Instance set, paradigm and generator settings (the configuration of the paper's experiments).
 instance:
   problem: dffsp_hfoi                 # dynamic flexible flow shop, high-frequency order insertion
-  paradigm: per_instance              # per_instance (legacy: train = evaluation instance) | generalization
-                                      # (one policy trained on the generated pool, evaluated on unseen tiers;
-                                      # configs/paper.yaml switches to it)
-  data_dir: data/instances/benchmark  # one folder per instance (<id>/<id>.txt + params.yaml), scanned recursively
-  patterns: ["DDT*.txt", "num*.txt", "train_num*.txt"]   # glob patterns used when train_instances is empty
-  train_instances: ["DDT500_num100.txt"]  # fixed instance file(s); `--instances` on the CLI has priority
-  instance_selection: fixed           # fixed | round_robin | random (how the instance is picked per iteration)
-  val_data_dir: data/instances/benchmark   # validation instances (generalization: model selection, val_curve.csv)
-  val_instances: [DDT500_num50.txt, DDT1200_num100.txt]   # the paper's two training-curve instances; [] = every file
-  eval_tiers: [benchmark]             # tiers evaluated by scripts/run_07 in the generalization paradigm
-  generator:                          # data/generator.py; v2 defaults matched to the benchmark statistics
+  paradigm: generalization            # generalization (one policy per method, trained on the generated pool and
+                                      # evaluated on unseen tiers; Section 5.1) | per_instance (train = evaluation instance)
+  data_dir: data/instances/train      # training pool: 1000 generated instances (seeds 1000-1999), one per iteration
+  patterns: ["*.txt"]                 # glob patterns used when train_instances is empty
+  train_instances: []                 # empty = every instance of the pool; `--instances` on the CLI has priority
+  instance_selection: round_robin     # round_robin (iteration k trains on pool instance k, sorted ids) | fixed | random
+  val_data_dir: data/instances/benchmark   # validation instances (model selection, val_curve.csv)
+  val_instances: [DDT500_num50.txt, DDT1200_num100.txt]   # the two training-curve instances of Fig. 7; [] = every file
+  eval_tiers: [benchmark, arrival, small]   # unseen tiers evaluated by scripts/run_07: the fifteen benchmark
+                                      # configurations (Tables 7-11), the arrival regimes (Section 5.7) and the small
+                                      # instances of the exact check and the sensitivity analysis (Appendix A, 5.8)
+  generator:                          # data/generator.py; defaults matched to the benchmark statistics
     n_products: 5
     n_stages: 5
     machines_per_stage: 5
     process_time_range: [25, 450]     # seconds, discrete uniform per (product, machine)
     inter_arrival_range: [1, 40]      # seconds, discrete uniform (mean 20.5 s; benchmark files 14.5-22 s)
     ddt_range: [500, 1600]            # due-date tightness drawn per instance
-    slack_rule: ddt_uniform           # order slack uniform in slack_rel_range x DDT (per_order = legacy rule)
+    slack_rule: ddt_uniform           # order slack uniform in slack_rel_range x DDT (per_order = the per-order rule)
     slack_rel_range: [0.6, 1.55]      # benchmark files: slack in about [0.6, 1.55] x DDT
     n_orders_range: [50, 150]
   pools:                              # generated tiers written by scripts/run_01_prepare_data.py (seeds fixed)

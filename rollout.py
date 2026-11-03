@@ -1,4 +1,4 @@
-"""Synchronous multi-environment episode collection (moved verbatim from agent/sci_rollout.py)."""
+"""Synchronous multi-environment episode collection ."""
 from __future__ import annotations
 
 import time
@@ -107,7 +107,7 @@ def _episode_record(simulator: TrainingSimulator, total_reward: float, wall_seco
         "fluid_solve_seconds": float(simulator.fluid_solve_seconds),
         "fluid_cache_hit_count": int(simulator.fluid_cache_hit_count),
         "fluid_fallback_count": int(simulator.fluid_fallback_count),
-        # v2 mask statistics (per decision of this episode)
+        # mask statistics (per decision of this episode)
         "candidate_pairs_mean": simulator.candidate_pairs_before / max(int(simulator.mask_decision_count), 1),
         "masked_pairs_mean": simulator.candidate_pairs_after / max(int(simulator.mask_decision_count), 1),
         "mask_fallback_rate": simulator.fluid_mask_fallback_count / max(int(simulator.mask_decision_count), 1),
@@ -121,11 +121,11 @@ def run_episodes(policy, spec, train_paras: dict, episodes: int = 1, sample: boo
                  simulator_factory=TrainingSimulator) -> list:
     """Run ``episodes`` complete episodes of one instance in lockstep and return one record per episode.
 
-    New code (no counterpart in the original repository). It drives the simulators exactly like
+    It drives the simulators exactly like
     ``collect_vectorized_rollouts`` but keeps no buffer. With ``sample=False`` the policy decodes greedily
     (argmax of both action distributions) and draws **no random numbers**, which is what lets ``train.py``
     evaluate the policy after every update without disturbing the training stream (checked by
-    ``tests/equivalence``). ``sample=True`` draws actions from the policy and is for ``eval.py`` only.
+    ``tests/test_collector.py``). ``sample=True`` draws actions from the policy and is for ``eval.py`` only.
 
     With ``episodes > 1`` the observations of all running episodes share one forward pass; the policy's
     per-batch normalisation (due dates, processing rates) then sees the batch as a whole, so numbers that

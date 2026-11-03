@@ -1,10 +1,10 @@
-"""Validation-set tracking for the generalisation paradigm (v2, new code).
+"""Validation-set tracking for the generalisation paradigm.
 
 A ``ValidationTracker`` evaluates the current policy greedily on a fixed set of validation instances every
 ``val_every`` iterations (and at the last iteration), appends one row per instance to ``val_curve.csv``, keeps
 the running best validation mean (``obj = 1 - fulfilment``, minimised) and saves ``best_val_checkpoint.pt``
 whenever it improves. Model selection by this checkpoint replaces the legacy ``best_checkpoint.pt`` (sampled
-training episodes, saved after the update) in every v2 experiment. ``early_stop_patience`` > 0 stops the run
+training episodes, saved after the update) in every experiment. ``early_stop_patience`` > 0 stops the run
 when the best validation mean has not improved for that many iterations.
 
 The tracker draws no random numbers (greedy decoding) and is shared by the PPO loop (``train.py``) and the

@@ -6,7 +6,7 @@ the GIL; with 8 environments the observation building alone takes about half of 
 Worker processes own the simulators and execute nothing but simulator code; every policy forward, action
 sample and the PPO update stay in the main process, so with the same ``num_envs`` the collected
 ``RolloutBuffer`` is bit-identical to the in-process path ``rollout.collect_vectorized_rollouts``
-(``tests/test_collector.py``, ``python -m tests.equivalence --collector-workers 3``).
+(``tests/test_collector.py``).
 
 Transport: observations cross the process boundary as NumPy arrays serialised with the plain ``pickle``
 module over ``Connection.send_bytes`` / ``recv_bytes``. Torch tensors are never sent through multiprocessing

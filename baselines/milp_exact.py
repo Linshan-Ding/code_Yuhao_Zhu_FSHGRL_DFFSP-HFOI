@@ -1,4 +1,4 @@
-"""Exact MILP solutions on small instances (v2, new code): verification of the paper's model.
+"""Exact MILP solutions on small instances: verification of the paper's model.
 
     python baselines/milp_exact.py                                  # tiers tiny and tiny5, both variants
     python baselines/milp_exact.py --instances TNY5000_DDT500_num4 --variants B --time-limit 60

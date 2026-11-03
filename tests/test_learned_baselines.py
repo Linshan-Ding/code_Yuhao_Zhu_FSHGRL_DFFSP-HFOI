@@ -109,7 +109,7 @@ def test_factory_networks_match_algorithms():
     assert "hsddqn" in OFF_POLICY
 
 
-# -- v2 comparators -------------------------------------------------------------------------------------------
+# -- comparators -------------------------------------------------------------------------------------------
 def test_hsddqn_hierarchical_actions_are_feasible_and_two_level_td_update_runs(tmp_path):
     config, train_paras = _config("hsddqn")
     torch.manual_seed(2)
@@ -175,7 +175,7 @@ def test_hsddqn_token_codec_round_trip():
 
 
 def test_comparator_overlays_switch_off_fluid_guidance_and_hgnn_ppo_has_pair_actions():
-    base = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml", "configs/paper.yaml"]
+    base = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]
     for name, algorithm in (("hsddqn", "hsddqn"), ("hgnn_ppo", "ppo"), ("a2c", "a2c"), ("dqn", "dqn"), ("ddqn", "ddqn")):
         config = load_config(base + [f"configs/baselines/{name}.yaml"])
         train_paras = config["train_paras"]

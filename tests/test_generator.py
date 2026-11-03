@@ -1,5 +1,5 @@
 """data/generator.py: reproducible files in the benchmark format that the parser and simulator accept, with the
-v2 distributions (benchmark-like arrivals, one DDT per instance, slack in slack_rel_range x DDT) and pools."""
+the distributions (benchmark-like arrivals, one DDT per instance, slack in slack_rel_range x DDT) and pools."""
 from __future__ import annotations
 
 import sys
@@ -124,7 +124,7 @@ def test_configured_pools_cover_the_plan(tmp_path):
 
     cfg = load_config()
     specs = pool_specs(cfg.instance)
-    assert set(specs) == {"train", "arrival", "small"}                   # the revision's tiers (2026-10-30)
+    assert set(specs) == {"train", "arrival", "small"}                   # the generated tiers
     assert specs["train"]["n"] == 1000 and specs["train"]["seed"] == 1000
     arrival = generate_pool("arrival", specs["arrival"], cfg.instance.generator, tmp_path)
     assert len(arrival) == 6 and sum("bursty" in p.stem for p in arrival) == 1 and all("DDT900_num100" in p.stem for p in arrival)

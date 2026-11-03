@@ -1,4 +1,4 @@
-"""Fig. 7 of the revised manuscript (``train_curve``): one panel per validation instance with the validation
+"""Fig. 7 of the manuscript (``train_curve``): one panel per validation instance with the validation
 fulfilment of the FSHGRL policy (result/ours/run1/val_curve.csv: one greedy episode per validation instance every
 val_every iterations; raw trace, centred moving average and the validation-selected checkpoint of train_meta.yaml),
 each panel scaled to the range of its own curve. COMPARATORS adds a last panel with the smoothed validation

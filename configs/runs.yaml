@@ -1,5 +1,7 @@
-# Runs per method class (scripts read these). Every learned method is trained once (decision of 2026-10-30):
-# a class with 1 run gets the fixed seed 1, recorded in config_snapshot.yaml.
+# Runs per method class (scripts read these). Every learned method is trained once: a class with 1 run gets the
+# fixed seed 1, recorded in config_snapshot.yaml.
+exclude_methods: [spt]    # left out of every table, test and figure (the paper compares five dispatching rules);
+                          # the records of these methods stay in result/; FSHGRL_EXCLUDE_METHODS overrides
 ours: 1                   # FSHGRL
 ablations: 1              # ablation variants (scripts/run_04 VARIANTS)
 learned_baselines: 1      # learned comparators HSDDQN / HGNN-PPO (scripts/run_05 BASELINES); same budget as ours

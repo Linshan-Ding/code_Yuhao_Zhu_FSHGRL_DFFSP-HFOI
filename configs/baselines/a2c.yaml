@@ -1,6 +1,6 @@
 # A2C baseline (agent/baselines/a2c.py): the PPO network and rollout, Monte-Carlo returns and one
-# gradient step per iteration. New code; the original repository holds no results to compare against.
-# v2: comparators run without fluid guidance (docs/baselines.md).
+# gradient step per iteration.
+# comparators run without fluid guidance (docs/baselines.md).
 env:
   fluid_features: "off"
   fluid_mask: false

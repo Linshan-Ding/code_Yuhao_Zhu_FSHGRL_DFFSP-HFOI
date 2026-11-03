@@ -55,7 +55,7 @@ class SparseGraphEncoder(nn.Module):
 
     # -- copied from HGNNScheduler ------------------------------------------------------------------------
     def feature_normalize(self, data: torch.Tensor) -> torch.Tensor:
-        """Per-observation normalisation (v2): statistics over each batch element, not over the batch."""
+        """Per-observation normalisation: statistics over each batch element, not over the batch."""
         return normalize_per_observation(data)
 
     def get_normalized(self, raw_opes: torch.Tensor, raw_mas: torch.Tensor,
@@ -117,7 +117,7 @@ class SparseGraphEncoder(nn.Module):
             features = (h_opes, features[1], features[2])
         h_mas_pooled = torch.mean(h_mas, dim=-2)
         h_opes_pooled = torch.mean(h_opes, dim=-2)
-        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # v2: per observation
+        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # per observation
         return batch, h_opes, h_mas, h_opes_pooled, h_mas_pooled, due_dates
 
     # -- new ----------------------------------------------------------------------------------------------

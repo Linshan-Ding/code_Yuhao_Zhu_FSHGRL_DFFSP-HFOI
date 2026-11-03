@@ -1,9 +1,9 @@
-# Learning algorithm, network and training schedule.
+# Learning algorithm, network and training schedule (Table 6 of the paper).
 algo:
   algorithm: ppo              # ppo | a2c | dqn | ddqn
   model_type: hgnn            # hgnn (FSHGRL) | mlp (FSHGRL-NG: point-wise encoders instead of the graph)
-  train_confirmed: true       # training-parameter table confirmed (v2 = configs/paper.yaml; v1 = original values)
-  train_version: 2
+  train_confirmed: true       # the training-parameter table below is the confirmed one (Table 6 of the paper)
+  train_version: 2            # version of the training-parameter table, recorded in every run's train_meta.yaml
   model:
     in_size_ma: 5             # raw machine feature width (must match environment/simulator.py)
     out_size_ma: 16           # machine embedding width
@@ -17,7 +17,7 @@ algo:
     n_hidden_actor: 3         # actor layers
     n_hidden_critic: 3        # critic layers
     action_dim: 1             # score per candidate
-    epsilon: 1.0              # legacy epsilon-greedy start value; unused by the sparse policy path
+    epsilon: 1.0              # epsilon-greedy start value of the flat parameter dictionary; unused by the sparse policy path
   attention:
     use_sparse_attention: true      # self-attention over the retained candidate actions
     sparse_attention_scope: pair    # pair | pair_order
@@ -34,20 +34,24 @@ algo:
     eps_clip: 0.2
     A_coeff: 1.0              # policy-loss coefficient (c1)
     vf_coeff: 0.5             # value-loss coefficient (c2)
-    entropy_coeff: 0.01       # entropy coefficient (c3); the archived runs used 0.01 (docs/known-issues.md item 1)
+    entropy_coeff: 0.01       # entropy coefficient (c3)
     max_grad_norm: 0.5
     target_kl: 0.03           # early stop of the PPO passes when the approximate KL exceeds this
-    max_iterations: 2000      # training iterations (v2 paper configuration; the archived v1 runs used 1000)
+    max_iterations: 1000      # training iterations (Table 6: 1000 x 8 episodes, one pool instance per iteration)
     minibatch_size: 512
     max_minibatch_tokens: 0   # optional token budget per minibatch; 0 disables it
     num_envs: 8               # complete episodes collected per iteration
-    num_workers: 8            # legacy alias of num_envs
+    num_workers: 8            # alias of num_envs kept for the flat parameter dictionary
     rollout_device: cpu       # device for action sampling during collection
     update_device: cuda:0     # device for the PPO update (falls back to cpu when CUDA is unavailable)
     resume: auto              # auto: resume from result/<run>/last_checkpoint.pt when present | none
     checkpoint_interval: 1    # write last_checkpoint.pt every N iterations
-    experiment_name: HGNNPPO-NF   # result/<experiment_name>/ (the original default name)
+    experiment_name: ours     # result/<experiment_name>/ when no --run-name is given (the scripts pass <method>/run<k>)
     eval_every: 1             # greedy evaluation on the training instance every N iterations (curve.csv); 0 disables
+    eval_scope: selected      # curve.csv: greedy episode on this iteration's training instance
+    val_every: 10             # Section 5.1: every 10 iterations one greedy episode per validation instance
+                              # -> val_curve.csv (Fig. 7) and best_val_checkpoint.pt (model selection)
+    early_stop_patience: 0    # off (set e.g. 200 to stop after 200 iterations without improvement)
     checkpoint_every: 0       # additionally keep checkpoint_epoch{N:04d}.pt every N iterations; 0 disables
   viz:
     viz: false                # live Visdom charts (set true and start `python -m visdom.server`)

@@ -1,6 +1,6 @@
 """Minute-scale end-to-end smoke test of the generalisation flow: train 2 iterations (PPO, hgnn, fluid features
 and mask on) on three training-pool instances with validation on two val instances (configs/smoke.yaml after
-configs/paper.yaml), evaluate the best validation checkpoint on those two val instances, run the dispatching
+the base configuration), evaluate the best validation checkpoint on those two val instances, run the dispatching
 rules on them once, aggregate, draw the figures and build the tables, then run the unit tests of the reward
 identity and the statistics. --smoke bypasses the training-parameter gate; nothing here is paper data
 (everything goes to result/smoke/)."""
