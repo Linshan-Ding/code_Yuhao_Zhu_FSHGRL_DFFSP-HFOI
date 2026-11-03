@@ -261,8 +261,26 @@ def _config_label(instance_id: str) -> str:
     return f"({match.group(1)}, {match.group(2)})" if match else _tex(instance_id)
 
 
+def _threshold_text(value) -> str:
+    """``1e-05`` -> ``$10^{-5}$``, ``2.5e-03`` -> ``$2.5\\times10^{-3}$`` (the mask threshold of Table 6)."""
+    try:
+        mantissa, exponent = f"{float(value):.3e}".split("e")
+    except (TypeError, ValueError):
+        return str(value)
+    mantissa = mantissa.rstrip("0").rstrip(".")
+    base = f"10^{{{int(exponent)}}}"
+    return f"${base}$" if mantissa == "1" else f"${mantissa}\\times{base}$"
+
+
+def _device_text(device) -> str:
+    """Configuration device names as prose: ``cpu`` -> CPU, ``cuda:0`` -> GPU."""
+    name = str(device).lower()
+    return "GPU" if name.startswith(("cuda", "gpu", "mps")) else "CPU" if name.startswith("cpu") else str(device)
+
+
 def hyperparameter_rows(config: dict | None = None, runs: dict | None = None, counts: dict | None = None) -> list:
-    """``(block, parameter, value)`` triples of the paper's Table 6, read from the configuration."""
+    """``(block, parameter, value)`` triples of the paper's Table 6, read from the configuration and written as
+    prose rather than as configuration values (threshold in powers of ten, CPU / GPU, instance sets)."""
     cfg = config if config is not None else _load_config()
     runs = runs if runs is not None else (yaml.safe_load((ROOT / "configs" / "runs.yaml").read_text(encoding="utf-8")) or {})
     counts = counts if counts is not None else _tier_counts()
@@ -284,8 +302,9 @@ def hyperparameter_rows(config: dict | None = None, runs: dict | None = None, co
         ("Environment and action", "Fluid LP solver / time limit (s)", f"{backend_text} / {env.get('fluid_time_limit', 2)}"),
         ("Environment and action", "Fluid node features / candidate mask",
          f"{env.get('fluid_features', 'on')} / {'on' if env.get('fluid_mask', True) else 'off'}"),
-        ("Environment and action", "Mask threshold $\\varepsilon_f$", env.get("fluid_mask_threshold", 1e-5)),
-        ("Environment and action", "LP recomputation", env.get("fluid_recompute", "decision")),
+        ("Environment and action", "Mask threshold $\\varepsilon_f$", _threshold_text(env.get("fluid_mask_threshold", 1e-5))),
+        ("Environment and action", "LP recomputation",
+         {"decision": "at every decision epoch"}.get(str(env.get("fluid_recompute", "decision")), str(env.get("fluid_recompute")))),
         ("Environment and action", "Discard penalty / progress coefficient",
          f"{env.get('discard_penalty', 1.0)} / {env.get('progress_reward_coeff', 0.0)}"),
         ("Network", "Raw feature width (operation type / machine)",
@@ -294,7 +313,7 @@ def hyperparameter_rows(config: dict | None = None, runs: dict | None = None, co
         ("Network", "HGNN layers / attention heads per layer", f"{len(heads)} / {heads[0] if heads else 1}"),
         ("Network", "Operation MLP hidden width", model.get("hidden_size_ope", 256)),
         ("Network", "Candidate self-attention: heads / feature width / normalisation",
-         f"{attention.get('sparse_attention_heads', 1)} / {attn_dim} / LayerNorm"
+         f"{attention.get('sparse_attention_heads', 1)} / {attn_dim} / layer normalization"
          if attention.get("use_sparse_attention", True) else "off"),
         ("Network", "Actor / order actor / critic (layers $\\times$ width, tanh)",
          f"{model.get('n_hidden_actor', 3)} $\\times$ {model.get('n_latent_actor', 128)} / "
@@ -310,13 +329,14 @@ def hyperparameter_rows(config: dict | None = None, runs: dict | None = None, co
         ("Training", "$c_1$ / $c_2$ / $c_3$", f"{train.get('A_coeff')} / {train.get('vf_coeff')} / {train.get('entropy_coeff')}"),
         ("Training", "Gradient clipping / target KL", f"{train.get('max_grad_norm')} / {train.get('target_kl')}"),
         ("Training", "Collection device / update device",
-         f"{train.get('rollout_device', 'cpu')} / {train.get('update_device', 'cuda:0')}"),
+         f"{_device_text(train.get('rollout_device', 'cpu'))} / {_device_text(train.get('update_device', 'cuda:0'))}"),
         ("Training", "Training instance per iteration",
          "the next pool instance (each used once)" if str(inst.get("instance_selection", "random")) in ("round_robin", "fixed")
          else f"{inst.get('instance_selection', 'random')} draw from the pool"),
         ("Data", "Training pool / validation / test",
          f"{counts.get('train', '--')} generated / {val_count} benchmark ({val_names}) / {counts.get('benchmark', '--')} benchmark"),
-        ("Data", "Other unseen tiers (arrival / small)", f"{counts.get('arrival', '--')} / {counts.get('small', '--')} instances"),
+        ("Data", "Other unseen instance sets (arrival regimes / small instances)",
+         f"{counts.get('arrival', '--')} / {counts.get('small', '--')} instances"),
         ("Evaluation", "Model selection",
          f"best validation mean (greedy episode per validation instance every {train.get('val_every', 50)} iterations)"),
         ("Evaluation", "Decoding / independent runs $K$",

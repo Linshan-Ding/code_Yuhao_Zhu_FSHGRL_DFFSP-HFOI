@@ -1,7 +1,7 @@
 # FSHGRL for DFFSP-HFOI —— 论文代码仓库（v2，修订版实验）
 
 正式代码仓库：`Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI`（本仓库）。`main` 以原仓库的单提交 c030dfa 为根完成了重构
-（训练路径与原仓库逐位一致，`CHANGELOG.md` 的 C0–C12）；分支 `claude/v2-generalization`（作者打标签 `v2.0-revision`）是审稿
+（训练路径与原仓库逐位一致，`CHANGELOG.md` 的 C0–C12）；分支 `claude/v2-generalization`（稿件以仓库网址引用其末端提交，不打标签）是审稿
 修订的**新实验版本**：泛化型训练范式、流体候选掩码、缺陷修复、新的对比方法与精确求解检查（`CHANGELOG.md` 的 V1–V11，
 修改方案见论文仓库 `revision/reviewer1_response_plan.md`）。实验规模（2026-10-30 定稿）：每个方法训练 1 次、1000 轮，
 验证集为基准算例 `DDT500_num50` 与 `DDT1200_num100`，测试集为 15 个基准算例 + 6 个到达模式算例，12 个小算例做精确求解与阈值敏感性。

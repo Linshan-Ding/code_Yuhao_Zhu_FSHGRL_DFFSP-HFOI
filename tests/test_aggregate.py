@@ -167,9 +167,12 @@ def test_make_tables_v2_outputs(tmp_path, monkeypatch):
     assert values["Iterations / episodes per iteration"] == "1000 / 8"
     assert values["Training pool / validation / test"] == "1000 generated / 2 benchmark ((500, 50), (1200, 100)) / 15 benchmark"
     assert values["Training instance per iteration"] == "the next pool instance (each used once)"
-    assert values["Other unseen tiers (arrival / small)"] == "6 / 12 instances"
+    assert values["Other unseen instance sets (arrival regimes / small instances)"] == "6 / 12 instances"
     assert values["Fluid LP solver / time limit (s)"] == "HiGHS (scipy.optimize.linprog) / 2"
-    assert values["Candidate self-attention: heads / feature width / normalisation"] == "1 / 66 / LayerNorm"
+    assert values["Candidate self-attention: heads / feature width / normalisation"] == "1 / 66 / layer normalization"
+    assert values["Mask threshold $\\varepsilon_f$"] == "$10^{-5}$"
+    assert values["Collection device / update device"] == "CPU / GPU"
+    assert values["LP recomputation"] == "at every decision epoch"
     stats = pd.read_csv(tables / "instance_statistics.csv")
     assert len(stats) == 15 and stats["load_ratio"].between(1.0, 3.0).all()
 
