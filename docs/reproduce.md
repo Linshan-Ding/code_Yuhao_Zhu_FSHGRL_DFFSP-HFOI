@@ -1,8 +1,7 @@
 # 复现手册（v2，泛化型范式；实验规模定于 2026-10-30）
 
 本文件是修订版实验（审稿人 1 修改方案 v3 的 C 线）的完整复现步骤：从干净检出到论文全部表格。所有命令在工程根目录执行，
-零参数；每条命令的产物与对应论文表格见 §8 与 README §10。代码冻结于分支 `claude/v2-generalization` 的末端提交，作者在其上打标签
-`v2.0-revision` 后以该标签为准（`git tag -a v2.0-revision -m "revision code freeze"` 与 `git push origin v2.0-revision`）。
+零参数；每条命令的产物与对应论文表格见 §8 与 README §10。代码冻结于分支 `claude/v2-generalization` 的末端提交，稿件以仓库网址引用该代码，不打标签（作者决定，2026-11-03）。
 
 实验规模（用户决定）：每个方法训练 **1 次**、**1000 轮**（每轮 8 条 episode，每轮一个新的训练池算例）；验证集为基准算例
 `DDT500_num50` 与 `DDT1200_num100`（原稿训练曲线的两个算例），每 10 轮各一条贪心 episode；测试集为 15 个基准算例 + 6 个到达模式算例；
@@ -105,9 +104,9 @@ python scripts/run_10_sensitivity.py
 | `paper_assets/tables/generalization_arrival.tex`、`generalization_small.tex` | 零样本表体（含 CSV） | 新 5.x |
 | `paper_assets/tables/hyperparameters.tex` | 由配置生成的超参表 | 表 6 |
 | `paper_assets/tables/instance_statistics.tex` | 基准算例统计（由 params.yaml 生成） | 新表（意见 2） |
-| `paper_assets/tables/milp_small.tex` | MILP-A/B 最优值、状态、求解时间、回放核对、最优规则、FSHGRL η 与差距 | 附录（意见 3） |
-| `paper_assets/tables/sensitivity.tex` | 各阈值的 η、与 η* 的差距、候选对数、回退率、每决策时间 | 新 5.x（意见 5） |
-| `paper_assets/figures/generated/` | `train_curve`（图 7：两个验证算例的 `val_curve.csv` + 最佳检查点，面板 (c) 为 FSHGRL/HSDDQN/HGNN-PPO 的平滑验证曲线）、`convergence`（仓库产物，稿件不用）、`ablation_paired_gains`（含 W/T/L 与 Holm p）、`baseline_advantage_heatmap`（含 Mean 列）、`decision_time_configurations`（ms，三方法）、`quality_time_tradeoff`（单面板、对数 ms）、`sensitivity_threshold`（新，§5.8） | 图 7–12 |
+| `paper_assets/tables/milp_small.tex`、`milp_small_compact.tex` | 全表：MILP-A/B 最优值、状态、求解时间、回放核对、最优规则、FSHGRL η 与差距；紧凑表（稿件表 A.1）：只含论文模型（变体 A）的最优值、求解时间、回放与 FSHGRL η，不含规则列 | 附录 A（意见 3） |
+| `paper_assets/tables/sensitivity.tex` | 各阈值的贪心/采样 η、剪枝比例、候选对数、每决策时间（CSV 另含与 η* 的差距与回退率） | §5.8（意见 5） |
+| `paper_assets/figures/generated/` | `train_curve`（图 7：两个验证算例的 `val_curve.csv` + 最佳检查点，各面板纵轴按自身曲线范围缩放，图例在图下）、`convergence`（仓库产物，稿件不用）、`ablation_paired_gains`（含 W/T/L 与 Holm p）、`baseline_advantage_heatmap`（含 Mean 列）、`decision_time_configurations`（ms，三方法）、`quality_time_tradeoff`（单面板、对数 ms、右侧图例）、`sensitivity_threshold`（新，§5.8） | 图 7–12 |
 
 一键顺序：`python scripts/run_all.py`（数据 → 训练 ‖ 规则 ‖ MILP → 评测 ‖ 敏感性 → 聚合）。
 

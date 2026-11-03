@@ -12,7 +12,7 @@
 | R1.5 | 剪枝阈值与敏感性 | 必须做（实验） | ε_f = 1e-5；评测期阈值扫描（`sensitivity.tex`，采样 η） | 已改稿 |
 | R1.6 | β_f 取值 | 必须做（论文） | 奖励按实现改写，对齐项删除（β_f = 0） | 已改稿 |
 | R1.7 | 去候选自注意力消融 | 必须做（实验） | 变体 NA（`ablation.tex`） | 已改稿 |
-| R1.8 | 代码版本与配置 | 必须做（论文 + 仓库） | 仓库 + tag + commit；表 6 由配置生成（`hyperparameters.tex`）；`docs/reproduce.md` | 已改稿（§5.1、Data availability；tag 待作者） |
+| R1.8 | 代码版本与配置 | 必须做（论文 + 仓库） | 仓库网址 + 末端提交（不打标签）；表 6 由配置生成（`hyperparameters.tex`）；`docs/reproduce.md` | 已改稿（§5.1、Data availability、附录 C；稿件不含代码库路径） |
 | R1.9 | 到达模式 | 必须做（实验） | 6 个到达模式算例零样本（`generalization_arrival.tex`） | 已改稿 |
 | R1.10 | 表 6 不完整 | 必须做（论文） | `hyperparameters.tex` | 已改稿 |
 | R1.11 | NF 双关 | 必须做（实验） | NFe / NM / NF 2×2（`ablation.tex`） | 已改稿 |
