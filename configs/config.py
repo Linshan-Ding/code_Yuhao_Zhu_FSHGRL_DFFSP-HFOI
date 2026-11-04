@@ -4,11 +4,9 @@ Three files make up the default configuration (``configs/instance.yaml``,
 ``configs/env.yaml``, ``configs/algo.yaml``); further files overlay them in
 the order given (``configs/ablation/*.yaml``, ``configs/smoke.yaml`` ...).
 
-The training code historically consumed two flat dictionaries,
-``train_paras`` and ``model_paras``.  ``to_legacy_config`` reproduces them key
-for key (same values, same types) so that the numerical behaviour of the
-trainer is untouched; ``tests/test_config_bridge.py`` checks this against the
-frozen ``tests/golden/legacy_config.json``.
+The training code consumes two flat dictionaries, ``train_paras`` and
+``model_paras``; ``to_legacy_config`` builds them from the dataclasses
+(``tests/test_config_bridge.py`` checks the bridge against the YAML values).
 """
 from __future__ import annotations
 
@@ -28,7 +26,7 @@ DEFAULT_CONFIG_FILES = ("instance.yaml", "env.yaml", "algo.yaml")
 
 @dataclass
 class GeneratorCfg:
-    """Synthetic-instance generator settings (data/generator.py). v2 defaults follow the statistics of the 15
+    """Synthetic-instance generator settings (data/generator.py). defaults follow the statistics of the 15
     benchmark files (docs/experiment-spec.md), not the paper's Table 5 (inter-arrival [1, 200] s there)."""
     n_products: int = 5
     n_stages: int = 5
@@ -126,7 +124,7 @@ class TrainCfg:
     update_device: str = "cuda:0"
     resume: str = "auto"
     checkpoint_interval: int = 1
-    experiment_name: str = "HGNNPPO-NF"
+    experiment_name: str = "ours"
     eval_every: int = 1
     checkpoint_every: int = 0
     eval_scope: str = "all"               # curve.csv greedy evaluation on all training instances | selected (this iteration's)

@@ -1,4 +1,4 @@
-"""Evaluation entry point (new code; the original repository had no evaluation script).
+"""Evaluation entry point.
 
 Model mode -- load a checkpoint and run complete episodes on benchmark instances::
 

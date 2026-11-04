@@ -3,7 +3,7 @@
 ``build_agent`` returns the PPO agent for ``algorithm: ppo`` (the same object the original trainer built,
 so the PPO path is unchanged) and the learned baselines otherwise; ``build_policy_network`` returns the
 bare network for evaluation tools. Algorithms: ppo (default), a2c, dqn, ddqn, hsddqn (hierarchical double DQN,
-v2; the HGNN-PPO comparator is ``ppo`` under configs/baselines/hgnn_ppo.yaml).
+the HGNN-PPO comparator is ``ppo`` under configs/baselines/hgnn_ppo.yaml).
 """
 from __future__ import annotations
 

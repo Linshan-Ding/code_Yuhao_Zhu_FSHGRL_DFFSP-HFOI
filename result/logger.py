@@ -4,8 +4,7 @@ contract (``log.csv``, ``curve.csv``, ``fixed_set_final.csv``, ``config_snapshot
 
 File roles
 ----------
-- ``train_metrics.csv``  the original 49-column per-iteration record; written exactly as before and
-                         regression-tested (``tests/equivalence``);
+- ``train_metrics.csv``  the original 49-column per-iteration record; written exactly as before;
 - ``log.csv``            per-epoch training diagnostics projected from the same row. ``train_obj_mean`` comes
                          from the *sampled* training rollouts and is for diagnosis only: convergence plots
                          must read ``curve.csv``;

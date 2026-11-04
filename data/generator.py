@@ -1,6 +1,6 @@
-"""Synthetic instance generator in the benchmark file format (new code; the original repository had none).
+"""Synthetic instance generator in the benchmark file format.
 
-Distributions (``configs/instance.yaml`` ``instance.generator``, v2 defaults matched to the 15 benchmark files,
+Distributions (``configs/instance.yaml`` ``instance.generator``, defaults matched to the 15 benchmark files,
 see docs/experiment-spec.md): 5 product types, 5 stages, 5 machines per stage, processing times uniform in
 [25, 450] s per (product, machine), order inter-arrival gaps uniform in [1, 40] s (mean 20.5 s; the paper's
 Table 5 states [1, 200], which the benchmark files do not follow), S orders. Due dates: with

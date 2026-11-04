@@ -12,7 +12,7 @@ fulfilment rate and the gap), ``paired_tests.csv`` (Table 11 layout against ``--
 tier, benchmark by default), ``ablation_results.csv``, ``advantage_table.csv``, ``friedman.csv``,
 ``conv_<method>.csv`` (convergence curves: the validation objective of ``result/<method>/run*/val_curve.csv``
 averaged over the validation instances and runs in the generalisation layout, the incumbent objective of
-``curve.csv`` in the per-instance layout), and, v2:
+``curve.csv`` in the per-instance layout), and:
 ``integer_check.csv`` (every (instance, method, decode) group: S x n_episodes x mean eta must be an integer,
 the count of on-time orders; a violation aborts the aggregation) and ``generalization.csv`` (zero-shot
 results per method and evaluation tier: K runs, mean +- std of eta, completed_mean, the best deterministic
@@ -42,12 +42,21 @@ INTEGER_TOL = 1e-9
 
 
 EXCLUDE_ENV = "FSHGRL_EXCLUDE_METHODS"       # comma-separated method ids left out of every table, test and figure
+SCRATCH_DIRS = {"smoke", "pilot", "rules", "sensitivity", "milp", "__pycache__"}   # result/ folders that are not methods
 
 
 def excluded_methods() -> set:
-    """Method ids named in the FSHGRL_EXCLUDE_METHODS environment variable (the manuscript's comparison set
-    is the released set minus these; the excluded rows stay in the CSVs of the repository)."""
-    return {m.strip().lower() for m in os.environ.get(EXCLUDE_ENV, "").split(",") if m.strip()}
+    """Method ids left out of every product: the FSHGRL_EXCLUDE_METHODS environment variable when it is set,
+    otherwise ``exclude_methods`` of configs/runs.yaml (the paper's comparison set leaves out the SPT rule; the
+    excluded rows stay in the CSVs of result/)."""
+    if EXCLUDE_ENV in os.environ:
+        return {m.strip().lower() for m in os.environ[EXCLUDE_ENV].split(",") if m.strip()}
+    runs = ROOT / "configs" / "runs.yaml"
+    if not runs.exists():
+        return set()
+    import yaml
+    listed = (yaml.safe_load(runs.read_text(encoding="utf-8")) or {}).get("exclude_methods") or []
+    return {str(m).strip().lower() for m in listed if str(m).strip()}
 
 
 def load_eval_results(path: Path, exclude=None) -> pd.DataFrame:
@@ -82,7 +91,7 @@ def point_estimates(frame: pd.DataFrame) -> pd.DataFrame:
 
 def integer_check(frame: pd.DataFrame, tol: float = INTEGER_TOL) -> pd.DataFrame:
     """One row per (instance, method, decode): the mean fulfilment times S times the number of episodes is the
-    total number of on-time orders and must be an integer (reviewer 1, comment 14); ``completed`` rows are
+    total number of on-time orders and must be an integer; ``completed`` rows are
     checked against ``fulfillment_rate * total_orders`` as well."""
     required = {"instance_id", "method", "fulfillment_rate", "total_orders"}
     if not required <= set(frame.columns):
@@ -197,7 +206,8 @@ def aggregate(eval_path: Path, out_dir: Path, reference: str = "ours", paired_ti
             table.to_csv(out_dir / "friedman.csv", index=False)
             written["friedman"] = out_dir / "friedman.csv"
 
-    for method_dir in sorted(p for p in out_dir.iterdir() if p.is_dir()):
+    for method_dir in sorted(p for p in out_dir.iterdir()
+                             if p.is_dir() and p.name not in SCRATCH_DIRS and not p.name.startswith(("pilot_", "test_"))):
         val_runs = sorted(glob.glob(str(method_dir / "run*" / "val_curve.csv")))      # generalisation layout
         if val_runs:                     # validation objective (mean over the validation instances) per epoch
             conv = aggregate_curves([Path(p).parent for p in val_runs], key="obj", filename="val_curve.csv")

@@ -1,3 +1,0 @@
-instance_id,method,run_id,tier,scale,obj_model,obj_ref,gap,feasible,infer_time_ms,decode,episode,eval_batch,fulfillment_rate,completed,discarded,total_orders,decision_count,policy_ms,obs_ms,fluid_ms,sim_ms,fluid_backend,candidate_pairs_mean,masked_pairs_mean,mask_fallback_rate,ddt,checkpoint,checkpoint_iteration,epochs,wall_time_s,obj_best
-DDT500_num50,fifo,run1,benchmark,50,0.7,0.7,0.0,True,74.13602620363235,rule,0,1,0.3,15,35,50,149,20.93879133462906,0.0,0.0,52.82298102974892,none,0.0,0.0,0.0,500,,,,,
-DDT1200_num100,fifo,run1,benchmark,100,0.42000000000000004,0.18999999999999995,121.05263157894746,True,251.6959123313427,rule,0,1,0.58,58,42,100,401,69.99674811959267,0.0,0.0,180.66270649433136,none,0.0,0.0,0.0,1200,,,,,

@@ -158,7 +158,7 @@ def evaluate_fixed_set(policy, instance_files, train_paras: dict, reference: dic
 
     New code: one complete episode per instance with argmax decoding under torch.no_grad(); it draws no
     random numbers, so running it after each PPO update leaves the training stream untouched
-    (tests/equivalence runs with eval_every=1 and checks bit-identical training results).
+    (the curve is one greedy episode per iteration).
     """
     rows = []
     for path in instance_files:
@@ -182,7 +182,7 @@ def evaluate_fixed_set(policy, instance_files, train_paras: dict, reference: dic
 
 
 def resolve_validation_files(train_paras: dict) -> list:
-    """Validation instances (v2): ``val_instances`` of ``val_data_dir``, or every instance file under it;
+    """Validation instances: ``val_instances`` of ``val_data_dir``, or every instance file under it;
     empty (with a notice) when the directory does not exist."""
     val_dir = resolve_data_dir(str(train_paras.get("val_data_dir") or "data/instances/val"))
     names = train_paras.get("val_instances") or None
@@ -518,7 +518,7 @@ def main():
                     save_checkpoint(best_greedy_checkpoint_path, model, iteration, best_fulfillment_rate,
                                     train_paras, config)
             val_metrics = {}
-            if validation.due(iteration):                       # v2: validation set, best_val_checkpoint.pt
+            if validation.due(iteration):                       # validation set, best_val_checkpoint.pt
                 val_policy = prepare_rollout_policy(model, rollout_device, update_device)
                 saved_forward_stats = getattr(val_policy, "last_forward_stats", None)
                 val_metrics = validation.evaluate(

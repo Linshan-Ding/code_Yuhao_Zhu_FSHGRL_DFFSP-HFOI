@@ -1,4 +1,4 @@
-"""result/aggregate.py v2 (integer consistency check, generalization.csv, tier-aware paired tests) and the v2
+"""result/aggregate.py (integer consistency check, generalization.csv, tier-aware paired tests) and the
 tables of paper_assets/scripts/make_tables.py on synthetic data; the configuration and instance tables on the
 repository's own files."""
 from __future__ import annotations
@@ -95,7 +95,7 @@ def test_generalization_table_summarises_every_tier():
     assert nf["losses"] == 3 and nf["delta_pp"] < 0
 
 
-def test_aggregate_writes_the_v2_products_and_pairs_on_the_benchmark_tier(tmp_path):
+def test_aggregate_writes_the_products_and_pairs_on_the_benchmark_tier(tmp_path):
     frame = _frame()
     eval_path = tmp_path / "eval_results.csv"
     frame.to_csv(eval_path, index=False)
@@ -113,7 +113,7 @@ def test_aggregate_writes_the_v2_products_and_pairs_on_the_benchmark_tier(tmp_pa
     assert (tmp_path / "out2" / "integer_check.csv").exists()
 
 
-def test_make_tables_v2_outputs(tmp_path, monkeypatch):
+def test_make_tables_outputs(tmp_path, monkeypatch):
     import make_tables as mt
 
     importlib.reload(mt)

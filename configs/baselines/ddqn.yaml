@@ -1,5 +1,5 @@
 # Double DQN baseline: as dqn.yaml, the online network selects and the target network evaluates the next action.
-# v2: comparators run without fluid guidance (docs/baselines.md).
+# comparators run without fluid guidance (docs/baselines.md).
 env:
   fluid_features: "off"
   fluid_mask: false

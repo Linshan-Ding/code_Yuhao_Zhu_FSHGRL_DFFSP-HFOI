@@ -27,7 +27,7 @@ OI = {"blue": "#0072B2", "orange": "#E69F00", "green": "#009E73", "vermilion": "
 CYCLE = [(OI["blue"], "-", "o"), (OI["vermilion"], "--", "s"), (OI["green"], ":", "^"),
          (OI["orange"], "-.", "D"), (OI["purple"], (0, (4, 1.5)), "x"), (OI["gray"], (0, (1, 1)), "+"),
          (OI["sky"], (0, (3, 1, 1, 1)), "v"), (OI["yellow"], (0, (5, 1)), "P")]
-# One style per method, shared by every figure (v2 revision): colour, linestyle, marker. The proposed method is
+# One style per method, shared by every figure: colour, linestyle, marker. The proposed method is
 # always the blue solid circle; its ablations, the learned comparators and the rules keep their own entries.
 METHOD_STYLE = {
     "ours": (OI["blue"], "-", "o"),
@@ -137,7 +137,7 @@ def plot_training_trace(csv_path, out_stem=None, column: str = "fulfillment_rate
                         width_mm: float = 84, height_mm: float = 56, instance_id: str | None = None):
     """Raw per-iteration trace and its moving average (the look of the former train_curve.py). Reads
     train_metrics.csv (sampled training rate), curve.csv (pass column='obj', x_column='epoch') or val_curve.csv
-    (pass column='fulfillment_rate' and the ``instance_id`` to keep; v2 generalisation paradigm)."""
+    (pass column='fulfillment_rate' and the ``instance_id`` to keep; generalisation paradigm)."""
     frame = pd.read_csv(csv_path)
     if instance_id is not None and "instance_id" in frame.columns:
         frame = frame[frame["instance_id"] == instance_id]
@@ -325,7 +325,7 @@ def plot_validation_panels(val_curve_csv, conv_series: Sequence, out_stem=None,
                            smooth_window: int = 9, width_mm: float = 181, height_mm: float = 55,
                            labels: dict | None = None, instance_labels: dict | None = None,
                            y_margin: float | None = 0.06):
-    """The paper's Fig. 7 (v2): one panel per validation instance with the validation fulfillment of the proposed
+    """The paper's Fig. 7: one panel per validation instance with the validation fulfillment of the proposed
     policy (raw trace from val_curve.csv and its centred moving average; the selected checkpoint marked with an
     open circle and its value) and, when ``conv_series`` = [(frame, method_id), ...] is not empty, a last panel
     with the moving average of the validation fulfillment (1 - ``mean`` of a conv_<method>.csv frame) of those

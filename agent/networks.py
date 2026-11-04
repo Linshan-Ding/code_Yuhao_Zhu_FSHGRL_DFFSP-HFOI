@@ -183,7 +183,7 @@ class HGNNScheduler(nn.Module):
 
 
     def feature_normalize(self, data: torch.Tensor) -> torch.Tensor:
-        """Per-observation normalisation (v2): statistics over each batch element, not over the batch."""
+        """Per-observation normalisation: statistics over each batch element, not over the batch."""
         return normalize_per_observation(data)
 
     def get_normalized(self,
@@ -272,7 +272,7 @@ class HGNNScheduler(nn.Module):
             features = (h_opes, features[1], features[2])
         h_mas_pooled = torch.mean(h_mas, dim=-2)
         h_opes_pooled = torch.mean(h_opes, dim=-2)
-        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # v2: per observation
+        due_dates = normalize_due_dates(batch["due_dates"], batch["order_mask"])   # per observation
         state_values = self.critic(torch.cat((h_opes_pooled, h_mas_pooled,
                                               batch["current_rate"].view(len(obs_batch), 1)), dim=-1)).squeeze(-1)
         return batch, h_opes, h_mas, h_opes_pooled, h_mas_pooled, due_dates, state_values, start_time

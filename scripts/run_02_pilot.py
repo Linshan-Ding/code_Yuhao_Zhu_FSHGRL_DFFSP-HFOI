@@ -4,7 +4,7 @@ Generalization paradigm: the proposed method is trained once for pilot.max_itera
 validation every val_every iterations; the gate compares the best validation epoch with the best deterministic
 rule on the same validation instances (data/instances/reference.csv, written by scripts/run_06_run_rules.py):
 PASS when the mean fulfilment is at least the rules' mean and the policy reaches the reference on at least
-pilot.min_win_share (configs/runs.yaml) of the validation instances. Fails are recorded in docs/pilot-log.md
+pilot.min_win_share (configs/runs.yaml) of the validation instances. Fails are recorded in result/pilot/pilot-report.md
 with the parameter change of the next round (learning rate, entropy coefficient, normalisation, iterations).
 Per-instance paradigm (legacy): the listed methods are trained on pilot.instances and the verdict compares the
 training incumbents with the rule references. Disabled when configs/pilot.yaml says enabled: false."""
@@ -104,4 +104,4 @@ else:
 VERDICT.write_text(f"{verdict}\n", encoding="utf-8")
 done(t0, PILOT_DIR / "pilot-report.md", VERDICT)
 if verdict != "PASS":
-    sys.exit("[FAIL] pilot verdict FAIL: see result/pilot/pilot-report.md and docs/pilot-log.md")
+    sys.exit("[FAIL] pilot verdict FAIL: see result/pilot/pilot-report.md")

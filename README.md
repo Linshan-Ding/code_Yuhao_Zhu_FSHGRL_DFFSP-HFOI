@@ -1,22 +1,18 @@
-# FSHGRL for DFFSP-HFOI —— 论文代码仓库（v2，修订版实验）
-
-正式代码仓库：`Linshan-Ding/code_Yuhao_Zhu_FSHGRL_DFFSP-HFOI`（本仓库）。`main` 以原仓库的单提交 c030dfa 为根完成了重构
-（训练路径与原仓库逐位一致，`CHANGELOG.md` 的 C0–C12）；分支 `claude/v2-generalization`（稿件以仓库网址引用其末端提交，不打标签）是审稿
-修订的**新实验版本**：泛化型训练范式、流体候选掩码、缺陷修复、新的对比方法与精确求解检查（`CHANGELOG.md` 的 V1–V11，
-修改方案见论文仓库 `revision/reviewer1_response_plan.md`）。实验规模（2026-10-30 定稿）：每个方法训练 1 次、1000 轮，
-验证集为基准算例 `DDT500_num50` 与 `DDT1200_num100`，测试集为 15 个基准算例 + 6 个到达模式算例，12 个小算例做精确求解与阈值敏感性。
+# FSHGRL for DFFSP-HFOI —— 论文代码与实验结果
 
 论文：*Fluid-Guided Sparse Heterogeneous Graph Reinforcement Learning for the Dynamic Flexible Flow Shop
-Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库按 `opt-paper-codegen` 技能的五大模块骨架
-（configs / data / environment / agent / result）组织，是论文实验的复现手册与代码。
+Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库是论文实验的代码、算例、评测记录与全部表图的
+生成链，按 `opt-paper-codegen` 技能的五大模块骨架（configs / data / environment / agent / result）组织：
 
-- 修订版完整复现步骤与三台机器的预算分配：`docs/reproduce.md`
-- 实验设计规格（范式、档位、run 矩阵、落盘契约、参数表 v2）：`docs/experiment-spec.md`；作业数与代价：`docs/run-matrix.md`
-- 对比方法与基线的改编范围、精确求解检查、阈值敏感性：`docs/baselines.md`
-- 已知缺陷与 v2 处理状态：`docs/known-issues.md`；论文结论与数据文件的对应：`docs/claim-verdicts.md`
-- 与原仓库的文件对应：`docs/migration-map.md`；预实验门控（本版关闭）：`docs/pilot-log.md`
-- 修订版实验的完整评估档案：`experiments/2026-11-01/`（`result/` 全部方法；`paper/` 为修订稿比较集的聚合、表与图，
-  生成命令见其 README）；审稿意见的处置记录：`docs/revision-log.md`
+- `result/`：论文实验的完整记录——每个方法一个 run 文件夹（训练曲线、验证曲线、日志、配置快照、评测记录），规则、敏感性与
+  精确求解的记录，以及根级聚合（`eval_results.csv`、`paired_tests.csv` 等）。检查点不入库；重跑脚本会覆盖这些文件。
+- `paper_assets/`：表图生成链（`scripts/make_tables.py`、`figures/src/*.py`）及其产物（`tables/*.tex|csv`、
+  `figures/generated/*.pdf|png`）；论文仓库只复制产物。
+- `docs/`：复现手册 `reproduce.md`、实验设计规格 `experiment-spec.md`、run 矩阵 `run-matrix.md`、对比方法 `baselines.md`、
+  实现说明与已知局限 `known-issues.md`、论文结论与数据文件的对应 `claim-verdicts.md`。
+
+实验规模：每个方法训练 1 次、1000 轮，验证集为基准算例 `DDT500_num50` 与 `DDT1200_num100`，测试集为 15 个基准算例 + 6 个
+到达模式算例，12 个小算例做精确求解与阈值敏感性。
 
 ## 1. 问题与假设
 
@@ -30,47 +26,45 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
 - 流体引导（`configs/env.yaml`）：每个新状态求解一次容量分配 LP（按状态签名缓存），其解有两种用法——`fluid_features`
   两列工序类型节点特征，`fluid_mask` 候选掩码（只保留 u* > `fluid_mask_threshold` = 1e-5 的合法对，空集回退全部合法对，
   回退次数记入 `log.csv`）；求解后端 `fluid_backend: scipy`：HiGHS（`scipy.optimize.linprog`，精确、无许可证、单线程确定性），
-  Gurobi 不再支持（仅为未受支持的显式选项），实际后端写入 `config_snapshot.yaml`；
+  实际后端写入 `config_snapshot.yaml`；
 - 状态：工序类型节点（12 维）与机器节点（5 维）的异质图，另有候选订单的剩余交期，交期与加工率**按单个观测**归一化；
 - 奖励：`(完成增量 - discard_penalty × 丢弃增量) / S`，整条 episode 的累计奖励等于 `2 eta - 1`（`tests/test_rules.py`）；
   订单一旦无法按期完成即被丢弃；非法动作抛错。
 
-**训练范式**：`generalization`（泛化型，`configs/paper.yaml`）。每个方法只训练**一个**策略（1 run，固定种子 1 并记录）：
+**训练范式**：`generalization`（泛化型，`configs/instance.yaml`）。每个方法只训练**一个**策略（1 run，固定种子 1 并记录）：
 1000 轮，第 k 轮用训练池的第 k 个生成算例（1000 个，每个恰用一次），采集 8 条完整 episode 做一次 PPO 更新；每 10 轮在两个
-基准验证算例 `DDT500_num50`、`DDT1200_num100`（原稿图 7 的两个算例）上各跑一条贪心 episode（`val_curve.csv`），验证均值
+基准验证算例 `DDT500_num50`、`DDT1200_num100`（图 7 的两个算例）上各跑一条贪心 episode（`val_curve.csv`），验证均值
 最优的检查点 `best_val_checkpoint.pt` 用于评测；评测档位是 15 个基准算例、6 个到达模式算例与 12 个小算例，所有表格报告
-零样本结果（两个验证算例同时在测试集内，论文 5.1 节须写明）。旧的逐算例范式（`per_instance`）仍可用（`configs/instance.yaml`
-默认），只为与 v1 对照。
+零样本结果（两个验证算例同时在测试集内，论文 5.1 节写明）。逐算例范式（`paradigm: per_instance`）仍可用。
 
 **方法**（方法 id 用于目录名与 `eval_results.csv` 的 `method` 列）：
 
 | id | 方法 | 配置 | 说明 |
 |---|---|---|---|
-| `ours` | FSHGRL：PPO + 流体特征 + 流体掩码 + 稀疏异质图策略（候选自注意力） | `configs/paper.yaml` | |
+| `ours` | FSHGRL：PPO + 流体特征 + 流体掩码 + 稀疏异质图策略（候选自注意力） | `configs/{instance,env,algo}.yaml` | |
 | `nfe`、`nm`、`nf` | 流体引导的 2×2 消融：去特征 / 去掩码 / 都去 | `configs/ablation/{nf_feature,nf_mask,nf}.yaml` | |
 | `ng`、`na` | 逐节点 MLP 编码器替代图编码 / 去候选自注意力 | `configs/ablation/{ng,no_sparse_attn}.yaml` | |
 | `hsddqn`、`hgnn_ppo` | 层级 Double DQN（改编）、HGNN-PPO (adapted) | `configs/baselines/{hsddqn,hgnn_ppo}.yaml` | 流体引导关闭，`docs/baselines.md` |
-| `a2c`、`dqn`、`ddqn` | 附加学习型基线 | `configs/baselines/*.yaml` | 可省（`run_05` 的 `EXTRA`） |
-| `fifo` `spt` `mor` `mwkr` `random` `rrc` | 调度规则 | `baselines/run_rules.py` | 与策略相同的候选集 |
-| MILP-A / MILP-B | 论文 3.2 节的 MILP 及其可放弃变体 | `baselines/milp_exact.py` | small 档精确求解 |
+| `a2c`、`dqn`、`ddqn` | 附加学习型基线 | `configs/baselines/*.yaml` | 可省（`run_05` 的 `EXTRA`），不在论文表格中 |
+| `fifo` `spt` `mor` `mwkr` `random` `rrc` | 调度规则 | `baselines/run_rules.py` | 与策略相同的候选集；论文比较集不含 SPT（`configs/runs.yaml` `exclude_methods`） |
+| MILP | 论文 3.2 节的模型（另含可放弃变体的核对） | `baselines/milp_exact.py` | small 档精确求解 |
 | ours @ ε_f | 剪枝阈值敏感性（评测期，不重训） | `configs/sensitivity/*.yaml` | `scripts/run_10` |
 
-训练参数表 v2 = `configs/paper.yaml`（`train_version: 2`，`train_confirmed: true`），论文表 6 由它生成（§8）。
+训练参数表即 `configs/algo.yaml`（`train_confirmed: true`），论文表 6 由配置生成（§8）。
 
 ## 2. 环境配置
 
 Python 3.10 以上（本次验证 3.13）；CPU 即可运行，有 NVIDIA GPU 时 PPO 更新默认放在 `cuda:0`（CUDA 不可用自动回退 CPU）。
-流体 LP 与 MILP 都用 scipy 自带的 HiGHS（Gurobi 不再支持）；可选依赖：`visdom`、`psutil`。
+流体 LP 与 MILP 都用 scipy 自带的 HiGHS；可选依赖：`visdom`、`psutil`。
 
 ```
 pip install -r requirements.txt
 ```
 
-安装自检（单元测试约 80 个，本机约 4 分钟；数值等价回归以 `tests/golden_v2/manifest.json` 的冻结提交为黄金，约 5 分钟）：
+安装自检（单元测试约 80 个，本机约 4 分钟）：
 
 ```
 python -m pytest tests
-python -m tests.equivalence --golden v2
 ```
 
 实测耗时（本机：4 核 CPU、无 GPU、Python 3.13、torch 2.14 CPU 版、每作业 1 个 BLAS 线程、HiGHS 后端）：
@@ -81,13 +75,13 @@ python -m tests.equivalence --golden v2
 | 一次 PPO 迭代（8 个环境 + 贪心评估，S=50 到 150） | 20–90 s；每 10 轮两条验证 episode 约 3 s |
 | 单个 run，1000 轮 | 作者平台约 7 h（FSHGRL）到 11.5 h（NG），见 `docs/run-matrix.md` |
 | §5 规则基线 `run_06`（33 个评测算例） | 约 5 min |
-| §5 精确求解 `run_08`（12 个小算例 × MILP-A/B） | 约 1 min（本机 24 次求解全部最优，单次 ≤ 2.6 s） |
+| §5 精确求解 `run_08`（12 个小算例，两个变体） | 约 1 min（本机 24 次求解全部最优，单次 ≤ 2.6 s） |
 | §6 评测，每个检查点（33 算例 × 贪心 + 10 次采样） | 约 30 min；敏感性 `run_10` 约 10 min |
 
 ## 3. 冒烟自检（先跑这条，约 1 分钟）
 
 泛化型布局的整条链路（`configs/smoke.yaml`：3 个训练池算例 × 2 轮 × 2 个环境，两个基准验证算例，评测、规则、聚合、出图出表、
-单元测试），产物在 `result/smoke/`，不产生论文数据：
+单元测试），产物在 `result/smoke/`（不入库），不触碰论文数据：
 
 ```
 python scripts/run_00_smoke.py
@@ -102,12 +96,12 @@ python scripts/run_01_prepare_data.py
 生成 `configs/instance.yaml` `instance.pools` 的全部档位（种子固定，重跑逐字节相同），为每个算例写 `params.yaml`
 （订单数、到达间隔均值与变异系数、负荷率 ρ、交期松弛、加工时间统计），重建 `data/instances/index.csv`（1033 行）：
 benchmark 15（外部文件，不重新生成）、train 1000（种子 1000–1999）、arrival 6、small 12；各档位的生成设定见 `docs/reproduce.md` §2。
-验证集不是生成档位，而是 `configs/paper.yaml` 指定的两个基准文件。
+验证集不是生成档位，而是 `configs/instance.yaml` 指定的两个基准文件。
 单独生成算例：`python -m data.generator --help`（到达模型 uniform / exponential / bursty、负荷率 `--rho`、结构覆盖、案例工艺）。
 
 ## 5. 训练、规则与精确求解
 
-预实验在本版关闭（`configs/pilot.yaml` `enabled: false`，`run_02` 打印 SKIP），正式训练直接开始；每个方法 1 个作业，
+预实验关闭（`configs/pilot.yaml` `enabled: false`，`run_02` 打印 SKIP），正式训练直接开始；每个方法 1 个作业，
 布局 `result/<method>/run1/`（训练参数表未确认时拒绝启动）：
 
 ```
@@ -119,7 +113,7 @@ python scripts/run_05_train_learned_baselines.py
 产物：`result/<method>/run1/`，内含 `train_metrics.csv`（逐迭代记录）、`curve.csv`（逐轮贪心目标值）、
 `val_curve.csv`（每 10 轮两个验证算例的贪心达成率，图 7 的数据）、`log.csv`（训练诊断：`approx_kl`、掩码统计、验证均值等）、
 `best_val_checkpoint.pt`（§6 评测默认用它）、`best_greedy_checkpoint.pt`、`best_checkpoint.pt`、`last_checkpoint.pt`
-（断点续训）、`config_snapshot.yaml`（生效配置、范式、训练池大小、验证设置、评测档位、实际流体后端、种子、git 提交）、
+（断点续训；检查点不入库）、`config_snapshot.yaml`（生效配置、范式、训练池大小、验证设置、评测档位、实际流体后端、种子、git 提交）、
 `train_meta.yaml`、`fixed_set_final.csv`。被中断的作业重跑时续训；已完成的作业自动跳过。实时曲线：另开终端
 `python -m visdom.server` 并把 `configs/algo.yaml` 的 `viz.viz` 置 true。多进程采集（`configs/env.yaml` 的 `collector_workers`）
 与进程内路径逐位一致，开启前用 `tools/profile_collector.py` 实测。
@@ -132,7 +126,7 @@ python scripts/run_08_milp_check.py
 ```
 
 产物：`result/rules/<rule>/eval_results.csv`、`result/rules.csv`（benchmark、arrival、small 三档）与 `data/instances/reference.csv`；
-`result/milp/milp_results.csv`（small 档 MILP-A/B 的最优值、状态、求解时间、验证器与仿真器回放核对）。
+`result/milp/milp_results.csv`（small 档的最优值、状态、求解时间、验证器与仿真器回放核对，论文模型 A 与可放弃变体 B 各一行）。
 
 ## 6. 评测、敏感性与实验数据生成
 
@@ -159,14 +153,19 @@ masked_pairs_mean, mask_fallback_rate, ddt, checkpoint, checkpoint_iteration`；
 python scripts/run_09_aggregate_stats.py
 ```
 
+聚合默认使用论文的比较集：`configs/runs.yaml` 的 `exclude_methods: [spt]` 把 SPT 留在表格、检验与图之外，它的记录仍在
+`result/rules/spt/` 与 `result/eval_results.csv`；环境变量 `FSHGRL_EXCLUDE_METHODS` 可覆盖（空串 = 全部方法）。
+
 产物：`result/integer_check.csv`（每 (算例, 方法, 解码) 组 S × episode 数 × 平均 η 必为按期订单数，违反即中止）、
 `result/stats_summary.csv`、`result/generalization.csv`（方法 × 档位：η 均值、`completed_mean`、每决策时间、最优确定性规则与
 逐算例胜/平/负）、`result/paired_tests.csv`（基准档 15 个配置的配对 Wilcoxon：精确 p 值、Holm 校正）、`result/ablation_results.csv`、
 `advantage_table.csv`、`friedman.csv`、`conv_<method>.csv`（验证目标值随轮数）；
-图：`paper_assets/figures/generated/`（图 7 的两条训练曲线来自 `val_curve.csv`）；表（`paper_assets/tables/`，v2 表同时落 CSV）：
-`ablation.tex`、`comparison_pdr.tex`、`comparison_drl.tex`、`wilcoxon.tex`（基准档）、`generalization_arrival.tex`、
-`generalization_small.tex`（零样本档位）、`hyperparameters.tex`（表 6，由配置生成）、`instance_statistics.tex`（基准算例统计，
-由 `params.yaml` 生成）、`milp_small.tex`（精确求解检查 + 最优规则 + FSHGRL 差距）、`sensitivity.tex`（阈值敏感性）。
+图：`paper_assets/figures/generated/`；表（`paper_assets/tables/`，每张表同时落 CSV）：
+`ablation.tex`、`comparison_pdr.tex`（及分组表头版 `_grouped`）、`comparison_drl.tex`、`wilcoxon.tex`（基准档）、
+`generalization_arrival.tex`、`generalization_small.tex`（零样本档位）、`hyperparameters.tex`（表 6，由配置生成）、
+`generator_settings.tex`、`instance_statistics.tex`（表 5，由配置与 `params.yaml` 生成）、`milp_small.tex`（全表）与
+`milp_small_compact.tex`（附录 A）、`sampled_decoding.tex`（附录 C）、`sensitivity.tex`（表 12）、`evaluation_statistics`、
+`training_statistics`（正文引用的统计量）。
 
 一键跑完 §4–§7（按依赖并发调度：数据 → 训练三组作业 ‖ 规则 ‖ 精确求解 → 评测 ‖ 敏感性 → 聚合）：
 
@@ -178,15 +177,16 @@ python scripts/run_all.py
 
 | 论文 | 表体 / 数据 | 生成脚本 |
 |---|---|---|
-| 表 5（生成设定）、算例统计表 | `configs/instance.yaml` `generator` 段、`instance_statistics.tex` | run_01、run_09 |
+| 表 5（生成设定与算例统计） | `generator_settings.tex`、`instance_statistics.tex` | run_01、run_09 |
 | 表 6 | `hyperparameters.tex` | run_09 |
 | 表 7、图 8 | `ablation.tex`、`ablation_results.csv`、`advantage_table.csv` | run_09 |
-| 表 8、10、11 | `comparison_pdr.tex`、`comparison_drl.tex`、`wilcoxon.tex` | run_09 |
-| 图 7、收敛图、决策时间图 | `result/ours/run1/val_curve.csv`、`conv_<method>.csv`、`eval_results.csv` | run_09 |
-| 新 5.x 到达模式 | `generalization_arrival.tex`、`generalization.csv` | run_09 |
-| 新 5.x 阈值敏感性 | `sensitivity.tex`、`result/sensitivity.csv` | run_10、run_09 |
-| 附录精确求解 | `milp_small.tex`、`result/milp/milp_results.csv` | run_08、run_09 |
-| 表 13（工业案例） | 沿用原稿结果（不重做；最优派工规则 = 现场做法） | — |
+| 表 8、9、10 | `comparison_pdr_grouped.tex`、`comparison_drl_grouped.tex`、`wilcoxon.tex` | run_09 |
+| 图 7、图 9、图 10、图 11 | `result/ours/run1/val_curve.csv`、`eval_results.csv`、`advantage_table.csv` | run_09 |
+| 表 11（到达模式） | `generalization_arrival.tex`、`generalization.csv` | run_09 |
+| 表 12、图 12（阈值敏感性） | `sensitivity.tex`、`result/sensitivity.csv` | run_10、run_09 |
+| 附录 A（精确求解） | `milp_small_compact.tex`、`result/milp/milp_results.csv` | run_08、run_09 |
+| 附录 C（采样解码） | `sampled_decoding.tex` | run_09 |
+| 工业案例表 | 案例数据不在本仓库（现场使用文中的派工规则，表中最优规则结果即现场做法） | — |
 
 ## 9. 启动方式与并发度
 
@@ -242,22 +242,16 @@ visdom 面板单独建一个配置：Script path 下拉切换为 **Module name**
 
 | 实验数据文件 | 生成脚本（节号） | 服务论文哪张表/图 |
 |---|---|---|
-| `data/instances/benchmark/<id>/<id>.txt` | 随仓库发布（原 `data/instance/competition/`，文件名未改） | 固定测试集；其中两个兼作验证集 |
+| `data/instances/benchmark/<id>/<id>.txt` | 随仓库发布 | 固定测试集；其中两个兼作验证集 |
 | `data/instances/{train,arrival,small}/<id>/{<id>.txt,params.yaml}`、`index.csv` | run_01（§4） | 训练池；到达模式档；精确求解 / 敏感性档；算例统计表 |
 | `data/instances/reference.csv`、`result/rules.csv` | run_06（§5） | 规则对比表（表 8）、到达 / small 档的规则列、所有 `gap` 的参考解 |
 | `result/<method>/run1/{train_metrics,curve,val_curve,log}.csv` | run_03–05（§5） | 图 7（`val_curve.csv`）、收敛曲线、模型选择记录 |
-| `result/<method>/run1/*.pt`、`config_snapshot.yaml`、`train_meta.yaml` | run_03–05 | 评测输入；复现记录（配置、后端、种子、提交、停止原因） |
-| `result/milp/milp_results.csv` | run_08（§5） | 附录精确求解表（`milp_small.tex`） |
+| `result/<method>/run1/config_snapshot.yaml`、`train_meta.yaml`（检查点 `*.pt` 不入库） | run_03–05 | 复现记录（配置、后端、种子、提交、停止原因） |
+| `result/milp/milp_results.csv` | run_08（§5） | 附录 A（`milp_small_compact.tex`） |
 | `result/eval_results.csv`、`incumbents.csv` | run_07（§6） | 表 7–11 的达成率与决策时间列；决策时间图 |
-| `result/sensitivity.csv` | run_10（§6） | 阈值敏感性表（`sensitivity.tex`） |
-| `result/integer_check.csv`、`stats_summary.csv`、`generalization.csv` | run_09（§7） | 意见 14 的机检；均值；新 5.x 节 |
-| `result/paired_tests.csv`、`friedman.csv`、`ablation_results.csv`、`advantage_table.csv`、`conv_<method>.csv` | run_09（§7） | 表 11；表 7；优势热力图；收敛曲线图 |
-| `paper_assets/figures/generated/*.pdf`、`paper_assets/tables/*.tex` | run_09（§7） | 论文图表成品（源脚本在 `paper_assets/figures/src/`、`paper_assets/scripts/`） |
-| `paper_assets/figures/legacy/*` | 原仓库成品图（不可再生成） | 原投稿的训练曲线图 |
+| `result/sensitivity.csv` | run_10（§6） | 表 12（`sensitivity.tex`） |
+| `result/integer_check.csv`、`stats_summary.csv`、`generalization.csv` | run_09（§7） | 整数一致性机检；均值；表 11 |
+| `result/paired_tests.csv`、`friedman.csv`、`ablation_results.csv`、`advantage_table.csv`、`conv_<method>.csv` | run_09（§7） | 表 10；表 7；优势热力图；收敛曲线 |
+| `paper_assets/figures/generated/*.pdf`、`paper_assets/tables/*.tex|csv` | run_09（§7） | 论文图表成品（源脚本在 `paper_assets/figures/src/`、`paper_assets/scripts/`） |
 
-## 附：原仓库命令的对应
-
-旧入口 `python agent/train.py` 仍可用（转发到根目录 `train.py`），旧 import 路径（`agent.HGHH_model`、
-`agent.PPO_model`、`agent.sci_rollout`、`agent.training_simulator`、`agent.visualization`、`compare.MLP_model`）
-保留为转发模块；旧 JSON 配置可用 `python train.py --config path/to/config.json` 直接加载。完整映射见
-`docs/migration-map.md`。
+`result/` 中已入库的记录是论文实验的记录；每个 run 的 `config_snapshot.yaml` 按运行当时的配置文件记录生效参数。

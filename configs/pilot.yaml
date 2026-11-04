@@ -1,10 +1,10 @@
 # Pilot experiment (scripts/run_02_pilot.py): optional training gate of the generalisation paradigm.
-# Disabled for the revision experiments (decision of 2026-10-30: the formal runs start directly; each method is
+# Disabled for the paper's experiments (: the formal runs start directly; each method is
 # trained once for the configured max_iterations with validation on the two benchmark validation instances).
 # When enabled, FSHGRL is trained once for max_iterations on the training pool; the verdict compares the best
 # validation epoch with the best deterministic rule on the validation instances (reference.csv from run_06):
 # PASS when the mean fulfilment is at least the rules' mean and the policy reaches the reference on at least
-# pilot.min_win_share (configs/runs.yaml) of the validation instances. Rounds are logged in docs/pilot-log.md.
+# pilot.min_win_share (configs/runs.yaml) of the validation instances. Rounds are reported in result/pilot/pilot-report.md.
 enabled: false
 methods: [ours]
 max_iterations: 1000

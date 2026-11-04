@@ -1,4 +1,4 @@
-"""Instance specification and parser (moved verbatim from agent/training_simulator.py)."""
+"""Instance specification and parser ."""
 from __future__ import annotations
 
 from dataclasses import dataclass

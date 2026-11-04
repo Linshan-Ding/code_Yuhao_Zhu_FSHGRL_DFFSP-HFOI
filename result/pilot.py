@@ -1,4 +1,4 @@
-"""Pilot-gate verdict (v2, generalisation paradigm; new code).
+"""Pilot-gate verdict (generalisation paradigm).
 
 The pilot trains the proposed method once for a reduced number of iterations on the training pool and
 compares its best validation evaluation with the best deterministic dispatching rule on the same validation

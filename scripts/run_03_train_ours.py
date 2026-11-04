@@ -1,11 +1,11 @@
 """Train the proposed method (FSHGRL: PPO + fluid features + fluid candidate mask + sparse HGNN policy).
-Generalization paradigm (configs/paper.yaml): N runs on the training pool (one pool instance per iteration),
+Generalization paradigm (the base configuration): N runs on the training pool (one pool instance per iteration),
 validation on the two benchmark validation instances every val_every iterations, products
 result/ours/run<k>/{train_metrics.csv,curve.csv,val_curve.csv,log.csv,best_val_checkpoint.pt,
 best_greedy_checkpoint.pt,last_checkpoint.pt,config_snapshot.yaml,train_meta.yaml}. POOLS maps the method id to
-its pool overlay (only the manuscript's training pool in this revision).
+its pool overlay (only the manuscript's training pool).
 Per-instance paradigm (legacy): every benchmark instance x N runs -> result/ours/<instance_id>/run<k>/.
-N = ours in configs/runs.yaml (1 in the revision: fixed seed 1, recorded). Interrupted runs resume from
+N = ours in configs/runs.yaml (1: fixed seed 1, recorded). Interrupted runs resume from
 last_checkpoint.pt; finished runs (train_meta.yaml present) are skipped."""
 from _bootstrap import (instance_ids, method_jobs, n_runs, paradigm, require_train_confirmed, resolve_workers,
                         run_jobs, step)

@@ -25,9 +25,9 @@ paper_assets/tables/ (FSHGRL_TABLE_DIR) from result/ (FSHGRL_RESULT_DIR):
                           per benchmark configuration (eval_results.csv, decode = sample);
 - generator_settings.tex  Table 5(a): the generator settings of the training pool (configs/instance.yaml);
 - milp_small_compact.tex  the nine-column layout of the MILP check used in the manuscript appendix.
-Every v2 table is also written as CSV next to the .tex file (same name) for the response letter.
+Every table is also written as CSV next to the .tex file (same name) for the response letter.
 The environment variable FSHGRL_EXCLUDE_METHODS (comma-separated method ids) leaves methods out of every table
-(the manuscript compares the five rules of the original submission; the released CSVs keep every method).
+(the manuscript compares the five dispatching rules of the paper; the CSVs of result/ keep every method).
 """
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ from result.stats import (ABLATION_METHODS, DETERMINISTIC_RULE_METHODS, DRL_METH
 RESULT = Path(os.environ.get("FSHGRL_RESULT_DIR", ROOT / "result"))          # redirected by run_00_smoke.py
 TABLES = Path(os.environ.get("FSHGRL_TABLE_DIR", ROOT / "paper_assets" / "tables"))
 INSTANCES = Path(os.environ.get("FSHGRL_INSTANCES_DIR", ROOT / "data" / "instances"))
-CONFIG_FILES = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml", "configs/paper.yaml"]
+CONFIG_FILES = ["configs/instance.yaml", "configs/env.yaml", "configs/algo.yaml"]
 PAIRED_TIER = "benchmark"
 
 
@@ -207,7 +207,7 @@ def wilcoxon() -> None:
     _write_csv("wilcoxon", table)
 
 
-# -- v2: zero-shot tiers ---------------------------------------------------------------------------------------
+# -- zero-shot tiers ---------------------------------------------------------------------------------------
 def generalization_tables(exclude: tuple = (PAIRED_TIER,)) -> None:
     """One table per evaluation tier other than the paired one: instances x methods (eta, run means), plus the
     tier mean; the methods are ordered FSHGRL, its pool variants, ablations, learned comparators, rules."""
@@ -229,7 +229,7 @@ def generalization_tables(exclude: tuple = (PAIRED_TIER,)) -> None:
         _write_csv(f"generalization_{tier}", pivot.reset_index())
 
 
-# -- v2: configuration and data tables -----------------------------------------------------------------------------
+# -- configuration and data tables -----------------------------------------------------------------------------
 def _load_config(files=CONFIG_FILES) -> dict:
     merged: dict = {}
 
@@ -579,7 +579,7 @@ def evaluation_statistics(method: str = "ours", tier: str = PAIRED_TIER) -> None
         "fluid_ms", "policy_ms", "obs_ms", "sim_ms")}
     required = ("candidate_pairs_mean", "masked_pairs_mean", "mask_fallback_rate", "decision_count", "infer_time_ms")
     if any(c not in num for c in required):
-        print("[SKIP] evaluation statistics need the v2 evaluation columns (candidate pairs, decisions, timing)")
+        print("[SKIP] evaluation statistics need the evaluation columns (candidate pairs, decisions, timing)")
         return
     before, after = num["candidate_pairs_mean"].mean(), num["masked_pairs_mean"].mean()
     per_decision = num["infer_time_ms"] / num["decision_count"].where(num["decision_count"] > 0)

@@ -8,12 +8,11 @@ venv/
 *.pt
 *.pth
 *.log
-result/*
-!result/__init__.py
-!result/*.py
-photo/
 .pytest_cache/
-tests/golden/_work/
-tests/golden_v2/_work/
-paper_assets/figures/generated/
-paper_assets/tables/*.tex
+# scratch outputs of the smoke test, the pilot gate, the tests and the profilers
+result/smoke/
+result/pilot/
+result/pilot_round*/
+result/test_generalization/
+result/parallel-log.md
+result/profile_*.csv

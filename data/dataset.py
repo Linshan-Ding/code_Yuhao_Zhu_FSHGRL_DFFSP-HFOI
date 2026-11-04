@@ -1,4 +1,4 @@
-"""Instance discovery and selection (moved verbatim from agent/sci_rollout.py)."""
+"""Instance discovery and selection ."""
 from __future__ import annotations
 
 import random

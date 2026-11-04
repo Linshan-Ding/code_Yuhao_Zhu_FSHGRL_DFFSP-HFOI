@@ -1,4 +1,4 @@
-"""Rollout buffer (moved verbatim from agent/sci_rollout.py)."""
+"""Rollout buffer ."""
 from __future__ import annotations
 
 import random
@@ -29,7 +29,7 @@ class RolloutBuffer:
     fluid_solve_seconds: float = 0.0
     fluid_cache_hit_count: int = 0
     fluid_fallback_count: int = 0
-    fluid_mask_fallback_count: int = 0        # v2 mask statistics (summed over the collected episodes)
+    fluid_mask_fallback_count: int = 0        # mask statistics (summed over the collected episodes)
     fluid_mask_unavailable_count: int = 0
     candidate_pairs_before: int = 0
     candidate_pairs_after: int = 0

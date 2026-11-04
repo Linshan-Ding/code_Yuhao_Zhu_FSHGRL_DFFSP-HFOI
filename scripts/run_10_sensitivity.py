@@ -1,4 +1,4 @@
-"""Mask-threshold sensitivity (reviewer comment 5) without retraining: the trained FSHGRL policy
+"""Mask-threshold sensitivity without retraining: the trained FSHGRL policy
 (result/ours/run1/best_val_checkpoint.pt) is evaluated on the small tier under evaluation-time mask settings
 epsilon_f in {off, 1e-5, 0.05, 0.1, 0.2} (configs/sensitivity/eps_<v>.yaml on top of the paper configuration),
 greedy + eval.sampled_episodes sampled episodes per instance, CPU single thread. The MILP optimum of

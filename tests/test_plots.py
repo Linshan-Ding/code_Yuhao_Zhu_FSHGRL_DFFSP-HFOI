@@ -94,8 +94,8 @@ def test_aggregate_writes_summary_tables(tmp_path):
     assert list(paired["comparator"]) == ["nf", "dqn", "spt"] and paired["p_holm"].between(0, 1).all()
 
 
-def test_revision_figures_from_synthetic_frames(tmp_path):
-    """The v2 revision figures: validation figure with and without the comparator panel, decision time per method,
+def test_paper_figures_from_synthetic_frames(tmp_path):
+    """The paper figures: validation figure with and without the comparator panel, decision time per method,
     single-panel log-time trade-off with labels or a legend, annotated paired gains, heat map with a mean column and
     the sensitivity figure."""
     frame = _eval_frame(["ours", "nf", "dqn", "spt"])

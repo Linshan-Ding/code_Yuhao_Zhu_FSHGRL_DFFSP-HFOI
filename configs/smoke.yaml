@@ -1,4 +1,4 @@
-# Smoke overlay (scripts/run_00_smoke.py), applied after configs/paper.yaml: 2 iterations x 2 environments on
+# Smoke overlay (scripts/run_00_smoke.py), applied after the default trio: 2 iterations x 2 environments on
 # three training-pool instances with validation on the two benchmark validation instances every iteration,
 # no Visdom, a checkpoint every iteration (tools/eval_curve.py can be exercised on the smoke run).
 instance:

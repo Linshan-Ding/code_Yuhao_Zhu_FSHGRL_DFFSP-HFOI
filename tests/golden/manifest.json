@@ -1,9 +1,0 @@
-{
-  "golden_commit": "c030dfa74edd1a3147fd2b92f87791d7dcdca710",
-  "python": "3.13.16",
-  "torch": "2.14.1+cu130",
-  "numpy": "2.5.3",
-  "gurobipy_available": false,
-  "instance": "DDT500_num50.txt",
-  "note": "generated on CPU with OMP/MKL threads pinned to 1; fluid LP falls back to the heuristic path"
-}

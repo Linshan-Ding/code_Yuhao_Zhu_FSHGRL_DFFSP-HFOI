@@ -1,4 +1,4 @@
-"""v2 fixes of docs/known-issues.md items 8 (future-order leakage), 9 (batch-dependent normalisation) and
+"""Fixes of docs/known-issues.md items 8 (future-order leakage), 9 (batch-dependent normalisation) and
 12 (silent remapping of invalid actions)."""
 from __future__ import annotations
 
