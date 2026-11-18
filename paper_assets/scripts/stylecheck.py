@@ -129,7 +129,7 @@ SUFFIX = r"(?:aware|driven|guided|enhanced|adaptive|based|oriented)"
 COMMON_ACRONYMS = {"PPO", "GNN", "GAT", "GCN", "DRL", "RL", "VRP", "TSP", "JSSP", "FJSP", "CVRP", "MDP",
                    "MLP", "CNN", "RNN", "LSTM", "LLM", "GPU", "CPU", "SOTA", "MIP", "MILP", "CP", "GA",
                    "SA", "PSO", "TS", "LKH", "HV", "IGD", "OOD", "API", "CI", "SGD", "KL", "GAE",
-                   "AM", "POMO", "OR", "AI", "ML", "DL", "NN", "SGD", "FIFO", "SPT", "MWKR", "LoRA"}
+                   "AM", "POMO", "OR", "AI", "ML", "DL", "NN", "SGD", "FIFO", "MWKR", "LoRA"}
 SUMMARY_TAIL = r"^(this|the proposed|our)\s+(design|approach|mechanism|strategy|scheme|framework|module)\s+(ensures|guarantees|enables|allows|makes)"
 # 30: obscure word -> what the field writes. Any word the venue corpus uses twice is allowed anyway.
 OBSCURE = {

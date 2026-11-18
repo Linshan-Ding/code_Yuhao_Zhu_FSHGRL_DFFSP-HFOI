@@ -35,10 +35,10 @@ METHOD_LABELS = {
     "ng": "FSHGRL-NG",          # point-wise MLP encoders instead of the heterogeneous graph
     "na": "FSHGRL-NA",          # no self-attention over the candidate pairs
     "hsddqn": "HSDDQN", "hgnn_ppo": "HGNN-PPO", "a2c": "A2C", "dqn": "DQN", "ddqn": "DDQN",
-    "fifo": "FIFO", "spt": "SPT", "mor": "MOR", "mwkr": "MWKR", "random": "Random", "rrc": "RRC",
+    "fifo": "FIFO", "mor": "MOR", "mwkr": "MWKR", "random": "Random", "rrc": "RRC",
 }
-RULE_METHODS = ("fifo", "spt", "mor", "mwkr", "random", "rrc")
-DETERMINISTIC_RULE_METHODS = ("fifo", "spt", "mor", "mwkr")
+RULE_METHODS = ("fifo", "mor", "mwkr", "random", "rrc")
+DETERMINISTIC_RULE_METHODS = ("fifo", "mor", "mwkr")
 DRL_METHODS = ("hsddqn", "hgnn_ppo", "a2c", "dqn", "ddqn")
 ABLATION_METHODS = ("nfe", "nm", "nf", "ng", "na")     # 2 x 2 fluid factor design + encoder + attention
 

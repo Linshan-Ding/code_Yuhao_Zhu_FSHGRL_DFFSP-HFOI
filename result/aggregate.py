@@ -46,17 +46,9 @@ SCRATCH_DIRS = {"smoke", "pilot", "rules", "sensitivity", "milp", "__pycache__"}
 
 
 def excluded_methods() -> set:
-    """Method ids left out of every product: the FSHGRL_EXCLUDE_METHODS environment variable when it is set,
-    otherwise ``exclude_methods`` of configs/runs.yaml (the paper's comparison set leaves out the SPT rule; the
-    excluded rows stay in the CSVs of result/)."""
-    if EXCLUDE_ENV in os.environ:
-        return {m.strip().lower() for m in os.environ[EXCLUDE_ENV].split(",") if m.strip()}
-    runs = ROOT / "configs" / "runs.yaml"
-    if not runs.exists():
-        return set()
-    import yaml
-    listed = (yaml.safe_load(runs.read_text(encoding="utf-8")) or {}).get("exclude_methods") or []
-    return {str(m).strip().lower() for m in listed if str(m).strip()}
+    """Method ids named in the FSHGRL_EXCLUDE_METHODS environment variable (empty by default): they are left
+    out of every product while their rows stay in the CSVs of result/."""
+    return {m.strip().lower() for m in os.environ.get(EXCLUDE_ENV, "").split(",") if m.strip()}
 
 
 def load_eval_results(path: Path, exclude=None) -> pd.DataFrame:

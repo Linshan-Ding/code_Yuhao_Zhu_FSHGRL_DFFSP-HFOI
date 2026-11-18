@@ -1,4 +1,4 @@
-"""Dispatching-rule baselines (FIFO, SPT, MOR, MWKR, Random, RRC) on every indexed tier except the training
+"""Dispatching-rule baselines (FIFO, MOR, MWKR, Random, RRC) on every indexed tier except the training
 pool (benchmark, val, arrival, ...), CPU only, and the reference solutions: result/rules/<rule>/eval_results.csv,
 result/rules.csv and data/instances/reference.csv (best deterministic rule per instance; the reference of every
 gap and of the pilot gate). Random / RRC get rules_random independent runs (configs/runs.yaml).

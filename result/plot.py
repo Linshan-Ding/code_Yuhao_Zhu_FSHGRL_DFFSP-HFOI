@@ -43,9 +43,8 @@ METHOD_STYLE = {
     "mwkr": (OI["vermilion"], "-.", "D"),
     "random": (OI["purple"], (0, (4, 1.5)), "x"),
     "rrc": (OI["sky"], (0, (3, 1, 1, 1)), "v"),
-    "spt": (OI["gray"], (0, (1, 1)), "+"),
 }
-RULE_LIKE = {"fifo", "mor", "mwkr", "random", "rrc", "spt"}       # drawn with hollow markers in scatter plots
+RULE_LIKE = {"fifo", "mor", "mwkr", "random", "rrc"}       # drawn with hollow markers in scatter plots
 
 
 def use_scifig(width_mm: float = 84, height_mm: float = 52) -> None:

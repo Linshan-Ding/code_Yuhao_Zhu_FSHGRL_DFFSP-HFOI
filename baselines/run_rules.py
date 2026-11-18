@@ -1,7 +1,7 @@
 """Dispatching-rule baselines on the benchmark instances, and the reference solutions (new code).
 
     python baselines/run_rules.py                         # all rules, all instances
-    python baselines/run_rules.py --rules fifo spt --instances DDT500_num50 --runs-random 3
+    python baselines/run_rules.py --rules fifo mor --instances DDT500_num50 --runs-random 3
 
 Outputs
 - result/rules/<rule>/eval_results.csv   one row per (instance, run) with the columns of eval.py

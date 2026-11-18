@@ -24,10 +24,9 @@ paper_assets/tables/ (FSHGRL_TABLE_DIR) from result/ (FSHGRL_RESULT_DIR):
 - sampled_decoding.tex    Appendix B: the sampled-decoding fulfilment (mean of 10 episodes) of every learned policy
                           per benchmark configuration (eval_results.csv, decode = sample);
 - generator_settings.tex  Table 5(a): the generator settings of the training pool (configs/instance.yaml);
-- milp_small_compact.tex  the nine-column layout of the MILP check used in the manuscript appendix.
-Every table is also written as CSV next to the .tex file (same name) for the response letter.
-The environment variable FSHGRL_EXCLUDE_METHODS (comma-separated method ids) leaves methods out of every table
-(the manuscript compares the five dispatching rules of the paper; the CSVs of result/ keep every method).
+- milp_small_compact.tex  the MILP check of the manuscript appendix (the paper's model only).
+Every table is also written as CSV next to the .tex file (same name).
+The environment variable FSHGRL_EXCLUDE_METHODS (comma-separated method ids) leaves methods out of every table.
 """
 from __future__ import annotations
 
