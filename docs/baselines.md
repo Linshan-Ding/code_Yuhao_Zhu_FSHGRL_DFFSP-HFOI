@@ -11,7 +11,7 @@ episode）与同一评测协议（`eval.py`：贪心 1 条 + 采样 10 条，验
 | `hgnn_ppo` | HGNN-PPO（柔性作业车间的异质图 PPO 调度器，song2022flexible 一系） | 异质图编码器 + (工序类型, 机器) 对动作 + PPO（本仓库编码器即源于此） | 无流体引导、无候选自注意力；订单维由 EDD 固定（`order_top_k: 1`），即原方法的 O–M 对动作空间 |
 | `a2c` | A2C | 同 FSHGRL 网络，蒙特卡洛回报，单步 actor-critic 更新 | 附加基线，不在论文表格中 |
 | `dqn` / `ddqn` | DQN / DDQN | 图编码器 + 候选 token 的标量 Q，ε-贪心 + 回放（DDQN：在线选择、目标评估） | 附加基线，不在论文表格中 |
-| `fifo` `spt` `mor` `mwkr` `random` `rrc` | 派工规则 | 与策略相同的候选集，确定性平局打破 | SPT 不在论文比较集（`configs/runs.yaml` `exclude_methods`） |
+| `fifo` `mor` `mwkr` `random` `rrc` | 派工规则 | 与策略相同的候选集，确定性平局打破 | `rrc` 每条 episode 从 `RRC_POOL`（FIFO、最短加工时间打分、MOR、MWKR，顺序固定）中随机抽一条；最短加工时间打分只在 RRC 内使用（`agent/baselines/rules.py`） |
 
 论文附录 B 说明两种学习型对比方法的改编范围。各方法的配置覆盖层在 `configs/baselines/*.yaml`，对比方法一律关闭流体引导
 （`fluid_features: off`、`fluid_mask: false`）。
