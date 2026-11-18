@@ -9,7 +9,7 @@ GPU 型号影响可忽略，每作业显存 0.3–0.4 GB。`result/` 中是论�
 | run_04 消融 | nfe、nm、nf、ng、na × 1 run | 5 | 7 / 7 / 9 / 11.5 / 7 h | 41.5 h |
 | run_05 对比方法 | hsddqn、hgnn_ppo × 1 run | 2 | 8 h | 16 h |
 | run_05 附加基线 | a2c、dqn、ddqn × 1 run（可从 `EXTRA` 删除） | 3 | 8 h | 24 h |
-| run_06 规则 | 6 条规则 × 33 个评测算例（Random/RRC 10 次） | 1 | 约 5 min（CPU） | 5 min |
+| run_06 规则 | 5 条规则 × 33 个评测算例（Random/RRC 10 次） | 1 | 约 5 min（CPU） | 5 min |
 | run_08 MILP | small 12 算例 × 两个变体 | 1 | 约 1 min（CPU，HiGHS；本机 24 次求解全部最优，单次 ≤ 2.6 s） | 1 min |
 | run_07 评测 | 8（+3）个检查点 × 33 算例 × 11 episode | 8–11 | 约 30 min（CPU） | 约 4–6 h（可并行） |
 | run_10 敏感性 | ours × 5 个阈值 × 12 算例 × 11 episode | 5 | 约 2 min（CPU） | 10 min |

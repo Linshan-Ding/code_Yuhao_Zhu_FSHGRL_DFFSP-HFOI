@@ -20,7 +20,7 @@ from result.aggregate import aggregate, generalization_table, integer_check, poi
 
 INSTANCES = {"benchmark": [("DDT500_num50", 50, 500), ("DDT900_num100", 100, 900), ("DDT1600_num150", 150, 1600)],
              "arrival": [("ARR3000_uniform_rho0.8_DDT900_num100", 100, 900), ("ARR3001_uniform_rho1.2_DDT900_num100", 100, 900)]}
-COMPLETED = {"ours": 0.8, "nf": 0.6, "hsddqn": 0.5, "spt": 0.7, "fifo": 0.65}       # share of on-time orders
+COMPLETED = {"ours": 0.8, "nf": 0.6, "hsddqn": 0.5, "mor": 0.7, "fifo": 0.65}       # share of on-time orders
 
 
 def _frame(sampled: int = 2) -> pd.DataFrame:
@@ -30,7 +30,7 @@ def _frame(sampled: int = 2) -> pd.DataFrame:
         for i, (iid, s, ddt) in enumerate(instances):
             for method, share in COMPLETED.items():
                 runs = 2 if method in ("ours", "nf") else 1
-                decodes = ["rule"] if method in ("spt", "fifo") else ["greedy"] + ["sample"] * sampled
+                decodes = ["rule"] if method in ("mor", "fifo") else ["greedy"] + ["sample"] * sampled
                 for run in range(runs):
                     for episode, decode in enumerate(decodes):
                         completed = int(round(share * s)) - i - run - (1 if decode == "sample" else 0) * episode
@@ -60,17 +60,17 @@ def test_excluded_methods_leave_every_product(tmp_path, monkeypatch):
     frame = _frame()
     eval_path = tmp_path / "eval_results.csv"
     frame.to_csv(eval_path, index=False)
-    monkeypatch.setenv("FSHGRL_EXCLUDE_METHODS", "spt, HSDDQN")
+    monkeypatch.setenv("FSHGRL_EXCLUDE_METHODS", "mor, HSDDQN")
     from result.aggregate import excluded_methods, load_eval_results
 
-    assert excluded_methods() == {"spt", "hsddqn"}
+    assert excluded_methods() == {"mor", "hsddqn"}
     loaded = load_eval_results(eval_path)
     assert set(loaded["method"]) == {"ours", "nf", "fifo"}
     written = aggregate(eval_path, tmp_path / "out", "ours")
     paired = pd.read_csv(written["paired_tests"])
     assert set(paired["comparator"]) == {"nf", "fifo"}
     generalization = pd.read_csv(written["generalization"])
-    assert "spt" not in set(generalization["method"]) and set(generalization["best_rule"]) == {"fifo"}
+    assert "mor" not in set(generalization["method"]) and set(generalization["best_rule"]) == {"fifo"}
     assert set(load_eval_results(eval_path, exclude=[])["method"]) == set(COMPLETED)   # explicit override
 
 
@@ -85,12 +85,12 @@ def test_generalization_table_summarises_every_tier():
     table = generalization_table(point_estimates(_frame()))
     assert set(table["tier"]) == {"benchmark", "arrival"}
     ours = table[(table["tier"] == "arrival") & (table["method"] == "ours")].iloc[0]
-    assert ours["K"] == 2 and ours["n_instances"] == 2 and ours["best_rule"] == "spt"
+    assert ours["K"] == 2 and ours["n_instances"] == 2 and ours["best_rule"] == "mor"
     assert ours["eta_mean"] == pytest.approx((0.8 * 100 - 0.5 + 0.8 * 100 - 1.5) / 2 / 100)
     assert ours["wins"] == 2 and ours["ties"] == 0 and ours["losses"] == 0 and ours["delta_pp"] > 0
     assert ours["completed_mean"] == pytest.approx((80 + 79 + 79 + 78) / 4)
-    spt = table[(table["tier"] == "arrival") & (table["method"] == "spt")].iloc[0]
-    assert spt["wins"] == "" and pd.isna(spt["delta_pp"])                            # the reference rule itself
+    mor = table[(table["tier"] == "arrival") & (table["method"] == "mor")].iloc[0]
+    assert mor["wins"] == "" and pd.isna(mor["delta_pp"])                            # the reference rule itself
     nf = table[(table["tier"] == "benchmark") & (table["method"] == "nf")].iloc[0]
     assert nf["losses"] == 3 and nf["delta_pp"] < 0
 
@@ -103,7 +103,7 @@ def test_aggregate_writes_the_products_and_pairs_on_the_benchmark_tier(tmp_path)
     assert {"integer_check", "generalization", "stats_summary", "paired_tests", "ablation_results"} <= set(written)
     paired = pd.read_csv(written["paired_tests"])
     assert (paired["n"] == 3).all()                                                   # benchmark instances only
-    assert set(paired["comparator"]) == {"nf", "hsddqn", "spt", "fifo"}
+    assert set(paired["comparator"]) == {"nf", "hsddqn", "mor", "fifo"}
     generalization = pd.read_csv(written["generalization"])
     assert len(generalization) == 2 * len(COMPLETED)
     frame.loc[frame.index[0], "fulfillment_rate"] = 0.3426
@@ -125,7 +125,7 @@ def test_make_tables_outputs(tmp_path, monkeypatch):
     result.mkdir()
     frame.to_csv(result / "eval_results.csv", index=False)
     aggregate(result / "eval_results.csv", result, "ours")
-    frame[frame["method"].isin(["spt", "fifo"])].to_csv(result / "rules.csv", index=False)
+    frame[frame["method"].isin(["mor", "fifo"])].to_csv(result / "rules.csv", index=False)
     (result / "milp").mkdir()
     pd.DataFrame([
         {"instance": "DDT500_num50", "tier": "tiny", "S": 4, "n_ops": 12, "n_binary": 64, "n_pairs": 36, "variant": "A",
@@ -146,7 +146,7 @@ def test_make_tables_outputs(tmp_path, monkeypatch):
             "generator_settings.tex", "generator_settings.csv"} <= names
     assert "generalization_benchmark.tex" not in names                                # the paired tier has its own tables
     arrival = (tables / "generalization_arrival.tex").read_text(encoding="utf-8")
-    assert "FSHGRL & FSHGRL-NF & HSDDQN & FIFO & SPT" in arrival and arrival.count("\\\\") == 1 + 2 + 1
+    assert "FSHGRL & FSHGRL-NF & HSDDQN & FIFO & MOR" in arrival and arrival.count("\\\\") == 1 + 2 + 1
     comparison = (tables / "comparison_pdr.tex").read_text(encoding="utf-8")
     assert comparison.count("\\\\") == 1 + 3 + 1                                           # header + 3 configurations + mean
     assert "time per decision (ms)" in comparison

@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from agent.baselines.rules import RULES, DETERMINISTIC_RULES, RulePolicy, run_rule_episode, select_candidate  # noqa: E402
+from agent.baselines.rules import RRC_POOL, RULES, DETERMINISTIC_RULES, RulePolicy, run_rule_episode, select_candidate  # noqa: E402
 from data.instance_io import parse_instance_file  # noqa: E402
 from rollout import run_episodes  # noqa: E402
 
@@ -31,10 +31,22 @@ CANDIDATES = [
 
 def test_rule_scores_follow_the_legacy_directions():
     assert select_candidate(CANDIDATES, "fifo")["arrival"] == 5.0           # earliest arrival
-    assert select_candidate(CANDIDATES, "spt")["p"] == 40.0                 # shortest processing time
+    assert select_candidate(CANDIDATES, "spt")["p"] == 40.0                 # shortest processing time (RRC pool only)
     chosen = select_candidate(CANDIDATES, "mor")                            # most remaining operations ...
     assert chosen["rem_ops"] == 5 and chosen["machine"] == 1                # ... tie -> shorter p
     assert select_candidate(CANDIDATES, "mwkr")["rem_work"] == 400.0
+
+
+def test_rrc_pool_and_the_comparator_rules():
+    """RRC draws from four scores in a fixed order; the shortest-processing-time score is not a comparator."""
+    assert RRC_POOL == ("fifo", "spt", "mor", "mwkr")
+    assert DETERMINISTIC_RULES == ("fifo", "mor", "mwkr") and "spt" not in RULES
+    try:
+        RulePolicy("spt")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("spt must not be accepted as a comparator rule")
 
 
 def test_tie_breaking_is_independent_of_enumeration_order():

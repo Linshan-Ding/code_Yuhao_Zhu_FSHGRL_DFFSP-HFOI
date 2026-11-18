@@ -3,7 +3,7 @@
 | 论文结论 | 数据文件 / 脚本 | 复核结论 |
 |---|---|---|
 | FSHGRL 在 15 个未见基准配置上高于消融变体（表 7、图 8） | `result/ablation_results.csv`、`result/paired_tests.csv` | **成立**（单次训练）：贪心均值 0.480 对 NFe 0.426 / NM 0.431 / NF 0.427 / NG 0.398 / NA 0.439；W/T/L 10/3/2 到 13/1/1，Holm p ≤ 0.0154 |
-| FSHGRL 高于论文比较的五条规则 FIFO/MOR/MWKR/Random/RRC（表 8） | `paper_assets/tables/comparison_pdr.tex`、`result/paired_tests.csv` | **成立**：0.480 对 0.385 / 0.347 / 0.284 / 0.266 / 0.416，W/T/L 13/1/1 到 15/0/0，Holm p ≤ 0.0022。事实记录：评测记录中的 SPT（0.531）在 13/15 个配置高于 FSHGRL，不在论文比较集（`result/rules.csv`，`configs/runs.yaml` `exclude_methods`） |
+| FSHGRL 高于论文比较的五条规则 FIFO/MOR/MWKR/Random/RRC（表 8） | `paper_assets/tables/comparison_pdr.tex`、`result/paired_tests.csv` | **成立**：0.480 对 0.385 / 0.347 / 0.284 / 0.266 / 0.416，W/T/L 13/1/1 到 15/0/0，Holm p ≤ 0.0022 |
 | FSHGRL 高于 DRL 对比方法（表 9、附录 B） | `paper_assets/tables/comparison_drl.tex` | **成立**：0.480 对 HSDDQN 0.377（15/0/0）、HGNN-PPO 0.416（12/1/2），Holm p ≤ 0.0116；A2C/DQN/DDQN 未运行 |
 | 配对 Wilcoxon（表 10） | `paper_assets/tables/wilcoxon.tex`、`result/friedman.csv` | **成立**：12 个比较对象 Holm 校正后全部 p < 0.05（家族 = 12，单策略 × 15 配置）；Friedman χ² = 97.1，FSHGRL 平均秩 2.40 |
 | 决策时间（表 8/9 的 time 列、图 9、图 10） | `result/generalization.csv`、`paper_assets/tables/evaluation_statistics.csv` | 已测：FSHGRL 13.5 ms/决策（含 LP，LP 占 9.4%），DRL 对比 10.3–10.7 ms，规则 0.6 ms（CPU 单线程） |

@@ -18,7 +18,7 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
 
 **问题**：高频插单柔性流水车间（DFFSP-HFOI）。订单按到达时间动态进入，每个订单有交期；目标是**最大化订单按时达成率**
 `eta = N_c / S`（N_c 为整条 episode 结束时按期完成的订单数，S 为订单总数，丢弃订单计入分母）。实验契约文件统一用
-**最小化**的目标值 `obj = 1 - eta`，`gap` 以各算例最优确定性规则为参考解（`data/instances/reference.csv`）。
+**最小化**的目标值 `obj = 1 - eta`，`gap` 以各算例最优确定性规则（FIFO、MOR、MWKR）为参考解（`data/instances/reference.csv`）。
 
 **MDP**（`environment/simulator.py`，NumPy 离散事件仿真）：
 - 决策点：出现"空闲机器 + 该机器所属工序有等待订单"时；候选动作 = 合法 (机器, 工序类型) 对 × 该工序类型按交期排序的前
@@ -46,7 +46,7 @@ Scheduling Problem with High-Frequency Order Insertion*（FSHGRL）。本仓库�
 | `ng`、`na` | 逐节点 MLP 编码器替代图编码 / 去候选自注意力 | `configs/ablation/{ng,no_sparse_attn}.yaml` | |
 | `hsddqn`、`hgnn_ppo` | 层级 Double DQN（改编）、HGNN-PPO (adapted) | `configs/baselines/{hsddqn,hgnn_ppo}.yaml` | 流体引导关闭，`docs/baselines.md` |
 | `a2c`、`dqn`、`ddqn` | 附加学习型基线 | `configs/baselines/*.yaml` | 可省（`run_05` 的 `EXTRA`），不在论文表格中 |
-| `fifo` `spt` `mor` `mwkr` `random` `rrc` | 调度规则 | `baselines/run_rules.py` | 与策略相同的候选集；论文比较集不含 SPT（`configs/runs.yaml` `exclude_methods`） |
+| `fifo` `mor` `mwkr` `random` `rrc` | 调度规则 | `baselines/run_rules.py` | 与策略相同的候选集；RRC 每条 episode 从 FIFO、MOR、MWKR 与最短加工时间打分中随机抽一条 |
 | MILP | 论文 3.2 节的模型（另含可放弃变体的核对） | `baselines/milp_exact.py` | small 档精确求解 |
 | ours @ ε_f | 剪枝阈值敏感性（评测期，不重训） | `configs/sensitivity/*.yaml` | `scripts/run_10` |
 
@@ -153,8 +153,7 @@ masked_pairs_mean, mask_fallback_rate, ddt, checkpoint, checkpoint_iteration`；
 python scripts/run_09_aggregate_stats.py
 ```
 
-聚合默认使用论文的比较集：`configs/runs.yaml` 的 `exclude_methods: [spt]` 把 SPT 留在表格、检验与图之外，它的记录仍在
-`result/rules/spt/` 与 `result/eval_results.csv`；环境变量 `FSHGRL_EXCLUDE_METHODS` 可覆盖（空串 = 全部方法）。
+环境变量 `FSHGRL_EXCLUDE_METHODS`（逗号分隔的方法 id）可把方法留在表格、检验与图之外，它们的记录仍在 `result/`；默认为空。
 
 产物：`result/integer_check.csv`（每 (算例, 方法, 解码) 组 S × episode 数 × 平均 η 必为按期订单数，违反即中止）、
 `result/stats_summary.csv`、`result/generalization.csv`（方法 × 档位：η 均值、`completed_mean`、每决策时间、最优确定性规则与

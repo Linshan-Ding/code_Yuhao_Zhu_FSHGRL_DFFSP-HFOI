@@ -35,7 +35,7 @@ def test_generated_instance_is_reproducible_and_parsable(tmp_path):
     assert gaps.min() >= 1 and gaps.max() <= 40 and spec.arrival_times.min() == 1
     params = yaml.safe_load((path.parent / "params.yaml").read_text(encoding="utf-8"))
     assert params["ddt"] == first["ddt"] and params["seed"] == 3 and params["slack_rule"] == "ddt_uniform"
-    record = run_rule_episode(RulePolicy("spt"), spec, {"order_top_k": 5, "fluid_mode": "off"})
+    record = run_rule_episode(RulePolicy("mor"), spec, {"order_top_k": 5, "fluid_mode": "off"})
     assert record["completed"] + record["discarded"] == 30
 
 

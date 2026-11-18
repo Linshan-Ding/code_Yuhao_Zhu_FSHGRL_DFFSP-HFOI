@@ -3,7 +3,7 @@
 ## 0. 问题、范式与声明
 
 - 问题：DFFSP-HFOI，最大化订单按时达成率 `eta = N_c / S`（N_c 为整条 episode 结束时按期完成的订单数，S 为订单总数，丢弃订单计入分母）；
-  契约目标值 `obj = 1 - eta`（最小化），`gap` 以各算例最优确定性规则为参考（`data/instances/reference.csv`）。
+  契约目标值 `obj = 1 - eta`（最小化），`gap` 以各算例最优确定性规则（FIFO、MOR、MWKR）为参考（`data/instances/reference.csv`）。
 - 训练范式：**泛化型（generalization）**。每个方法只训练**一个**策略（1 run，固定种子 1 并记录）：1000 轮，第 k 轮用训练池的第 k 个
   生成算例（每个算例恰用一次，即论文"每个 epoch 一个新算例"），每轮 8 条完整 episode 后一次 PPO 更新。测试集是训练中从未见过的
   15 个基准算例与 6 个到达模式算例；所有表格报告未见算例上的零样本结果。
@@ -29,8 +29,8 @@ DDT∈{500,900,1500}。每个算例的 `params.yaml` 记录到达、松弛、负
 | nfe、nm、nf、ng、na | 各 1 | 同上 | `configs/ablation/*.yaml` |
 | hsddqn、hgnn_ppo | 各 1 | 同上（流体引导关闭） | `configs/baselines/{hsddqn,hgnn_ppo}.yaml` |
 | a2c、dqn、ddqn（附加，可省） | 各 1 | 同上 | `configs/baselines/*.yaml` |
-| fifo、spt、mor、mwkr | 1（确定性） | benchmark, arrival, small | `baselines/run_rules.py`（SPT 不在论文比较集） |
-| random、rrc | 10 | 同上 | 同上 |
+| fifo、mor、mwkr | 1（确定性） | benchmark, arrival, small | `baselines/run_rules.py` |
+| random、rrc | 10 | 同上 | 同上（RRC 的抽取池含最短加工时间打分，见 `docs/baselines.md`） |
 | MILP（论文模型与可放弃变体） | — | small | `baselines/milp_exact.py` |
 | ours @ ε_f ∈ {off, 1e-5, 0.05, 0.1, 0.2} | 评测（不重训） | small | `scripts/run_10_sensitivity.py` |
 

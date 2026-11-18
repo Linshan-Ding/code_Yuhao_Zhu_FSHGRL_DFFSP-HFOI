@@ -88,8 +88,6 @@ python scripts/run_10_sensitivity.py
 
 ## 7. 聚合与出表（`python scripts/run_09_aggregate_stats.py`）
 
-聚合默认用论文的比较集（`configs/runs.yaml` `exclude_methods: [spt]`）；SPT 的记录仍在 `result/`。
-
 | 产物 | 内容 | 论文 |
 |---|---|---|
 | `result/integer_check.csv` | 每 (算例, 方法, 解码) 组 S × episode 数 × 平均 η 为整数，违反即中止 | 表格值 S·η 为整数的机检 |

@@ -8,13 +8,13 @@ Candidate set: the simulator's eligible (machine, operation-type) pairs x the ``
 waiting orders of that operation type (set ``env.order_top_k: 0`` to score the whole queue). Scores:
 
     FIFO   -arrival time of the order                      (earliest arrival first)
-    SPT    -processing time of (product, machine)          (shortest processing time first)
     MOR    +remaining operations of the order              (stage_count - stage, current stage included)
     MWKR   +remaining work of the order                    (sum over the remaining stages of the mean
                                                             processing time of the product on that stage)
     random uniform choice among the candidates (private RNG)
-    rrc    random rule choice: one of the four deterministic rules drawn per episode (``rrc_mode="episode"``,
-           default) or per decision (``"step"``)
+    rrc    random rule choice: one score of RRC_POOL drawn per episode (``rrc_mode="episode"``, default) or per
+           decision (``"step"``); the pool holds FIFO, MOR, MWKR and the shortest-processing-time score
+           (-processing time of (product, machine)), which is used only inside RRC
 
 Ties are broken deterministically by (earlier due date, shorter processing time, lower machine index, lower
 operation-type index, lower queue rank), so the chosen action does not depend on the enumeration order.
@@ -30,7 +30,8 @@ import numpy as np
 from environment.simulator import TrainingSimulator
 from rollout import _episode_record
 
-DETERMINISTIC_RULES = ("fifo", "spt", "mor", "mwkr")
+DETERMINISTIC_RULES = ("fifo", "mor", "mwkr")
+RRC_POOL = ("fifo", "spt", "mor", "mwkr")          # scores drawn by RRC (order fixed: it determines the draws)
 STOCHASTIC_RULES = ("random", "rrc")
 RULES = DETERMINISTIC_RULES + STOCHASTIC_RULES
 
@@ -74,7 +75,7 @@ def enumerate_candidates(simulator: TrainingSimulator, mean_work: np.ndarray) ->
 def rule_score(candidate: dict, rule: str) -> float:
     if rule == "fifo":
         return -candidate["arrival"]
-    if rule == "spt":
+    if rule == "spt":                    # shortest processing time, a score of RRC_POOL only
         return -candidate["p"]
     if rule == "mor":
         return float(candidate["rem_ops"])
@@ -106,7 +107,7 @@ class RulePolicy:
     def start_episode(self, spec) -> None:
         self._mean_work = mean_stage_process_times(spec)
         if self.rule == "rrc" and self.rrc_mode == "episode":
-            self.active_rule = self.rng.choice(DETERMINISTIC_RULES)
+            self.active_rule = self.rng.choice(RRC_POOL)
 
     def choose(self, candidates: List[dict]) -> dict:
         if not candidates:
@@ -114,7 +115,7 @@ class RulePolicy:
         if self.rule == "random":
             return self.rng.choice(candidates)
         if self.rule == "rrc" and self.rrc_mode == "step":
-            self.active_rule = self.rng.choice(DETERMINISTIC_RULES)
+            self.active_rule = self.rng.choice(RRC_POOL)
         return select_candidate(candidates, self.active_rule)
 
     def act(self, simulator: TrainingSimulator) -> Tuple[int, int] | None:
